@@ -20,6 +20,9 @@ class BaseTests(unittest.TestCase):
         return dict(STR_VAR='bar',
                     INT_VAR='42',
                     FLOAT_VAR='33.3',
+                    FLOAT_COMMA_VAR='33,3',
+                    FLOAT_STRANGE_VAR1='123,420,333.3',
+                    FLOAT_STRANGE_VAR2='123.420.333,3',
                     BOOL_TRUE_VAR='1',
                     BOOL_TRUE_VAR2='True',
                     BOOL_FALSE_VAR='0',
@@ -74,6 +77,10 @@ class EnvTests(BaseTests):
     def test_float(self):
         self.assertTypeAndValue(float, 33.3, self.env('FLOAT_VAR', cast=float))
         self.assertTypeAndValue(float, 33.3, self.env.float('FLOAT_VAR'))
+
+        self.assertTypeAndValue(float, 33.3, self.env('FLOAT_COMMA_VAR', cast=float))
+        self.assertTypeAndValue(float, 123420333.3, self.env('FLOAT_STRANGE_VAR1', cast=float))
+        self.assertTypeAndValue(float, 123420333.3, self.env('FLOAT_STRANGE_VAR2', cast=float))
 
     def test_bool_true(self):
         self.assertTypeAndValue(bool, True, self.env('BOOL_TRUE_VAR', cast=bool))

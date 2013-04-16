@@ -218,6 +218,16 @@ class Env(object):
             value = dict([val.split('=') for val in value.split(',') if val])
         elif cast is list:
             value = [x for x in value.split(',') if x]
+        elif cast is float:
+            # clean string
+            float_str = re.sub(r'[^\d,\.]', '', value)
+            # split for avoid thousand separator and different locale comma/dot symbol
+            parts = re.split(r'[,\.]', float_str)
+            if len(parts) == 1:
+                float_str = parts[0]
+            else:
+                float_str = "{0}.{1}".format(''.join(parts[0:-1]), parts[-1])
+            value = float(float_str)
         else:
             value = cast(value)
         return value
