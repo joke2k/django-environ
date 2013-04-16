@@ -87,6 +87,21 @@ Tests
     $ cd django-environ/
     $ python setup.py test
 
+
+Changelog
+---------
+
+=== 0.2 (2013-04-16) ===
+
+  * environ/environ.py, environ/test.py, environ/test_env.txt: add advanced
+    float parsing (comma and dot symbols to separate thousands and decimals)
+
+  * README.rst, docs/index.rst: fix TYPO in documentation
+
+=== 0.1 (2013-04-02) ===
+
+  * initial release
+
 Credits
 -------
 

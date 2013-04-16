@@ -35,7 +35,7 @@ except ImportError:
 
 
 __author__ = 'joke2k'
-__version__ = (0, 1)
+__version__ = (0, 2)
 
 
 class Env(object):
