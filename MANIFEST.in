@@ -1,3 +1,2 @@
 include README.rst
-include NEWS.txt
 include environ/test_env.txt
