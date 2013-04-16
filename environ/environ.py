@@ -77,11 +77,11 @@ class Env(object):
 
             if has_default:
                 if not cast:
-                    cast = var_info[0]
+                    cast = var_info[1]
 
                 if default is self.NOTSET:
                     try:
-                        default = var_info[1]
+                        default = var_info[0]
                     except IndexError:
                         pass
             else:
