@@ -55,6 +55,12 @@ After::
 
     SECRET_KEY = env('SECRET_KEY') # Raises ImproperlyConfigured exception if SECRET_KEY not in os.environ
 
+How to install
+--------------
+
+::
+    $ pip install django-environ
+
 
 DevMode
 -------
@@ -90,6 +96,10 @@ Tests
 
 Changelog
 ---------
+
+=== 0.2.1 (2013-04-19) ===
+
+  * environ/environ.py: Env.__call__ now uses Env.get_value instance method
 
 === 0.2 (2013-04-16) ===
 

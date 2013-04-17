@@ -9,3 +9,5 @@ develop-eggs
 tmp
 build
 dist
+
+docs/_build

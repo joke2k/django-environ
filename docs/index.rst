@@ -3,6 +3,18 @@ Welcome to Django-environ's documentation!
 
 ..  automodule:: environ.environ
 
+This module is a merge of:
+
+* https://github.com/rconradharris/envparse
+* https://github.com/kennethreitz/dj-database-url
+* https://github.com/nickstenning/honcho
+
+and inspired by:
+
+* http://www.12factor.net/
+* http://www.wellfireinteractive.com/blog/easier-12-factor-django/
+* https://django.2scoops.org (book)
+
 This is your `settings.py` file before you have installed **django-environ**::
 
     import os
@@ -56,6 +68,11 @@ After::
 
     SECRET_KEY = env('SECRET_KEY') # Raises ImproperlyConfigured exception if SECRET_KEY not in os.environ
 
+How to install
+--------------
+::
+
+    pip install django-environ
 
 DevMode
 -------

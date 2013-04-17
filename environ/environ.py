@@ -1,19 +1,6 @@
 """
 Django-environ allows you to utilize 12factor inspired environment
 variables to configure your Django application.
-
-This module is a merge of:
-
-* https://github.com/rconradharris/envparse
-* https://github.com/kennethreitz/dj-database-url
-* https://github.com/nickstenning/honcho
-
-and inspired by:
-
-* http://www.12factor.net/
-* http://www.wellfireinteractive.com/blog/easier-12-factor-django/
-* https://django.2scoops.org (book)
-
 """
 import os
 import re
@@ -35,7 +22,7 @@ except ImportError:
 
 
 __author__ = 'joke2k'
-__version__ = (0, 2)
+__version__ = (0, 2, 1)
 
 
 class Env(object):
