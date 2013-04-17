@@ -66,28 +66,6 @@ class Env(object):
         self.schema = schema
 
     def __call__(self, var, cast=None, default=NOTSET):
-        """Pulled from Envparse."""
-        if var in self.schema:
-            var_info = self.schema[var]
-
-            try:
-                has_default = len(var_info) == 2
-            except TypeError:
-                has_default = False
-
-            if has_default:
-                if not cast:
-                    cast = var_info[0]
-
-                if default is self.NOTSET:
-                    try:
-                        default = var_info[1]
-                    except IndexError:
-                        pass
-            else:
-                if not cast:
-                    cast = var_info
-
         return self.get_value(var, cast=cast, default=default)
 
     # Shortcuts
@@ -152,10 +130,7 @@ class Env(object):
         """
         return Path(self.get_value(var, default=default), **kwargs)
 
-    # Class and static methods
-
-    @classmethod
-    def get_value(cls, var, cast=None, default=NOTSET):
+    def get_value(self, var, cast=None, default=NOTSET):
         """Return value for given environment variable.
 
         :param var: Name of variable.
@@ -167,10 +142,31 @@ class Env(object):
 
         logger.debug("get '{0}' casted as '{1}' with default '{2}'".format(var, cast, default))
 
+        if var in self.schema:
+            var_info = self.schema[var]
+
+            try:
+                has_default = len(var_info) == 2
+            except TypeError:
+                has_default = False
+
+            if has_default:
+                if not cast:
+                    cast = var_info[0]
+
+                if default is self.NOTSET:
+                    try:
+                        default = var_info[1]
+                    except IndexError:
+                        pass
+            else:
+                if not cast:
+                    cast = var_info
+
         try:
             value = os.environ[var]
         except KeyError:
-            if default is cls.NOTSET:
+            if default is self.NOTSET:
                 error_msg = "Set the {0} environment variable".format(var)
                 raise ImproperlyConfigured(error_msg)
 
@@ -179,13 +175,15 @@ class Env(object):
         # Resolve any proxied values
         if hasattr(value, 'startswith') and value.startswith('$'):
             value = value.lstrip('$')
-            value = cls.get_value(value, cast=cast, default=default)
+            value = self.get_value(value, cast=cast, default=default)
 
         # Don't cast if we're returning a default value
         if value != default:
-            value = cls.parse_value(value, cast)
+            value = self.parse_value(value, cast)
 
         return value
+
+    # Class and static methods
 
     @classmethod
     def parse_value(cls, value, cast):
@@ -263,7 +261,7 @@ class Env(object):
             'PASSWORD': url.password,
             'HOST': url.hostname,
             'PORT': url.port,
-            })
+        })
 
         # Update with kwargs configuration.
         config.update(overrides)
