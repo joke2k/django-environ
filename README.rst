@@ -1,6 +1,8 @@
 Django-environ
 ==============
 
+.. image:: https://travis-ci.org/joke2k/djang-environ.svg?branch=master   :target: https://travis-ci.org/joke2k/django-environ
+
 Django-environ allows you to utilize 12factor inspired environment variables to configure your Django application.
 This is your `settings.py` file before you have installed **django-envronment**::
 
