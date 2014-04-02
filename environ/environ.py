@@ -2,7 +2,9 @@
 Django-environ allows you to utilize 12factor inspired environment
 variables to configure your Django application.
 """
+from __future__ import unicode_literals
 import os
+import sys
 import re
 import json
 
@@ -19,6 +21,13 @@ try:
     import urlparse
 except ImportError:
     import urllib.parse as urlparse
+
+
+if sys.version < '3':
+    text_type = unicode
+else:
+    text_type = str
+    basestring = str
 
 
 __author__ = 'joke2k'
@@ -189,10 +198,10 @@ class Env(object):
             except ValueError:
                 value = value.lower() in cls.BOOLEAN_TRUE_STRINGS
         elif isinstance(cast, list):
-            value = map(cast[0], [x for x in value.split(',') if x])
+            value = list(map(cast[0], [x for x in value.split(',') if x]))
         elif isinstance(cast, dict):
-            key_cast = cast.get('key', str)
-            value_cast = cast.get('value', str)
+            key_cast = cast.get('key', text_type)
+            value_cast = cast.get('value', text_type)
             value_cast_by_key = cast.get('cast', dict())
             value = dict(map(
                 lambda kv: (key_cast(kv[0]), cls.parse_value(kv[1], value_cast_by_key.get(kv[0], value_cast))),
@@ -285,7 +294,7 @@ class Env(object):
                 m3 = re.match(r'\A"(.*)"\Z', val)
                 if m3:
                     val = re.sub(r'\\(.)', r'\1', m3.group(1))
-                os.environ.setdefault(key, val)
+                os.environ.setdefault(key, text_type(val))
 
         # set defaults
         for key, value in overrides.items():
@@ -371,7 +380,7 @@ class Path(object):
     def __sub__(self, other):
         if isinstance(other, int):
             return self.path('../' * other)
-        raise TypeError("unsupported operand type(s) for -: 'str' and '{0}'".format(other.__class__.__name__))
+        raise TypeError("unsupported operand type(s) for -: '{1}' and '{0}'".format(other.__class__.__name__, type(other)))
 
     def __invert__(self):
         return self.path('..')
