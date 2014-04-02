@@ -10,6 +10,7 @@ class BaseTests(unittest.TestCase):
     URL = 'http://www.google.com/'
     POSTGRES = 'postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
     MYSQL = 'mysql://bea6eb025ca0d8:69772142@us-cdbr-east.cleardb.com/heroku_97681db3eff7580?reconnect=true'
+    MYSQLGIS = 'mysqlgis://user:password@127.0.0.1/some_database'
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
     JSON = dict(one='bar', two=2, three=33.44)
     DICT = dict(foo='bar', test='on')
@@ -34,6 +35,7 @@ class BaseTests(unittest.TestCase):
                     DICT_VAR='foo=bar,test=on',
                     DATABASE_URL=cls.POSTGRES,
                     DATABASE_MYSQL_URL=cls.MYSQL,
+                    DATABASE_MYSQL_GIS_URL=cls.MYSQLGIS,
                     DATABASE_SQLITE_URL=cls.SQLITE,
                     URL_VAR=cls.URL,
                     JSON_VAR=json.dumps(cls.JSON),
@@ -141,6 +143,14 @@ class EnvTests(BaseTests):
         self.assertEqual(mysql_config['USER'], 'bea6eb025ca0d8')
         self.assertEqual(mysql_config['PASSWORD'], '69772142')
         self.assertEqual(mysql_config['PORT'], None)
+        
+        mysql_gis_config = self.env.db('DATABASE_MYSQL_GIS_URL')
+        self.assertEqual(mysql_gis_config['ENGINE'], 'django.contrib.gis.db.backends.mysql')
+        self.assertEqual(mysql_gis_config['NAME'], 'some_database')
+        self.assertEqual(mysql_gis_config['HOST'], '127.0.0.1')
+        self.assertEqual(mysql_gis_config['USER'], 'user')
+        self.assertEqual(mysql_gis_config['PASSWORD'], 'password')
+        self.assertEqual(mysql_gis_config['PORT'], None)
 
         sqlite_config = self.env.db('DATABASE_SQLITE_URL')
         self.assertEqual(sqlite_config['ENGINE'], 'django.db.backends.sqlite3')

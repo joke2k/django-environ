@@ -59,8 +59,17 @@ How to install
 --------------
 
 ::
+
     $ pip install django-environ
 
+Supported Databases
+-------------------
+
+-  PostgreSQL: postgres:// or postgresql://
+-  PostGIS: postgis://
+-  MySQL: mysql://
+-  MySQL for GeoDjango: mysqlgis://
+-  SQLITE: sqlite://
 
 DevMode
 -------

@@ -45,7 +45,7 @@ class Env(object):
         'postgresql': 'django.db.backends.postgresql_psycopg2',
         'postgis': 'django.contrib.gis.db.backends.postgis',
         'mysql': 'django.db.backends.mysql',
-        'mysql2': 'django.db.backends.mysql',
+        'mysqlgis': 'django.contrib.gis.db.backends.mysql',
         'sqlite': 'django.db.backends.sqlite3'
     }
 
