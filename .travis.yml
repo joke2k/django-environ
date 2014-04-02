@@ -16,7 +16,7 @@ branches:
  only:
   - master
   - develop
-script: coverage run manage.py test environ
+script: coverage run --source=environ setup.py test
 matrix:
   exclude:
     - python: "3.3"
