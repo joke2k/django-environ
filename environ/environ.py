@@ -20,9 +20,10 @@ except ImportError:
         pass
 
 try:
-    import urlparse
-except ImportError:
     import urllib.parse as urlparse
+except ImportError:
+    # Python <= 2.6
+    import urlparse
 
 
 if sys.version < '3':
@@ -583,7 +584,10 @@ class Path(object):
             raise ImproperlyConfigured("Create required path: {0}".format(absolute_path))
         return absolute_path
 
+def register_scheme(scheme):
+    for method in filter(lambda s: s.startswith('uses_'), dir(urlparse)):
+        getattr(urlparse, method).append(scheme)
 
 # Register database and cache schemes in URLs.
-for schema in Env.DB_SCHEMES.keys() + Env.CACHE_SCHEMES.keys() + Env.EMAIL_SCHEMES.keys():
-    urlparse.uses_netloc.append(schema)
+for schema in list(Env.DB_SCHEMES.keys()) + list(Env.CACHE_SCHEMES.keys()) + list(Env.EMAIL_SCHEMES.keys()):
+    register_scheme(schema)
