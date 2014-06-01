@@ -169,6 +169,12 @@ class Env(object):
         """
         return self.cache_url_config(self.url(var, default=default), backend=backend)
 
+    def email(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
+        """Returns a config dictionary, defaulting to EMAIL_URL.
+        :rtype: dict
+        """
+        return self.email_url_config(self.url(var, default=default), backend=backend)
+
     def path(self, var, default=NOTSET, **kwargs):
         """
         :rtype: Path
