@@ -1,10 +1,19 @@
 Django-environ
 ==============
 
-.. image:: https://travis-ci.org/joke2k/djang-environ.svg?branch=master   :target: https://travis-ci.org/joke2k/django-environ
-
 Django-environ allows you to utilize 12factor inspired environment variables to configure your Django application.
-This is your `settings.py` file before you have installed **django-envronment**::
+
+
+.. image:: https://travis-ci.org/joke2k/djang-environ.svg?branch=master   :target: https://travis-ci.org/joke2k/django-environ
+.. image:: https://coveralls.io/repos/joke2k/djang-environ/badge.png?branch=master   :target: https://coveralls.io/r/joke2k/django-environ?branch=master
+.. image:: https://badge.fury.io/py/django-environ.png   :target: http://badge.fury.io/py/django-environ
+.. image:: https://pypip.in/d/django-environ/badge.png   :target: https://crate.io/packages/django-environ
+
+
+
+This is your `settings.py` file before you have installed **django-environ**
+
+::
 
     import os
     SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -18,7 +27,7 @@ This is your `settings.py` file before you have installed **django-envronment**:
             'NAME': 'database',
             'USER': 'user',
             'PASSWORD': 'githubbedpassword',
-            'HOST': '123.123.123.123',
+            'HOST': '127.0.0.1',
             'PORT': '8458',
         }
         'extra': {
@@ -34,6 +43,23 @@ This is your `settings.py` file before you have installed **django-envronment**:
 
     SECRET_KEY = '...im incredibly still here...'
 
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': [
+                '127.0.0.1:11211', '127.0.0.1:11212', '127.0.0.1:11213',
+            ]
+        },
+        'redis': {
+            'BACKEND': 'redis_cache.cache.RedisCache',
+            'LOCATION': '127.0.0.1:6379:1',
+            'OPTIONS': {
+                'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+                'PASSWORD': 'redis-githubbed-password',
+            }
+        }
+    }
+
 After::
 
     import environ
@@ -47,15 +73,39 @@ After::
 
     DATABASES = {
         'default': env.db(), # Raises ImproperlyConfigured exception if DATABASE_URL not in os.environ
-        'extra': env.db('SQLITE_DB_URL', default=root('database.sqlite'))
+        'extra': env.db('SQLITE_URL', default='sqlite:////tmp/my-tmp-sqlite.db')
     }
 
-    MEDIA_ROOT = root('assets')
+    public_root = root.path('public/')
+
+    MEDIA_ROOT = public_root('media')
     MEDIA_URL = 'media/'
-    STATIC_ROOT = root('static')
+    STATIC_ROOT = public_root('static')
     STATIC_URL = 'static/'
 
     SECRET_KEY = env('SECRET_KEY') # Raises ImproperlyConfigured exception if SECRET_KEY not in os.environ
+
+    CACHES = {
+        'default: env.cache(),
+        'redis': env.cache('REDIS_URL')
+    }
+
+Create a `.env` file::
+
+    DEBUG=on
+    # DJANGO_SETTINGS_MODULE=myapp.settings.dev
+    SECRET_KEY=your-secret-key
+    DATABASE_URL=psql://urser:un-githubbedpassword@127.0.0.1:8458/database
+    # SQLITE_URL=sqlite:///my-local-sqlite.db
+    CACHE_URL=memcache://127.0.0.1:11211,127.0.0.1:11212,127.0.0.1:11213
+    REDIS_URL=rediscache://127.0.0.1:6379:1?client_class=redis_cache.client.DefaultClient&password=redis-un-githubbed-password
+
+Open `manage.py` and `wsgi.py`. Add::
+
+    import environ
+    environ.Env.read_env()
+
+You can also pass `read_env()` an explicit path to the .env file, or to the directory where it lives.
 
 How to install
 --------------
@@ -64,36 +114,71 @@ How to install
 
     $ pip install django-environ
 
-Supported Databases
--------------------
 
--  PostgreSQL: postgres:// or postgresql://
--  PostGIS: postgis://
--  MySQL: mysql://
--  MySQL for GeoDjango: mysqlgis://
--  SQLITE: sqlite://
+How to use
+----------
 
-DevMode
--------
+There are only classes, Env and Path
 
-Put your environment variables definition in a `.env` file::
+::
 
-    $ cat >.env <<EOM
-    DEBUG=on
-    SECRET_KEY=1110110010111101111011101111
-    DATABASE_URL=postgres://uf07k1:wegauwhg@compute-1.amazonaws.com:5431/d8r827
-    SQLITE_URL=sqlite:////var/db/myapp.db
-    EOM
+    >>> import environ
+    >>> env = environ.Env(
+            DEBUG=(bool, False),
+        )
+    >>> env('DEBUG')
+    False
+    >>> env('DEBUG', default=True)
+    True
 
-Then in your `settings.py` or `settings/dev.py`::
+    >>> open('.myenv', 'a').write('DEBUG=on')
+    >>> environ.Env.read_env('.`myenv') # or env.read_env('.myenv')
+    >>> env('DEBUG')
+    True
 
-    import environ
-    root = environ.Path(__file__) - 3
-    env = environ.Env()
+    >>> open('.myenv', 'a').write('\nINT_VAR=1010')
+    >>> env.int('INT_VAR'), env.str('INT_VAR')
+    1010, '1010'
 
-    env.read_env(root('.env'))
+    >>> open('.myenv', 'a').write('\nDATABASE_URL=sqlite:///my-local-sqlite.db')
+    >>> env.read_env('.myenv')
+    >>> env.db()
+    {'ENGINE': 'django.db.backends.sqlite3', 'NAME': 'my-local-sqlite.db', 'HOST': '', 'USER': '', 'PASSWORD': '', 'PORT': ''}
 
-    ...
+    >>> root = env.path('/home/myproject/')
+    >>> root('static')
+    '/home/myproject/static'
+
+
+Supported Types
+---------------
+
+- str
+- bool
+- int
+- float
+- json
+- list (FOO=a,b,c)
+- dict (BAR=key=val;foo=bar)
+- url
+- db
+    -  PostgreSQL: postgres://, pgsql:// or postgresql://
+    -  PostGIS: postgis://
+    -  MySQL: mysql:// or mysql2://
+    -  MySQL for GeoDjango: mysqlgis://
+    -  SQLITE: sqlite://
+    -  SQLITE with SPATIALITE for GeoDjango: spatialite://
+
+- cache (see Supported Caches)
+    -  Database: dbcache://
+    -  Dummy: dummycache://
+    -  File: filecache://
+    -  Memory: locmemcache://
+    -  Memcached: memcache://
+    -  Python memory: pymemcache://
+    -  Redis: rediscache://
+
+- path (environ.Path)
 
 Tests
 -----
@@ -107,6 +192,13 @@ Tests
 
 Changelog
 ---------
+
+=== 0.3.0 (2014-06-??) ===
+
+  * Add cache url support
+  * Add email url support
+  * Rewriting README.rst
+
 
 === 0.2.1 (2013-04-19) ===
 
@@ -131,6 +223,9 @@ Credits
 - `Two Scoops of Django`_
 - `rconradharris`_ / `envparse`_
 - `kennethreitz`_ / `dj-database-url`_
+- `migonzalvar`_ / `dj-email-url`_
+- `ghickman`_ / `dj-cache-url`_
+- `julianwachholz`_ / `dj-config-url`_
 - `nickstenning`_ / `honcho`_
 - `envparse`_
 - `Distribute`_
@@ -141,6 +236,15 @@ Credits
 
 .. _kennethreitz: https://github.com/kennethreitz
 .. _dj-database-url: https://github.com/kennethreitz/dj-database-url
+
+.. _migonzalvar: https://github.com/migonzalvar
+.. _dj-email-url: https://github.com/migonzalvar/dj-email-url
+
+.. _ghickman: https://github.com/ghickman
+.. _dj-cache-url: https://github.com/ghickman/django-cache-url
+
+.. _julianwachholz: https://github.com/julianwachholz
+.. _dj-config-url: https://github.com/julianwachholz/dj-config-url
 
 .. _nickstenning: https://github.com/nickstenning
 .. _honcho: https://github.com/nickstenning/honcho

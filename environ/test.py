@@ -12,6 +12,8 @@ class BaseTests(unittest.TestCase):
     MYSQL = 'mysql://bea6eb025ca0d8:69772142@us-cdbr-east.cleardb.com/heroku_97681db3eff7580?reconnect=true'
     MYSQLGIS = 'mysqlgis://user:password@127.0.0.1/some_database'
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
+    MEMCACHE = 'memcache://127.0.0.1:11211'
+    REDIS = 'rediscache://127.0.0.1:6379:1?client_class=redis_cache.client.DefaultClient&password=secret'
     JSON = dict(one='bar', two=2, three=33.44)
     DICT = dict(foo='bar', test='on')
     PATH = '/home/dev'
@@ -37,6 +39,8 @@ class BaseTests(unittest.TestCase):
                     DATABASE_MYSQL_URL=cls.MYSQL,
                     DATABASE_MYSQL_GIS_URL=cls.MYSQLGIS,
                     DATABASE_SQLITE_URL=cls.SQLITE,
+                    CACHE_URL=cls.MEMCACHE,
+                    CACHE_REDIS=cls.REDIS,
                     URL_VAR=cls.URL,
                     JSON_VAR=json.dumps(cls.JSON),
                     PATH_VAR=cls.PATH)
@@ -154,6 +158,21 @@ class EnvTests(BaseTests):
         self.assertEqual(sqlite_config['ENGINE'], 'django.db.backends.sqlite3')
         self.assertEqual(sqlite_config['NAME'], '/full/path/to/your/database/file.sqlite')
 
+    def test_cache_url_value(self):
+
+        cache_config = self.env.cache()
+        self.assertEqual(cache_config['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(cache_config['LOCATION'], '127.0.0.1:11211')
+
+        redis_config = self.env.cache('CACHE_REDIS')
+        self.assertEqual(redis_config['BACKEND'], 'redis_cache.cache.RedisCache')
+        self.assertEqual(redis_config['LOCATION'], '127.0.0.1:6379:1')
+        self.assertEqual(redis_config['OPTIONS'], {
+            'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+            'PASSWORD': 'secret',
+        })
+
+
     def test_json_value(self):
         self.assertEqual(self.JSON, self.env.json('JSON_VAR'))
 
@@ -175,8 +194,8 @@ class FileEnvTests(EnvTests):
 class SchemaEnvTests(BaseTests):
 
     def test_schema(self):
-        env = Env(INT_VAR=int, NOT_PRESENT_VAR=(float, 33.3), STR_VAR=text_type,
-                  INT_LIST=[int], DEFAULT_LIST=([int], [2]))
+        env = Env(INT_VAR=int, NOT_PRESENT_VAR=(float, '33.3'), STR_VAR=text_type,
+                  INT_LIST=[int], DEFAULT_LIST=([int], '2'))
 
         self.assertTypeAndValue(int, 42, env('INT_VAR'))
         self.assertTypeAndValue(float, 33.3, env('NOT_PRESENT_VAR'))
@@ -189,6 +208,207 @@ class SchemaEnvTests(BaseTests):
 
         # Override schema in this one case
         self.assertTypeAndValue(text_type, '42', env('INT_VAR', cast=text_type))
+
+
+class DatabaseTestSuite(unittest.TestCase):
+
+    def test_postgres_parsing(self):
+        url = 'postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
+        url = Env.db_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'django.db.backends.postgresql_psycopg2')
+        self.assertEqual(url['NAME'], 'd8r82722r2kuvn')
+        self.assertEqual(url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
+        self.assertEqual(url['USER'], 'uf07k1i6d8ia0v')
+        self.assertEqual(url['PASSWORD'], 'wegauwhgeuioweg')
+        self.assertEqual(url['PORT'], 5431)
+
+    def test_postgis_parsing(self):
+        url = 'postgis://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
+        url = Env.db_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'django.contrib.gis.db.backends.postgis')
+        self.assertEqual(url['NAME'], 'd8r82722r2kuvn')
+        self.assertEqual(url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
+        self.assertEqual(url['USER'], 'uf07k1i6d8ia0v')
+        self.assertEqual(url['PASSWORD'], 'wegauwhgeuioweg')
+        self.assertEqual(url['PORT'], 5431)
+
+    def test_mysql_gis_parsing(self):
+        url = 'mysqlgis://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
+        url = Env.db_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'django.contrib.gis.db.backends.mysql')
+        self.assertEqual(url['NAME'], 'd8r82722r2kuvn')
+        self.assertEqual(url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
+        self.assertEqual(url['USER'], 'uf07k1i6d8ia0v')
+        self.assertEqual(url['PASSWORD'], 'wegauwhgeuioweg')
+        self.assertEqual(url['PORT'], 5431)
+
+    def test_cleardb_parsing(self):
+        url = 'mysql://bea6eb025ca0d8:69772142@us-cdbr-east.cleardb.com/heroku_97681db3eff7580?reconnect=true'
+        url = Env.db_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'django.db.backends.mysql')
+        self.assertEqual(url['NAME'], 'heroku_97681db3eff7580')
+        self.assertEqual(url['HOST'], 'us-cdbr-east.cleardb.com')
+        self.assertEqual(url['USER'], 'bea6eb025ca0d8')
+        self.assertEqual(url['PASSWORD'], '69772142')
+        self.assertEqual(url['PORT'], None)
+
+    def test_empty_sqlite_url(self):
+        url = 'sqlite://'
+        url = Env.db_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'django.db.backends.sqlite3')
+        self.assertEqual(url['NAME'], ':memory:')
+
+    def test_memory_sqlite_url(self):
+        url = 'sqlite://:memory:'
+        url = Env.db_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'django.db.backends.sqlite3')
+        self.assertEqual(url['NAME'], ':memory:')
+
+    def test_database_options_parsing(self):
+        url = 'postgres://user:pass@host:1234/dbname?conn_max_age=600'
+        url = Env.db_url_config(url)
+        self.assertEqual(url['CONN_MAX_AGE'], 600)
+
+        url = 'mysql://user:pass@host:1234/dbname?init_command=SET storage_engine=INNODB'
+        url = Env.db_url_config(url)
+        self.assertEqual(url['OPTIONS'], {
+            'init_command': 'SET storage_engine=INNODB',
+        })
+
+
+class CacheTestSuite(unittest.TestCase):
+
+    def test_memcache_parsing(self):
+        url = 'memcache://127.0.0.1:11211'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(url['LOCATION'], '127.0.0.1:11211')
+
+    def test_memcache_pylib_parsing(self):
+        url = 'pymemcache://127.0.0.1:11211'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.memcached.PyLibMCCache')
+        self.assertEqual(url['LOCATION'], '127.0.0.1:11211')
+
+    def test_memcache_multiple_parsing(self):
+        url = 'memcache://172.19.26.240:11211,172.19.26.242:11212'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(url['LOCATION'], ['172.19.26.240:11211', '172.19.26.242:11212'])
+
+    def test_memcache_socket_parsing(self):
+        url = 'memcache:///tmp/memcached.sock'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(url['LOCATION'], 'unix:/tmp/memcached.sock')
+
+    def test_dbcache_parsing(self):
+        url = 'dbcache://my_cache_table'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.db.DatabaseCache')
+        self.assertEqual(url['LOCATION'], 'my_cache_table')
+
+    def test_filecache_parsing(self):
+        url = 'filecache:///var/tmp/django_cache'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
+        self.assertEqual(url['LOCATION'], '/var/tmp/django_cache')
+
+    def test_filecache_windows_parsing(self):
+        url = 'filecache://C:/foo/bar'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
+        self.assertEqual(url['LOCATION'], 'C:/foo/bar')
+
+    def test_locmem_parsing(self):
+        url = 'locmemcache://'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.locmem.LocMemCache')
+        self.assertEqual(url['LOCATION'], '')
+
+    def test_locmem_named_parsing(self):
+        url = 'locmemcache://unique-snowflake'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.locmem.LocMemCache')
+        self.assertEqual(url['LOCATION'], 'unique-snowflake')
+
+    def test_dummycache_parsing(self):
+        url = 'dummycache://'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.dummy.DummyCache')
+        self.assertEqual(url['LOCATION'], '')
+
+    def test_redis_parsing(self):
+        url = 'rediscache://127.0.0.1:6379:1?client_class=redis_cache.client.DefaultClient&password=secret'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], 'redis_cache.cache.RedisCache')
+        self.assertEqual(url['LOCATION'], '127.0.0.1:6379:1')
+        self.assertEqual(url['OPTIONS'], {
+            'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+            'PASSWORD': 'secret',
+        })
+
+    def test_redis_socket_parsing(self):
+        url = 'rediscache:///path/to/socket:1'
+        url = Env.cache_url_config(url)
+        self.assertEqual(url['BACKEND'], 'redis_cache.cache.RedisCache')
+        self.assertEqual(url['LOCATION'], 'unix:/path/to/socket:1')
+
+    def test_options_parsing(self):
+        url = 'filecache:///var/tmp/django_cache?timeout=60&max_entries=1000&cull_frequency=0'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
+        self.assertEqual(url['LOCATION'], '/var/tmp/django_cache')
+        self.assertEqual(url['TIMEOUT'], 60)
+        self.assertEqual(url['OPTIONS'], {
+            'MAX_ENTRIES': 1000,
+            'CULL_FREQUENCY': 0,
+        })
+
+    def test_custom_backend(self):
+        url = 'memcache://127.0.0.1:5400?foo=option&bars=9001'
+        backend = 'redis_cache.cache.RedisCache'
+        url = Env.cache_url_config(url, backend)
+
+        self.assertEqual(url['BACKEND'], backend)
+        self.assertEqual(url['LOCATION'], '127.0.0.1:5400')
+        self.assertEqual(url['OPTIONS'], {
+            'FOO': 'option',
+            'BARS': 9001,
+        })
+
+
+class EmailTests(unittest.TestCase):
+
+    def test_smtp_parsing(self):
+        url = 'smtps://user@domain.com:password@smtp.example.com:587'
+        url = Env.email_url_config(url)
+
+        self.assertEqual(url['EMAIL_BACKEND'],
+                'django.core.mail.backends.smtp.EmailBackend')
+        self.assertEqual(url['EMAIL_HOST'], 'smtp.example.com')
+        self.assertEqual(url['EMAIL_HOST_PASSWORD'], 'password')
+        self.assertEqual(url['EMAIL_HOST_USER'], 'user@domain.com')
+        self.assertEqual(url['EMAIL_PORT'], 587)
+        self.assertEqual(url['EMAIL_USE_TLS'], True)
 
 
 class PathTests(unittest.TestCase):
@@ -221,6 +441,7 @@ class PathTests(unittest.TestCase):
         self.assertEqual(Path('/') + 'home', Path('/home'))
         self.assertEqual(Path('/') + 'home' + Path('/public'), Path('/home/public'))
         self.assertEqual(Path('/home/dev/public') - 2, Path('/home'))
+        self.assertEqual(Path('/home/dev/public') - 'public', Path('/home/dev'))
 
         self.assertRaises(TypeError, lambda _: Path('/home/dev/') - 'not int')
 
@@ -228,7 +449,7 @@ class PathTests(unittest.TestCase):
 def load_suite():
 
     test_suite = unittest.TestSuite()
-    for case in [EnvTests, FileEnvTests, SchemaEnvTests, PathTests]:
+    for case in [EnvTests, FileEnvTests, SchemaEnvTests, PathTests, DatabaseTestSuite, CacheTestSuite, EmailTests]:
         test_suite.addTest(unittest.makeSuite(case))
     return test_suite
 

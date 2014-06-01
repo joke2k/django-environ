@@ -2,6 +2,8 @@ DICT_VAR=foo=bar,test=on
 BOOL_FALSE_VAR2=False
 DATABASE_MYSQL_URL=mysql://bea6eb025ca0d8:69772142@us-cdbr-east.cleardb.com/heroku_97681db3eff7580?reconnect=true
 DATABASE_MYSQL_GIS_URL=mysqlgis://user:password@127.0.0.1/some_database
+CACHE_URL=memcache://127.0.0.1:11211
+CACHE_REDIS=rediscache://127.0.0.1:6379:1?client_class=redis_cache.client.DefaultClient&password=secret
 URL_VAR=http://www.google.com/
 PATH_VAR=/home/dev
 BOOL_FALSE_VAR=0

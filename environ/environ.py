@@ -7,8 +7,10 @@ import os
 import sys
 import re
 import json
+import warnings
 
 import logging
+
 logger = logging.getLogger(__file__)
 
 try:
@@ -34,6 +36,12 @@ __author__ = 'joke2k'
 __version__ = (0, 2, 1)
 
 
+# return int if possible
+_cast_int = lambda v: int(v) if isinstance(v, basestring) and v.isdigit() else v
+# return str if possibile
+_cast_str = lambda v: str(v) if isinstance(v, basestring) else v
+
+
 class Env(object):
     """Provide schema-based lookups of environment variables so that each
     caller doesn't have to pass in `cast` and `default` parameters.
@@ -48,15 +56,44 @@ class Env(object):
     NOTSET = object()
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', '1')
     URL_CLASS = urlparse.ParseResult
-    DATABASE_URL = 'DATABASE_URL'
+    DEFAULT_DATABASE_ENV = 'DATABASE_URL'
     DB_SCHEMES = {
         'postgres': 'django.db.backends.postgresql_psycopg2',
         'postgresql': 'django.db.backends.postgresql_psycopg2',
+        'pgsql': 'django.db.backends.postgresql_psycopg2',
         'postgis': 'django.contrib.gis.db.backends.postgis',
         'mysql': 'django.db.backends.mysql',
+        'mysql2': 'django.db.backends.mysql',
         'mysqlgis': 'django.contrib.gis.db.backends.mysql',
-        'sqlite': 'django.db.backends.sqlite3'
+        'spatialite': 'django.contrib.gis.db.backends.spatialite',
+        'sqlite': 'django.db.backends.sqlite3',
     }
+    _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT']
+
+    DEFAULT_CACHE_ENV = 'CACHE_URL'
+    CACHE_SCHEMES = {
+        'dbcache': 'django.core.cache.backends.db.DatabaseCache',
+        'dummycache': 'django.core.cache.backends.dummy.DummyCache',
+        'filecache': 'django.core.cache.backends.filebased.FileBasedCache',
+        'locmemcache': 'django.core.cache.backends.locmem.LocMemCache',
+        'memcache': 'django.core.cache.backends.memcached.MemcachedCache',
+        'pymemcache': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'rediscache': 'redis_cache.cache.RedisCache',
+        'redis': 'redis_cache.cache.RedisCache',
+    }
+    _CACHE_BASE_OPTIONS = ['TIMEOUT', 'KEY_PREFIX', 'VERSION', 'KEY_FUNCTION']
+
+    DEFAULT_EMAIL_ENV = 'EMAIL_URL'
+    EMAIL_SCHEMES = {
+        'smtp': 'django.core.mail.backends.smtp.EmailBackend',
+        'smtps': 'django.core.mail.backends.smtp.EmailBackend',
+        'consolemail': 'django.core.mail.backends.console.EmailBackend',
+        'filemail': 'django.core.mail.backends.filebased.EmailBackend',
+        'memorymail': 'django.core.mail.backends.locmem.EmailBackend',
+        'dummymail': 'django.core.mail.backends.dummy.EmailBackend'
+    }
+    _EMAIL_BASE_OPTIONS = ['EMAIL_USE_TLS', ]
+
 
     def __init__(self, **schema):
         self.schema = schema
@@ -71,6 +108,12 @@ class Env(object):
         :rtype: str
         """
         return self.get_value(var, default=default)
+
+    def unicode(self, var, default=NOTSET):
+        """Helper for python2
+        :rtype: unicode
+        """
+        return self.get_value(var, cast=text_type, default=default)
 
     def bool(self, var, default=NOTSET):
         """
@@ -114,11 +157,17 @@ class Env(object):
         """
         return self.get_value(var, cast=urlparse.urlparse, default=default)
 
-    def db(self, var=DATABASE_URL, default=NOTSET, **kwargs):
-        """
+    def db(self, var=DEFAULT_DATABASE_ENV, default=NOTSET, engine=None):
+        """Returns a config dictionary, defaulting to DATABASE_URL.
         :rtype: dict
         """
-        return self.db_url_config(self.url(var, default=default), **kwargs)
+        return self.db_url_config(self.get_value(var, default=default), engine=engine)
+
+    def cache(self, var=DEFAULT_CACHE_ENV, default=NOTSET, backend=None):
+        """Returns a config dictionary, defaulting to CACHE_URL.
+        :rtype: dict
+        """
+        return self.cache_url_config(self.url(var, default=default), backend=backend)
 
     def path(self, var, default=NOTSET, **kwargs):
         """
@@ -173,8 +222,7 @@ class Env(object):
             value = value.lstrip('$')
             value = self.get_value(value, cast=cast, default=default)
 
-        # Don't cast if we're returning a default value
-        if value != default:
+        if value is not None:
             value = self.parse_value(value, cast)
 
         return value
@@ -200,7 +248,7 @@ class Env(object):
         elif isinstance(cast, list):
             value = list(map(cast[0], [x for x in value.split(',') if x]))
         elif isinstance(cast, dict):
-            key_cast = cast.get('key', text_type)
+            key_cast = cast.get('key', str)
             value_cast = cast.get('value', text_type)
             value_cast_by_key = cast.get('cast', dict())
             value = dict(map(
@@ -227,7 +275,7 @@ class Env(object):
         return value
 
     @classmethod
-    def db_url_config(cls, url, **overrides):
+    def db_url_config(cls, url, engine=None):
         """Pulled from DJ-Database-URL, parse an arbitrary Database URL.
         Support currently exists for PostgreSQL, PostGIS, MySQL and SQLite.
 
@@ -242,7 +290,17 @@ class Env(object):
         {'ENGINE': 'django.db.backends.postgresql_psycopg2', 'HOST': 'ec2-107-21-253-135.compute-1.amazonaws.com', 'NAME': 'd8r82722r2kuvn', 'PASSWORD': 'wegauwhgeuioweg', 'PORT': 5431, 'USER': 'uf07k1i6d8ia0v'}
 
         """
-        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        if not isinstance(url, cls.URL_CLASS):
+            if url == 'sqlite://:memory:':
+                # this is a special case, because if we pass this URL into
+                # urlparse, urlparse will choke trying to interpret "memory"
+                # as a port number
+                return {
+                    'ENGINE': cls.DB_SCHEMES['sqlite'],
+                    'NAME': ':memory:'
+                }
+                # note: no other settings are required for sqlite
+            url = urlparse.urlparse(url)
 
         config = {}
 
@@ -250,39 +308,149 @@ class Env(object):
         path = url.path[1:]
         path = path.split('?', 2)[0]
 
+        # if we are using sqlite and we have no path, then assume we
+        # want an in-memory database (this is the behaviour of sqlalchemy)
+        if url.scheme == 'sqlite' and path == '':
+            path = ':memory:'
+
         # Update with environment configuration.
         config.update({
             'NAME': path,
-            'USER': url.username,
-            'PASSWORD': url.password,
-            'HOST': url.hostname,
-            'PORT': url.port,
+            'USER': _cast_str(url.username),
+            'PASSWORD': _cast_str(url.password),
+            'HOST': _cast_str(url.hostname),
+            'PORT': _cast_int(url.port),
         })
 
-        # Update with kwargs configuration.
-        config.update(overrides)
+        if url.query:
+            config_options = {}
+            for k, v in urlparse.parse_qs(url.query).items():
+                if k.upper() in cls._DB_BASE_OPTIONS:
+                    config.update({k.upper(): _cast_int(v[0])})
+                else:
+                    config_options.update({k: _cast_int(v[0])})
+            config['OPTIONS'] = config_options
 
+        if engine:
+            config['ENGINE'] = engine
         if url.scheme in Env.DB_SCHEMES:
             config['ENGINE'] = Env.DB_SCHEMES[url.scheme]
 
         return config
 
+    @classmethod
+    def cache_url_config(cls, url, backend=None):
+        """Pulled from DJ-Cache-URL, parse an arbitrary Cache URL.
+
+        :param url:
+        :param overrides:
+        :return:
+        """
+        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+
+        location = url.netloc.split(',')
+        if len(location) == 1:
+            location = location[0]
+
+        config = {
+            'BACKEND': cls.CACHE_SCHEMES[url.scheme],
+            'LOCATION': location,
+        }
+
+        if url.scheme == 'filecache':
+            config.update({
+                'LOCATION': _cast_str(url.netloc + url.path),
+            })
+
+        if url.path and url.scheme in ['memcache', 'pymemcache', 'rediscache']:
+            config.update({
+                'LOCATION': 'unix:' + url.path,
+            })
+
+        if url.query:
+            config_options = {}
+            for k, v in urlparse.parse_qs(url.query).items():
+                opt = {k.upper(): _cast_int(v[0])}
+                if k.upper() in cls._CACHE_BASE_OPTIONS:
+                    config.update(opt)
+                else:
+                    config_options.update(opt)
+            config['OPTIONS'] = config_options
+
+        if backend:
+            config['BACKEND'] = backend
+
+        return config
+
+    @classmethod
+    def email_url_config(cls, url, backend=None):
+        """Parses an email URL."""
+
+        config = {}
+
+        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+
+        # Remove query strings
+        path = url.path[1:]
+        path = path.split('?', 2)[0]
+
+        # Update with environment configuration
+        config.update({
+            'EMAIL_FILE_PATH': path,
+            'EMAIL_HOST_USER': _cast_str(url.username),
+            'EMAIL_HOST_PASSWORD': _cast_str(url.password),
+            'EMAIL_HOST': _cast_str(url.hostname),
+            'EMAIL_PORT': _cast_int(url.port),
+        })
+
+        if backend:
+            config['EMAIL_BACKEND'] = backend
+        elif url.scheme in cls.EMAIL_SCHEMES:
+            config['EMAIL_BACKEND'] = cls.EMAIL_SCHEMES[url.scheme]
+
+        if url.scheme == 'smtps':
+            config['EMAIL_USE_TLS'] = True
+        else:
+            config['EMAIL_USE_TLS'] = False
+
+        if url.query:
+            config_options = {}
+            for k, v in urlparse.parse_qs(url.query).items():
+                opt = {k.upper(): _cast_int(v[0])}
+                if k.upper() in cls._EMAIL_BASE_OPTIONS:
+                    config.update(opt)
+                else:
+                    config_options.update(opt)
+            config['OPTIONS'] = config_options
+
+        return config
+
     @staticmethod
-    def read_env(env_file='.env', **overrides):
-        """Pulled from Honcho code with minor updates, reads local default
-        environment variables from a .env file located in the project root
-        directory.
+    def read_env(env_file=None, **overrides):
+        """Read a .env file into os.environ.
+
+        If not given a path to a dotenv path, does filthy magic stack backtracking
+        to find manage.py and then find the dotenv.
 
         http://www.wellfireinteractive.com/blog/easier-12-factor-django/
 
         https://gist.github.com/bennylope/2999704
         """
-        logger.debug('Read environment variables from file: {0}'.format(env_file))
+        if env_file is None:
+            frame = sys._getframe()
+            env_file = os.path.join(os.path.dirname(frame.f_back.f_code.co_filename), '.env')
+            if not os.path.exists(env_file):
+                warnings.warn("not reading %s - it doesn't exist." % env_file)
+                return
+
         try:
             with open(env_file) if isinstance(env_file, basestring) else env_file as f:
                 content = f.read()
         except IOError:
-            content = ''
+            warnings.warn("not reading %s - it doesn't exist." % env_file)
+            return
+
+        logger.debug('Read environment variables from: {0}'.format(env_file))
 
         for line in content.splitlines():
             m1 = re.match(r'\A([A-Za-z_0-9]+)=(.*)\Z', line)
@@ -380,7 +548,9 @@ class Path(object):
     def __sub__(self, other):
         if isinstance(other, int):
             return self.path('../' * other)
-        raise TypeError("unsupported operand type(s) for -: '{1}' and '{0}'".format(other.__class__.__name__, type(other)))
+        elif isinstance(other, (str, text_type)):
+            return Path(self.__root__.rstrip(other))
+        raise TypeError("unsupported operand type(s) for -: '{0}' and '{1}'".format(self, type(other)))
 
     def __invert__(self):
         return self.path('..')
@@ -406,3 +576,8 @@ class Path(object):
         if kwargs.get('required', False) and not os.path.exists(absolute_path):
             raise ImproperlyConfigured("Create required path: {0}".format(absolute_path))
         return absolute_path
+
+
+# Register database and cache schemes in URLs.
+for schema in Env.DB_SCHEMES.keys() + Env.CACHE_SCHEMES.keys() + Env.EMAIL_SCHEMES.keys():
+    urlparse.uses_netloc.append(schema)
