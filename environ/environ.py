@@ -55,7 +55,7 @@ class Env(object):
     """
 
     NOTSET = object()
-    BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', '1')
+    BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = urlparse.ParseResult
     DEFAULT_DATABASE_ENV = 'DATABASE_URL'
     DB_SCHEMES = {
