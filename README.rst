@@ -3,7 +3,7 @@ Django-environ
 
 Django-environ allows you to utilize 12factor inspired environment variables to configure your Django application.
 
-.. image:: https://travis-ci.org/joke2k/djang-environ.svg?branch=master
+.. image:: https://travis-ci.org/joke2k/djang-environ.svg?branch=develop
   :target: https://travis-ci.org/joke2k/django-environ
 .. image:: https://coveralls.io/repos/joke2k/django-environ/badge.png
   :target: https://coveralls.io/r/joke2k/django-environ
