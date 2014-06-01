@@ -43,6 +43,11 @@ _cast_int = lambda v: int(v) if isinstance(v, basestring) and v.isdigit() else v
 _cast_str = lambda v: str(v) if isinstance(v, basestring) else v
 
 
+class NoValue(object):
+    def __repr__(self):
+        return '<{0}>'.format(self.__class__.__name__)
+
+
 class Env(object):
     """Provide schema-based lookups of environment variables so that each
     caller doesn't have to pass in `cast` and `default` parameters.
@@ -54,7 +59,7 @@ class Env(object):
             ...
     """
 
-    NOTSET = object()
+    NOTSET = NoValue()
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = urlparse.ParseResult
     DEFAULT_DATABASE_ENV = 'DATABASE_URL'
