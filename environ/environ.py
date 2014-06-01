@@ -33,7 +33,7 @@ else:
 
 
 __author__ = 'joke2k'
-__version__ = (0, 2, 1)
+__version__ = (0, 3, 0)
 
 
 # return int if possible

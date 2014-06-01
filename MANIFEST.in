@@ -1,2 +1,2 @@
-include README.rst
-include environ/test_env.txt
+include *.rst
+include *.txt
