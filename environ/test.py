@@ -207,8 +207,8 @@ class FileEnvTests(EnvTests):
 class SchemaEnvTests(BaseTests):
 
     def test_schema(self):
-        env = Env(INT_VAR=int, NOT_PRESENT_VAR=(float, '33.3'), STR_VAR=text_type,
-                  INT_LIST=[int], DEFAULT_LIST=([int], '2'))
+        env = Env(INT_VAR=int, NOT_PRESENT_VAR=(float, 33.3), STR_VAR=text_type,
+                  INT_LIST=[int], DEFAULT_LIST=([int], [2]))
 
         self.assertTypeAndValue(int, 42, env('INT_VAR'))
         self.assertTypeAndValue(float, 33.3, env('NOT_PRESENT_VAR'))

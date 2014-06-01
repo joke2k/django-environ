@@ -104,8 +104,8 @@ class Env(object):
     def __init__(self, **schema):
         self.schema = schema
 
-    def __call__(self, var, cast=None, default=NOTSET):
-        return self.get_value(var, cast=cast, default=default)
+    def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
+        return self.get_value(var, cast=cast, default=default, parse_default=parse_default)
 
     # Shortcuts
 
@@ -161,22 +161,25 @@ class Env(object):
         """
         :rtype: urlparse.ParseResult
         """
-        return self.get_value(var, cast=urlparse.urlparse, default=default)
+        return self.get_value(var, cast=urlparse.urlparse, default=default, parse_default=True)
 
     def db(self, var=DEFAULT_DATABASE_ENV, default=NOTSET, engine=None):
         """Returns a config dictionary, defaulting to DATABASE_URL.
+
         :rtype: dict
         """
         return self.db_url_config(self.get_value(var, default=default), engine=engine)
 
     def cache(self, var=DEFAULT_CACHE_ENV, default=NOTSET, backend=None):
         """Returns a config dictionary, defaulting to CACHE_URL.
+
         :rtype: dict
         """
         return self.cache_url_config(self.url(var, default=default), backend=backend)
 
     def email(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
         """Returns a config dictionary, defaulting to EMAIL_URL.
+
         :rtype: dict
         """
         return self.email_url_config(self.url(var, default=default), backend=backend)
@@ -187,12 +190,13 @@ class Env(object):
         """
         return Path(self.get_value(var, default=default), **kwargs)
 
-    def get_value(self, var, cast=None, default=NOTSET):
+    def get_value(self, var, cast=None, default=NOTSET, parse_default=False):
         """Return value for given environment variable.
 
         :param var: Name of variable.
         :param cast: Type to cast return value as.
         :param default: If var not present in environ, return this instead.
+        :param parse_default: force to parse default..
 
         :returns: Value from environment or default (if set)
         """
@@ -234,7 +238,7 @@ class Env(object):
             value = value.lstrip('$')
             value = self.get_value(value, cast=cast, default=default)
 
-        if value is not None:
+        if value != default or parse_default:
             value = self.parse_value(value, cast)
 
         return value
