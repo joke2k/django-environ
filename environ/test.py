@@ -14,6 +14,7 @@ class BaseTests(unittest.TestCase):
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
     MEMCACHE = 'memcache://127.0.0.1:11211'
     REDIS = 'rediscache://127.0.0.1:6379:1?client_class=redis_cache.client.DefaultClient&password=secret'
+    EMAIL = 'smtps://user@domain.com:password@smtp.example.com:587'
     JSON = dict(one='bar', two=2, three=33.44)
     DICT = dict(foo='bar', test='on')
     PATH = '/home/dev'
@@ -41,6 +42,7 @@ class BaseTests(unittest.TestCase):
                     DATABASE_SQLITE_URL=cls.SQLITE,
                     CACHE_URL=cls.MEMCACHE,
                     CACHE_REDIS=cls.REDIS,
+                    EMAIL_URL=cls.EMAIL,
                     URL_VAR=cls.URL,
                     JSON_VAR=json.dumps(cls.JSON),
                     PATH_VAR=cls.PATH)
@@ -171,6 +173,17 @@ class EnvTests(BaseTests):
             'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
             'PASSWORD': 'secret',
         })
+
+    def test_email_url_value(self):
+
+        email_config = self.env.email()
+        self.assertEqual(email_config['EMAIL_BACKEND'],
+                'django.core.mail.backends.smtp.EmailBackend')
+        self.assertEqual(email_config['EMAIL_HOST'], 'smtp.example.com')
+        self.assertEqual(email_config['EMAIL_HOST_PASSWORD'], 'password')
+        self.assertEqual(email_config['EMAIL_HOST_USER'], 'user@domain.com')
+        self.assertEqual(email_config['EMAIL_PORT'], 587)
+        self.assertEqual(email_config['EMAIL_USE_TLS'], True)
 
 
     def test_json_value(self):
