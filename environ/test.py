@@ -162,11 +162,11 @@ class EnvTests(BaseTests):
 
     def test_cache_url_value(self):
 
-        cache_config = self.env.cache()
+        cache_config = self.env.cache_url()
         self.assertEqual(cache_config['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
         self.assertEqual(cache_config['LOCATION'], '127.0.0.1:11211')
 
-        redis_config = self.env.cache('CACHE_REDIS')
+        redis_config = self.env.cache_url('CACHE_REDIS')
         self.assertEqual(redis_config['BACKEND'], 'redis_cache.cache.RedisCache')
         self.assertEqual(redis_config['LOCATION'], '127.0.0.1:6379:1')
         self.assertEqual(redis_config['OPTIONS'], {
@@ -176,7 +176,7 @@ class EnvTests(BaseTests):
 
     def test_email_url_value(self):
 
-        email_config = self.env.email()
+        email_config = self.env.email_url()
         self.assertEqual(email_config['EMAIL_BACKEND'],
                 'django.core.mail.backends.smtp.EmailBackend')
         self.assertEqual(email_config['EMAIL_HOST'], 'smtp.example.com')

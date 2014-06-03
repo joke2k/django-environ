@@ -186,6 +186,7 @@ class Env(object):
         :rtype: dict
         """
         return self.cache_url_config(self.url(var, default=default), backend=backend)
+    cache=cache_url
 
     def email_url(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
         """Returns a config dictionary, defaulting to EMAIL_URL.

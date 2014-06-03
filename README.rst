@@ -12,6 +12,21 @@ Django-environ allows you to utilize 12factor inspired environment variables to 
 .. image:: https://pypip.in/d/django-environ/badge.png
   :target: https://crate.io/packages/django-environ
 
+This module is a merge of:
+
+* `envparse`_
+* `honcho`_
+* `dj-database-url`_
+* `dj-search-url`_
+* `dj-config-url`_
+* `django-cache-url`_
+
+and inspired by:
+
+* `12factor`_
+* `12factor-django`_
+* `Two Scoops of Django`_
+
 This is your `settings.py` file before you have installed **django-environ**
 
 ::
@@ -208,7 +223,6 @@ Changelog
   * Add search url support
   * Rewriting README.rst
 
-
 === 0.2.1 (2013-04-19) ===
 
   * environ/environ.py: Env.__call__ now uses Env.get_value instance method
@@ -233,7 +247,8 @@ Credits
 - `rconradharris`_ / `envparse`_
 - `kennethreitz`_ / `dj-database-url`_
 - `migonzalvar`_ / `dj-email-url`_
-- `ghickman`_ / `dj-cache-url`_
+- `ghickman`_ / `django-cache-url`_
+- `dstufft`_ / `dj-search-url`_
 - `julianwachholz`_ / `dj-config-url`_
 - `nickstenning`_ / `honcho`_
 - `envparse`_
@@ -250,10 +265,13 @@ Credits
 .. _dj-email-url: https://github.com/migonzalvar/dj-email-url
 
 .. _ghickman: https://github.com/ghickman
-.. _dj-cache-url: https://github.com/ghickman/django-cache-url
+.. _django-cache-url: https://github.com/ghickman/django-cache-url
 
 .. _julianwachholz: https://github.com/julianwachholz
 .. _dj-config-url: https://github.com/julianwachholz/dj-config-url
+
+.. _dstufft: https://github.com/dstufft
+.. _dj-search-url: https://github.com/dstufft/dj-search-url
 
 .. _nickstenning: https://github.com/nickstenning
 .. _honcho: https://github.com/nickstenning/honcho
