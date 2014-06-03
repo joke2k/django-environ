@@ -66,6 +66,7 @@ After::
     import environ
     root = environ.Path(__file__) - 3 # three folder back (/a/b/c/ - 3 = /)
     env = environ.Env(DEBUG=(bool, False),) # set default values and casting
+    environ.Env.read_env() # reading .env file
 
     SITE_ROOT = root()
 
@@ -91,6 +92,7 @@ After::
         'redis': env.cache('REDIS_URL')
     }
 
+You can also pass `read_env()` an explicit path to the .env file.
 Create a `.env` file::
 
     DEBUG=on
@@ -101,12 +103,6 @@ Create a `.env` file::
     CACHE_URL=memcache://127.0.0.1:11211,127.0.0.1:11212,127.0.0.1:11213
     REDIS_URL=rediscache://127.0.0.1:6379:1?client_class=redis_cache.client.DefaultClient&password=redis-un-githubbed-password
 
-Open `manage.py` and `wsgi.py`. Add::
-
-    import environ
-    environ.Env.read_env()
-
-You can also pass `read_env()` an explicit path to the .env file, or to the directory where it lives.
 
 How to install
 --------------
@@ -162,7 +158,8 @@ Supported Types
 - list (FOO=a,b,c)
 - dict (BAR=key=val;foo=bar)
 - url
-- db
+- path (environ.Path)
+- db_url
     -  PostgreSQL: postgres://, pgsql:// or postgresql://
     -  PostGIS: postgis://
     -  MySQL: mysql:// or mysql2://
@@ -170,7 +167,7 @@ Supported Types
     -  SQLITE: sqlite://
     -  SQLITE with SPATIALITE for GeoDjango: spatialite://
 
-- cache (see Supported Caches)
+- cache_url
     -  Database: dbcache://
     -  Dummy: dummycache://
     -  File: filecache://
@@ -178,8 +175,18 @@ Supported Types
     -  Memcached: memcache://
     -  Python memory: pymemcache://
     -  Redis: rediscache://
-
-- path (environ.Path)
+- search_url
+    - ElasticSearch: elasticsearch://
+    - Solr: solr://
+    - Whoosh: whoosh://
+    - Simple cache: simple://
+- email_url
+    - SMTP: smtp://
+    - SMTPS: smtps://
+    - Console mail: consolemail://
+    - File mail: filemail://
+    - LocMem mail: memorymail://
+    - Dummy mail: dummymail://
 
 Tests
 -----
@@ -198,6 +205,7 @@ Changelog
 
   * Add cache url support
   * Add email url support
+  * Add search url support
   * Rewriting README.rst
 
 
