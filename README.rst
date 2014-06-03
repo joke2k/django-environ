@@ -216,7 +216,7 @@ Tests
 Changelog
 ---------
 
-=== 0.3.0 (2014-06-??) ===
+=== 0.3 (2014-06-03) ===
 
   * Add cache url support
   * Add email url support
