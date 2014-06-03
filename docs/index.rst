@@ -5,9 +5,12 @@ Welcome to Django-environ's documentation!
 
 This module is a merge of:
 
-* https://github.com/rconradharris/envparse
-* https://github.com/kennethreitz/dj-database-url
-* https://github.com/nickstenning/honcho
+* `envparse`_
+* `honcho`_
+* `dj-database-url`_
+* `dj-search-url`_
+* `dj-config-url`_
+* `django-cache-url`_
 
 and inspired by:
 
@@ -69,6 +72,7 @@ After::
     import environ
     root = environ.Path(__file__) - 3 # three folder back (/a/b/c/ - 3 = /)
     env = environ.Env(DEBUG=(bool, False),) # set default values and casting
+    environ.Env.read_env() # reading .env file
 
     SITE_ROOT = root()
 
@@ -94,6 +98,7 @@ After::
         'redis': env.cache('REDIS_URL')
     }
 
+You can also pass `read_env()` an explicit path to the .env file.
 Create a `.env` file::
 
     DEBUG=on
@@ -104,12 +109,6 @@ Create a `.env` file::
     CACHE_URL=memcache://127.0.0.1:11211,127.0.0.1:11212,127.0.0.1:11213
     REDIS_URL=rediscache://127.0.0.1:6379:1?client_class=redis_cache.client.DefaultClient&password=redis-un-githubbed-password
 
-Open `manage.py` and `wsgi.py`. Add::
-
-    import environ
-    environ.Env.read_env()
-
-You can also pass `read_env()` an explicit path to the .env file, or to the directory where it lives.
 
 How to install
 --------------
@@ -165,7 +164,8 @@ Supported Types
 - list (FOO=a,b,c)
 - dict (BAR=key=val;foo=bar)
 - url
-- db
+- path (environ.Path)
+- db_url
     -  PostgreSQL: postgres://, pgsql:// or postgresql://
     -  PostGIS: postgis://
     -  MySQL: mysql:// or mysql2://
@@ -173,7 +173,7 @@ Supported Types
     -  SQLITE: sqlite://
     -  SQLITE with SPATIALITE for GeoDjango: spatialite://
 
-- cache (see Supported Caches)
+- cache_url
     -  Database: dbcache://
     -  Dummy: dummycache://
     -  File: filecache://
@@ -181,8 +181,18 @@ Supported Types
     -  Memcached: memcache://
     -  Python memory: pymemcache://
     -  Redis: rediscache://
-
-- path (environ.Path)
+- search_url
+    - ElasticSearch: elasticsearch://
+    - Solr: solr://
+    - Whoosh: whoosh://
+    - Simple cache: simple://
+- email_url
+    - SMTP: smtp://
+    - SMTPS: smtps://
+    - Console mail: consolemail://
+    - File mail: filemail://
+    - LocMem mail: memorymail://
+    - Dummy mail: dummymail://
 
 Tests
 -----
@@ -206,6 +216,8 @@ environ.Env
     ..  autoattribute:: DEFAULT_CACHE_ENV
     ..  autoattribute:: EMAIL_SCHEMES
     ..  autoattribute:: DEFAULT_EMAIL_ENV
+    ..  autoattribute:: SEARCH_SCHEMES
+    ..  autoattribute:: DEFAULT_SEARCH_ENV
 
     ..  automethod:: __call__
     ..  automethod:: str
@@ -216,15 +228,17 @@ environ.Env
     ..  automethod:: list
     ..  automethod:: dict
     ..  automethod:: url
-    ..  automethod:: db
-    ..  automethod:: cache
-    ..  automethod:: email
+    ..  automethod:: db_url
+    ..  automethod:: cache_url
+    ..  automethod:: email_url
+    ..  automethod:: search_url
     ..  automethod:: path
 
     ..  automethod:: read_env
     ..  automethod:: db_url_config
     ..  automethod:: cache_url_config
     ..  automethod:: email_url_config
+    ..  automethod:: search_url_config
     ..  automethod:: get_value
     ..  automethod:: parse_value
 
@@ -246,6 +260,7 @@ Changelog
 
   * Add cache url support
   * Add email url support
+  * Add search url support
   * Rewriting README.rst
 
 
@@ -273,7 +288,8 @@ Credits
 - `rconradharris`_ / `envparse`_
 - `kennethreitz`_ / `dj-database-url`_
 - `migonzalvar`_ / `dj-email-url`_
-- `ghickman`_ / `dj-cache-url`_
+- `ghickman`_ / `django-cache-url`_
+- `dstufft`_ / `dj-search-url`_
 - `julianwachholz`_ / `dj-config-url`_
 - `nickstenning`_ / `honcho`_
 - `envparse`_
@@ -290,10 +306,13 @@ Credits
 .. _dj-email-url: https://github.com/migonzalvar/dj-email-url
 
 .. _ghickman: https://github.com/ghickman
-.. _dj-cache-url: https://github.com/ghickman/django-cache-url
+.. _django-cache-url: https://github.com/ghickman/django-cache-url
 
 .. _julianwachholz: https://github.com/julianwachholz
 .. _dj-config-url: https://github.com/julianwachholz/dj-config-url
+
+.. _dstufft: https://github.com/dstufft
+.. _dj-search-url: https://github.com/dstufft/dj-search-url
 
 .. _nickstenning: https://github.com/nickstenning
 .. _honcho: https://github.com/nickstenning/honcho
