@@ -100,6 +100,15 @@ class Env(object):
     }
     _EMAIL_BASE_OPTIONS = ['EMAIL_USE_TLS', ]
 
+    DEFAULT_SEARCH_ENV = 'SEARCH_URL'
+    SEARCH_SCHEMES = {
+        "elasticsearch": "haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine",
+        "solr": "haystack.backends.solr_backend.SolrEngine",
+        "whoosh": "haystack.backends.whoosh_backend.WhooshEngine",
+        "simple": "haystack.backends.simple_backend.SimpleEngine",
+    }
+
+
 
     def __init__(self, **schema):
         self.schema = schema
@@ -163,26 +172,34 @@ class Env(object):
         """
         return self.get_value(var, cast=urlparse.urlparse, default=default, parse_default=True)
 
-    def db(self, var=DEFAULT_DATABASE_ENV, default=NOTSET, engine=None):
+    def db_url(self, var=DEFAULT_DATABASE_ENV, default=NOTSET, engine=None):
         """Returns a config dictionary, defaulting to DATABASE_URL.
 
         :rtype: dict
         """
         return self.db_url_config(self.get_value(var, default=default), engine=engine)
+    db=db_url
 
-    def cache(self, var=DEFAULT_CACHE_ENV, default=NOTSET, backend=None):
+    def cache_url(self, var=DEFAULT_CACHE_ENV, default=NOTSET, backend=None):
         """Returns a config dictionary, defaulting to CACHE_URL.
 
         :rtype: dict
         """
         return self.cache_url_config(self.url(var, default=default), backend=backend)
 
-    def email(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
+    def email_url(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
         """Returns a config dictionary, defaulting to EMAIL_URL.
 
         :rtype: dict
         """
         return self.email_url_config(self.url(var, default=default), backend=backend)
+
+    def search_url(self, var=DEFAULT_SEARCH_ENV, default=NOTSET, engine=None):
+        """Returns a config dictionary, defaulting to SEARCH_URL.
+
+        :rtype: dict
+        """
+        return self.search_url_config(self.url(var, default=default), engine=engine)
 
     def path(self, var, default=NOTSET, **kwargs):
         """
@@ -441,6 +458,46 @@ class Env(object):
 
         return config
 
+    @classmethod
+    def search_url_config(cls, url, engine=None):
+        config = {}
+
+        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+
+        # Remove query strings.
+        path = url.path[1:]
+        path = path.split('?', 2)[0]
+
+        if url.scheme in cls.SEARCH_SCHEMES:
+            config["ENGINE"] = cls.SEARCH_SCHEMES[url.scheme]
+
+        if path.endswith("/"):
+            path = path[:-1]
+
+        split = path.rsplit("/", 1)
+
+        if len(split) > 1:
+            path = split[:-1]
+            index = split[-1]
+        else:
+            path = ""
+            index = split[0]
+
+        config.update({
+            "URL": urlparse.urlunparse(("http",) + url[1:2] + (path,) + url[3:]),
+            "INDEX_NAME": index,
+            })
+
+        if path:
+            config.update({
+                "PATH": path,
+            })
+
+        if engine:
+            config['ENGINE'] = engine
+
+        return config
+
     @staticmethod
     def read_env(env_file=None, **overrides):
         """Read a .env file into os.environ.
@@ -598,5 +655,5 @@ def register_scheme(scheme):
         getattr(urlparse, method).append(scheme)
 
 # Register database and cache schemes in URLs.
-for schema in list(Env.DB_SCHEMES.keys()) + list(Env.CACHE_SCHEMES.keys()) + list(Env.EMAIL_SCHEMES.keys()):
+for schema in list(Env.DB_SCHEMES.keys()) + list(Env.CACHE_SCHEMES.keys()) + list(Env.SEARCH_SCHEMES.keys()) +list(Env.EMAIL_SCHEMES.keys()):
     register_scheme(schema)
