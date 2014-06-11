@@ -103,7 +103,7 @@ After::
     SECRET_KEY = env('SECRET_KEY') # Raises ImproperlyConfigured exception if SECRET_KEY not in os.environ
 
     CACHES = {
-        'default: env.cache(),
+        'default': env.cache(),
         'redis': env.cache('REDIS_URL')
     }
 
