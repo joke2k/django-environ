@@ -34,7 +34,7 @@ else:
 
 
 __author__ = 'joke2k'
-__version__ = (0, 3, 0)
+__version__ = (0, 3, 1)
 
 
 # return int if possible
@@ -66,6 +66,7 @@ class Env(object):
     DB_SCHEMES = {
         'postgres': 'django.db.backends.postgresql_psycopg2',
         'postgresql': 'django.db.backends.postgresql_psycopg2',
+        'psql': 'django.db.backends.postgresql_psycopg2',
         'pgsql': 'django.db.backends.postgresql_psycopg2',
         'postgis': 'django.contrib.gis.db.backends.postgis',
         'mysql': 'django.db.backends.mysql',
@@ -369,6 +370,10 @@ class Env(object):
             config['ENGINE'] = engine
         if url.scheme in Env.DB_SCHEMES:
             config['ENGINE'] = Env.DB_SCHEMES[url.scheme]
+
+        if not config.get('ENGINE', False):
+            warnings.warn("Engine not recognized from url: {0}".format(config))
+            return {}
 
         return config
 
