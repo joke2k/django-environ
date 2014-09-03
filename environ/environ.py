@@ -642,7 +642,7 @@ class Path(object):
     def __contains__(self, item):
         base_path = self.__root__
         if len(base_path) > 1:
-            base_path += '/'
+            base_path = os.path.join(base_path, '')
         return item.__root__.startswith(base_path)
 
     def __repr__(self):
