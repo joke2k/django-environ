@@ -627,7 +627,7 @@ class Path(object):
         return not self.__eq__(other)
 
     def __add__(self, other):
-        return Path(self.__root__, other if not isinstance(other, Path) else other.__root__[1:])
+        return Path(self.__root__, other if not isinstance(other, Path) else other.__root__)
 
     def __sub__(self, other):
         if isinstance(other, int):

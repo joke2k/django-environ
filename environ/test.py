@@ -462,7 +462,7 @@ class PathTests(unittest.TestCase):
 
         self.assertEqual(~Path('/home'), Path('/'))
         self.assertEqual(Path('/') + 'home', Path('/home'))
-        self.assertEqual(Path('/') + 'home' + Path('/public'), Path('/home/public'))
+        self.assertEqual(Path('/')+ '/home/public', Path('/home/public'))
         self.assertEqual(Path('/home/dev/public') - 2, Path('/home'))
         self.assertEqual(Path('/home/dev/public') - 'public', Path('/home/dev'))
 
