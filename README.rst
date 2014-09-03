@@ -175,13 +175,13 @@ Supported Types
 - url
 - path (environ.Path)
 - db_url
-    -  PostgreSQL: postgres://, pgsql:// or postgresql://
+    -  PostgreSQL: postgres://, pgsql://, psql:// or postgresql://
     -  PostGIS: postgis://
     -  MySQL: mysql:// or mysql2://
     -  MySQL for GeoDjango: mysqlgis://
     -  SQLITE: sqlite://
     -  SQLITE with SPATIALITE for GeoDjango: spatialite://
-
+    -  LDAP: ldap://
 - cache_url
     -  Database: dbcache://
     -  Dummy: dummycache://
@@ -215,6 +215,10 @@ Tests
 
 Changelog
 ---------
+
+=== 0.3.1 (2014-09-03)
+  * Add LDAP url support for database (django-ldapdb)
+  * Fix psql/pgsql url
 
 === 0.3 (2014-06-03) ===
 
