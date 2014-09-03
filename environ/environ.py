@@ -74,7 +74,7 @@ class Env(object):
         'mysqlgis': 'django.contrib.gis.db.backends.mysql',
         'spatialite': 'django.contrib.gis.db.backends.spatialite',
         'sqlite': 'django.db.backends.sqlite3',
-        'ldap': 'ldapdb.backends.ldap'
+        'ldap': 'ldapdb.backends.ldap',
     }
     _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT']
 
@@ -349,7 +349,9 @@ class Env(object):
         if url.scheme == 'sqlite' and path == '':
             path = ':memory:'
         if url.scheme == 'ldap':
-            path = '{scheme}://{hostname}:{port}'.format(scheme=_cast_str(url.scheme), hostname=_cast_str(url.hostname), port=_cast_str(url.port))
+            path = '{scheme}://{hostname}'.format(scheme=_cast_str(url.scheme), hostname=_cast_str(url.hostname))
+            if url.port:
+                path += ':{port}'.format(port=_cast_str(url.port))
 
         # Update with environment configuration.
         config.update({
