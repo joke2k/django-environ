@@ -8,7 +8,7 @@ env:
    - DJANGO=Django==1.4
    - DJANGO=Django==1.5
    - DJANGO=Django==1.6
-   - DJANGO="git+git://github.com/django/django.git@stable/1.7.x#egg=django"
+   - DJANGO=Django==1.7
 install:
  - pip install $DJANGO --use-mirrors
  - pip install . --use-mirrors

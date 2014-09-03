@@ -5,6 +5,8 @@ Django-environ allows you to utilize 12factor inspired environment variables to 
 
 .. image:: https://travis-ci.org/joke2k/django-environ.svg?branch=master
   :target: https://travis-ci.org/joke2k/django-environ
+.. image:: https://ci.appveyor.com/api/projects/status/o6p7l2o0xoatqcin
+  :target: https://ci.appveyor.com/project/joke2k/django-environ
 .. image:: https://coveralls.io/repos/joke2k/django-environ/badge.png?branch=master
   :target: https://coveralls.io/r/joke2k/django-environ?branch=master
 .. image:: https://badge.fury.io/py/django-environ.png
