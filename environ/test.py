@@ -294,6 +294,16 @@ class DatabaseTestSuite(unittest.TestCase):
             'init_command': 'SET storage_engine=INNODB',
         })
 
+    def test_database_ldap_url(self):
+        url = 'ldap://cn=admin,dc=nodomain,dc=org:some_secret_password@ldap.nodomain.org/'
+        url = Env.db_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'ldapdb.backends.ldap')
+        self.assertEqual(url['HOST'], 'ldap.nodomain.org')
+        self.assertEqual(url['PORT'], None)
+        self.assertEqual(url['NAME'], 'ldap://ldap.nodomain.org')
+        self.assertEqual(url['USER'], 'cn=admin,dc=nodomain,dc=org')
+        self.assertEqual(url['PASSWORD'], 'some_secret_password')
 
 class CacheTestSuite(unittest.TestCase):
 
