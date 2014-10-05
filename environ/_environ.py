@@ -563,7 +563,7 @@ class Env(object):
         cls.ENVIRON.update(resolve_files(files, defaults, overrides, iterator))
 
     @classmethod
-    def pprint(cls, stream=sys.stdout, maxlines=-1, safe=True):
+    def pprint(cls, stream=sys.stdout, maxlines=-1, safe=True, encoding='utf-8'):
 
         def is_reserved(key):
             return bool(cls.RESERVED_PATTERN.search(key.lower()))
@@ -582,7 +582,7 @@ class Env(object):
                     val = '*'*8
                 else:
                     val = env[key]
-                stream.write(('%s = %s' % (key, val)).strip().encode('utf-8'))
+                stream.write(('%s = %s' % (key, val)).strip().encode(encoding))
                 stream.write(b'\n')
                 line += 1
         stream.write(b'\n')

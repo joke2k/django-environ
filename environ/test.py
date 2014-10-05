@@ -54,7 +54,10 @@ class BaseTests(unittest.TestCase):
                     EMAIL_URL=cls.EMAIL,
                     URL_VAR=cls.URL,
                     JSON_VAR=json.dumps(cls.JSON),
-                    PATH_VAR=cls.PATH)
+                    PATH_VAR=cls.PATH,
+                    A_SECRET_VAR='my secret key',
+                    A_PASSWORD_VAR='qwerty123',
+                   )
 
     def setUp(self):
         Env.ENVIRON = self.generateData()
@@ -624,7 +627,7 @@ class PrettyPrintTests(BaseTests):
         stream = BytesIO()
         self.env.pprint(stream=stream, maxlines=1)
         expected = b'''
-BOOL_FALSE_VAR = 0
+A_PASSWORD_VAR = ********
 
 '''
         self.assertEqual(stream.getvalue(), expected)
@@ -632,8 +635,8 @@ BOOL_FALSE_VAR = 0
         stream.seek(0)
         self.env.pprint(stream=stream, maxlines=2)
         expected = b'''
-BOOL_FALSE_VAR = 0
-BOOL_FALSE_VAR2 = False
+A_PASSWORD_VAR = ********
+A_SECRET_VAR = ********
 
 '''
         self.assertEqual(stream.getvalue(), expected)
@@ -641,6 +644,9 @@ BOOL_FALSE_VAR2 = False
         stream.seek(0)
         self.env.pprint(stream=stream, maxlines=13)
         expected = b'''
+A_PASSWORD_VAR = ********
+A_SECRET_VAR = ********
+
 BOOL_FALSE_VAR = 0
 BOOL_FALSE_VAR2 = False
 BOOL_TRUE_VAR = 1
@@ -655,10 +661,6 @@ DATABASE_SQLITE_URL = sqlite:////full/path/to/your/database/file.sqlite
 DATABASE_URL = postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn
 
 DICT_VAR = foo=bar,test=on
-
-EMAIL_URL = smtps://user@domain.com:password@smtp.example.com:587
-
-EMPTY_LIST =
 
 '''
         self.assertEqual(stream.getvalue(), expected)
