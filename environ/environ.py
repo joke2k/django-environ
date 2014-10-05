@@ -556,6 +556,16 @@ class Env(object):
 
     @classmethod
     def read(cls, files, defaults=None, overrides=None, iterator=None):
+        """
+        Populate the environment dictionary from one or more files.
+
+        Interpolates values in the format $var or ${var}. If an interpolation
+        target is missing, a KeyError is raised; and if any key is an invalid
+        Python variable, a ValueError is raised.
+
+        The default file iterator will determine key/value pairs by splitting
+        lines on both '=' and ':='.
+        """
         if isinstance(files, basestring):
             files = [files]
         cls.ENVIRON.update(resolve_files(files, defaults, overrides, iterator))

@@ -7,6 +7,8 @@ from string import Template as StringTemplate
 from .compat import ExitStack
 
 def iter_properties(iterable):
+    """Split lines on '=' and ':=' ignoring blank lines and comments.
+    """
     for line in iterable:
         if not line.isspace() and not line.startswith('#'):
             key, sep, val = line.partition(':=')
@@ -16,6 +18,15 @@ def iter_properties(iterable):
                 yield key.strip(), val.strip()
 
 def interpolated(d, context=None):
+    """Recursively interpolate dictionary values.
+
+    The expected interpolation format is that defined within the stdlib
+    `string.Template` class::
+
+        $foo or ${foo}
+
+    Will raise KeyError for missing keys and ValueError for invalid keys.
+    """
     if context is None:
         context = dict(d)
     unresolved = {}
@@ -30,6 +41,12 @@ def interpolated(d, context=None):
     return context
 
 def resolve(iterables, defaults=None, overrides=None, iterator=None):
+    """
+    Create a dictionary from an 'iterable of iterables' and interpolate the
+    values within the result. Each iterable instance is expected to yield a
+    key/value pair (ie. a 2-tuple of strings). Duplicate keys are allowed,
+    with later keys will overriding earlier.
+    """
     if not defaults:
         initial = {}
     else:
@@ -44,6 +61,9 @@ def resolve(iterables, defaults=None, overrides=None, iterator=None):
     return result
 
 def resolve_files(filenames, defaults=None, overrides=None, iterator=None):
+    """Create a a dictionary from one or more 'property' or 'env' files and
+    interpolate the resulting values.
+    """
     with ExitStack() as stack:
         return resolve(
             [stack.enter_context(open(f)) for f in filenames],
