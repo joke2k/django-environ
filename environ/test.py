@@ -548,22 +548,18 @@ class InterpolationTests(unittest.TestCase):
         self.assertEqual(d['fit'], 'cat DB_bar TABLE_bar')
         self.assertEqual(d['tif'], 'DB_bar TABLE_bar cat')
 
-    def test_file_input(self):
-        infiles = [filepath("common.properties"), filepath("env.properties")]
-        d = resolve_files(infiles)
-        self.assertEqual(d['foo'], 'TEST')
-        self.assertEqual(d['fee'], 'DB_TEST')
-        self.assertEqual(d['fab'], 'DB_TEST TABLE_TEST')
-        self.assertEqual(d['baf'], 'TABLE_TEST DB_TEST')
-        self.assertEqual(d['fit'], 'cat DB_TEST TABLE_TEST')
-        self.assertEqual(d['tif'], 'DB_TEST TABLE_TEST cat')
-
     def test_bad_input(self):
         lines = '''
         foo := bar
         fee := DB_$typo
         '''.splitlines()
         self.assertRaises(KeyError, resolve, [lines])
+
+        lines = '''
+        2foo := bar
+        fee := DB_$2foo
+        '''.splitlines()
+        self.assertRaises(ValueError, resolve, [lines])
 
     def test_defaults(self):
         lines = '''
@@ -582,6 +578,28 @@ class InterpolationTests(unittest.TestCase):
         d = resolve([lines], {'typo': 'TEST'}, {'fee': 'OVERRIDE'})
         self.assertEqual(d['foo'], 'bar')
         self.assertEqual(d['fee'], 'OVERRIDE')
+
+    def test_file_input(self):
+        infiles = [filepath("common.properties"), filepath("env.properties")]
+        d = resolve_files(infiles)
+        self.assertEqual(d['foo'], 'TEST')
+        self.assertEqual(d['fee'], 'DB_TEST')
+        self.assertEqual(d['fab'], 'DB_TEST TABLE_TEST')
+        self.assertEqual(d['baf'], 'TABLE_TEST DB_TEST')
+        self.assertEqual(d['fit'], 'cat DB_TEST TABLE_TEST')
+        self.assertEqual(d['tif'], 'DB_TEST TABLE_TEST cat')
+
+    def test_read_classmethod(self):
+        ENVIRON = Env.ENVIRON = {}
+        infiles = [filepath("common.properties"), filepath("env.properties")]
+        Env.read(infiles)
+        self.assertEqual(ENVIRON['foo'], 'TEST')
+        self.assertEqual(ENVIRON['fee'], 'DB_TEST')
+        self.assertEqual(ENVIRON['fab'], 'DB_TEST TABLE_TEST')
+        self.assertEqual(ENVIRON['baf'], 'TABLE_TEST DB_TEST')
+        self.assertEqual(ENVIRON['fit'], 'cat DB_TEST TABLE_TEST')
+        self.assertEqual(ENVIRON['tif'], 'DB_TEST TABLE_TEST cat')
+
 
 def load_suite():
 
