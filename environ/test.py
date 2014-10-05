@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import unittest
 
 from environ import *
+from interpolation import resolve, resolve_files
 
 
 class BaseTests(unittest.TestCase):
@@ -475,13 +476,64 @@ class PathTests(unittest.TestCase):
 
         self.assertRaises(TypeError, lambda _: Path('/home/dev/') - 'not int')
 
+class InterpolationTests(unittest.TestCase):
+
+    def test_empty_input(self):
+        lines = '''
+        '''.splitlines()
+        d = resolve([lines])
+        self.assertTrue(type(d) is dict)
+        self.assertTrue(len(d) == 0)
+
+    def test_default_separators(self):
+        lines = '''
+        foo := bar
+        fee:= fum
+        fab :=day
+        null :=
+        '''.splitlines()
+        d = resolve([lines])
+        self.assertEqual(d['foo'], 'bar')
+        self.assertEqual(d['fee'], 'fum')
+        self.assertEqual(d['fab'], 'day')
+        self.assertEqual(d['null'], '')
+        lines = '''
+        foo = bar
+        fee= fum
+        fab =day
+        null =
+        '''.splitlines()
+        d = resolve([lines])
+        self.assertEqual(d['foo'], 'bar')
+        self.assertEqual(d['fee'], 'fum')
+        self.assertEqual(d['fab'], 'day')
+        self.assertEqual(d['null'], '')
+
+    def test_multiple_input(self):
+        common = '''
+        foo := bar
+        fee:= fum
+        fab :=day
+        null :=
+        '''.splitlines()
+        env_overrides = '''
+        password := mysecret
+        fab := night
+        null := nolongernull
+        '''.splitlines()
+        d = resolve([common, env_overrides])
+        self.assertEqual(d['foo'], 'bar')
+        self.assertEqual(d['fee'], 'fum')
+        self.assertEqual(d['fab'], 'night')
+        self.assertEqual(d['null'], 'nolongernull')
+        self.assertEqual(d['password'], 'mysecret')
 
 def load_suite():
 
     test_suite = unittest.TestSuite()
     cases = [
         EnvTests, FileEnvTests, SubClassTests, SchemaEnvTests, PathTests,
-        DatabaseTestSuite, CacheTestSuite, EmailTests
+        DatabaseTestSuite, CacheTestSuite, EmailTests, InterpolationTests
     ]
     for case in cases:
         test_suite.addTest(unittest.makeSuite(case))

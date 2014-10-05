@@ -32,6 +32,7 @@ else:
     text_type = str
     basestring = str
 
+from .interpolation import resolve_files
 
 __author__ = 'joke2k'
 __version__ = (0, 3, 1)
@@ -553,6 +554,11 @@ class Env(object):
         for key, value in overrides.items():
             cls.ENVIRON.setdefault(key, value)
 
+    @classmethod
+    def read(cls, files, defaults=None, overrides=None, iterator=None):
+        if isinstance(files, basestring):
+            files = [files]
+        cls.ENVIRON.update(resolve_files(files, defaults, overrides, iterator))
 
 class Path(object):
     """Inspired to Django Two-scoops, handling File Paths in Settings.
