@@ -3,8 +3,11 @@ import os
 import sys
 from itertools import chain
 from string import Template as StringTemplate
+import logging
 
-from .compat import ExitStack
+from .compat import ExitStack, basestring
+
+logger = logging.getLogger(__file__)
 
 def iter_properties(iterable):
     """Split lines on '=' and ':=' ignoring blank lines and comments.
@@ -60,15 +63,16 @@ def resolve(iterables, defaults=None, overrides=None, iterator=None):
     result.update(overrides)
     return result
 
-def resolve_files(filenames, defaults=None, overrides=None, iterator=None):
+def resolve_files(files, defaults=None, overrides=None, iterator=None):
     """Create a a dictionary from one or more 'property' or 'env' files and
     interpolate the resulting values.
     """
     with ExitStack() as stack:
-        return resolve(
-            [stack.enter_context(open(f)) for f in filenames],
-            defaults,
-            overrides,
-            iterator
-        )
+        iterables = []
+        for f in files:
+            if isinstance(f, basestring):
+                iterables.append(stack.enter_context(open(f)))
+            else:
+                iterables.append(stack.enter_context(f))
+        return resolve(iterables, defaults, overrides, iterator)
 

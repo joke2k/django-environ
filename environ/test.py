@@ -55,6 +55,7 @@ class BaseTests(unittest.TestCase):
         self.env = Env()
 
     def tearDown(self):
+        del Env.ENVIRON
         Env.ENVIRON = os.environ
 
     def assertTypeAndValue(self, type_, expected, actual):
@@ -198,10 +199,14 @@ class EnvTests(BaseTests):
 class FileEnvTests(EnvTests):
 
     def setUp(self):
-        Env.ENVIRON = {}
+        Env.ENVIRON = self.generateData()
         self.env = Env()
         file_path = Path(__file__, is_file=True)('test_env.txt')
         self.env.read_env(file_path, PATH_VAR=Path(__file__, is_file=True).__root__)
+
+    def test_path(self):
+        root = self.env.path('PATH_VAR')
+        self.assertNotEqual(Path(self.PATH), root)
 
 class SubClassTests(EnvTests):
 

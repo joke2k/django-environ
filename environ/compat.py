@@ -2,6 +2,13 @@
 import sys
 from collections import deque
 
+if sys.version < '3':
+    text_type = unicode
+    basestring = basestring
+else:
+    text_type = str
+    basestring = str
+
 # from Contextlib2 - Nick Coghlan
 class ExitStack(object):
     """Context manager for dynamic management of a stack of exit callbacks

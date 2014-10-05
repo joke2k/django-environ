@@ -529,30 +529,20 @@ class Env(object):
                 warnings.warn("not reading %s - it doesn't exist." % env_file)
                 return
 
-        try:
-            with open(env_file) if isinstance(env_file, basestring) else env_file as f:
-                content = f.read()
-        except IOError:
-            warnings.warn("not reading %s - it doesn't exist." % env_file)
-            return
+        def iterator(iterable):
+            for line in iterable:
+                m1 = re.match(r'\A([A-Za-z_0-9]+)=(.*)\Z', line)
+                if m1:
+                    key, val = m1.group(1), m1.group(2)
+                    m2 = re.match(r"\A'(.*)'\Z", val)
+                    if m2:
+                        val = m2.group(1)
+                    m3 = re.match(r'\A"(.*)"\Z', val)
+                    if m3:
+                        val = re.sub(r'\\(.)', r'\1', m3.group(1))
+                    yield key, text_type(val)
 
-        logger.debug('Read environment variables from: {0}'.format(env_file))
-
-        for line in content.splitlines():
-            m1 = re.match(r'\A([A-Za-z_0-9]+)=(.*)\Z', line)
-            if m1:
-                key, val = m1.group(1), m1.group(2)
-                m2 = re.match(r"\A'(.*)'\Z", val)
-                if m2:
-                    val = m2.group(1)
-                m3 = re.match(r'\A"(.*)"\Z', val)
-                if m3:
-                    val = re.sub(r'\\(.)', r'\1', m3.group(1))
-                cls.ENVIRON.setdefault(key, text_type(val))
-
-        # set defaults
-        for key, value in overrides.items():
-            cls.ENVIRON.setdefault(key, value)
+        cls.read(env_file, overrides=overrides, iterator=iterator)
 
     @classmethod
     def read(cls, files, defaults=None, overrides=None, iterator=None):
