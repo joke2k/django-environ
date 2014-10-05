@@ -528,6 +528,24 @@ class InterpolationTests(unittest.TestCase):
         self.assertEqual(d['null'], 'nolongernull')
         self.assertEqual(d['password'], 'mysecret')
 
+    def test_interpolation(self):
+        lines = '''
+        foo := bar
+        fat := cat
+        fee := DB_${foo}
+        fab := ${fee} TABLE_${foo}
+        baf := TABLE_${foo} ${fee}
+        fit := ${fat} ${fab}
+        tif := ${fab} ${fat}
+        '''.splitlines()
+        d = resolve([lines])
+        self.assertEqual(d['foo'], 'bar')
+        self.assertEqual(d['fee'], 'DB_bar')
+        self.assertEqual(d['fab'], 'DB_bar TABLE_bar')
+        self.assertEqual(d['baf'], 'TABLE_bar DB_bar')
+        self.assertEqual(d['fit'], 'cat DB_bar TABLE_bar')
+        self.assertEqual(d['tif'], 'DB_bar TABLE_bar cat')
+
 def load_suite():
 
     test_suite = unittest.TestSuite()
