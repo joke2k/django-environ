@@ -131,3 +131,8 @@ except ImportError:
     except ImportError:
         pass
 
+try:
+    from io import BytesIO
+except ImportError:
+    from cStringIO import StringIO as BytesIO
+

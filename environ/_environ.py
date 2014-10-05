@@ -112,6 +112,7 @@ class Env(object):
         "whoosh": "haystack.backends.whoosh_backend.WhooshEngine",
         "simple": "haystack.backends.simple_backend.SimpleEngine",
     }
+    RESERVED_PATTERN = re.compile('key|secret|passwd|password')
 
 
 
@@ -560,6 +561,31 @@ class Env(object):
         if isinstance(files, basestring):
             files = [files]
         cls.ENVIRON.update(resolve_files(files, defaults, overrides, iterator))
+
+    @classmethod
+    def pprint(cls, stream=sys.stdout, maxlines=-1, safe=True):
+
+        def is_reserved(key):
+            return bool(cls.RESERVED_PATTERN.search(key.lower()))
+
+        from itertools import groupby
+        env = cls.ENVIRON
+        line = -1 * maxlines
+        for _, group in groupby(sorted(env.keys()), lambda X: X.split('_')[0]):
+            if line == 0:
+                break
+            stream.write(b'\n')
+            for key in group:
+                if line == 0:
+                    break
+                if safe and is_reserved(key):
+                    val = '*'*8
+                else:
+                    val = env[key]
+                stream.write(('%s = %s' % (key, val)).strip().encode('utf-8'))
+                stream.write(b'\n')
+                line += 1
+        stream.write(b'\n')
 
 class Path(object):
     """Inspired to Django Two-scoops, handling File Paths in Settings.

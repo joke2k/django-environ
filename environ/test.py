@@ -617,13 +617,59 @@ class InterpolationTests(unittest.TestCase):
         self.assertEqual(ENVIRON['fit'], 'cat DB_TEST TABLE_TEST')
         self.assertEqual(ENVIRON['tif'], 'DB_TEST TABLE_TEST cat')
 
+class PrettyPrintTests(BaseTests):
+
+    def test_pprint(self):
+        from environ.compat import BytesIO
+        stream = BytesIO()
+        self.env.pprint(stream=stream, maxlines=1)
+        expected = b'''
+BOOL_FALSE_VAR = 0
+
+'''
+        self.assertEqual(stream.getvalue(), expected)
+
+        stream.seek(0)
+        self.env.pprint(stream=stream, maxlines=2)
+        expected = b'''
+BOOL_FALSE_VAR = 0
+BOOL_FALSE_VAR2 = False
+
+'''
+        self.assertEqual(stream.getvalue(), expected)
+
+        stream.seek(0)
+        self.env.pprint(stream=stream, maxlines=13)
+        expected = b'''
+BOOL_FALSE_VAR = 0
+BOOL_FALSE_VAR2 = False
+BOOL_TRUE_VAR = 1
+BOOL_TRUE_VAR2 = True
+
+CACHE_REDIS = rediscache://127.0.0.1:6379:1?client_class=redis_cache.client.DefaultClient&password=secret
+CACHE_URL = memcache://127.0.0.1:11211
+
+DATABASE_MYSQL_GIS_URL = mysqlgis://user:password@127.0.0.1/some_database
+DATABASE_MYSQL_URL = mysql://bea6eb025ca0d8:69772142@us-cdbr-east.cleardb.com/heroku_97681db3eff7580?reconnect=true
+DATABASE_SQLITE_URL = sqlite:////full/path/to/your/database/file.sqlite
+DATABASE_URL = postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn
+
+DICT_VAR = foo=bar,test=on
+
+EMAIL_URL = smtps://user@domain.com:password@smtp.example.com:587
+
+EMPTY_LIST =
+
+'''
+        self.assertEqual(stream.getvalue(), expected)
 
 def load_suite():
 
     test_suite = unittest.TestSuite()
     cases = [
         EnvTests, FileEnvTests, SubClassTests, SchemaEnvTests, PathTests,
-        DatabaseTestSuite, CacheTestSuite, EmailTests, InterpolationTests
+        DatabaseTestSuite, CacheTestSuite, EmailTests, InterpolationTests,
+        PrettyPrintTests,
     ]
     for case in cases:
         test_suite.addTest(unittest.makeSuite(case))
