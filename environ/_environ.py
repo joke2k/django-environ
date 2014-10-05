@@ -8,6 +8,7 @@ import sys
 import re
 import json
 import warnings
+import glob
 
 import logging
 
@@ -667,6 +668,10 @@ class Path(object):
         if kwargs.get('required', False) and not os.path.exists(absolute_path):
             raise ImproperlyConfigured("Create required path: {0}".format(absolute_path))
         return absolute_path
+
+    def glob(self, pattern):
+        for filename in glob.iglob(os.path.join(self.__root__, pattern)):
+            yield filename
 
 def register_scheme(scheme):
     for method in filter(lambda s: s.startswith('uses_'), dir(urlparse)):

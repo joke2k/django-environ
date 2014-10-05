@@ -9,6 +9,8 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from environ._environ import *
 
+basename = os.path.basename
+
 def filepath(relpath):
     return Path(__file__, is_file=True)(relpath)
 
@@ -486,6 +488,12 @@ class PathTests(unittest.TestCase):
         self.assertEqual(Path('/home/dev/public') - 'public', Path('/home/dev'))
 
         self.assertRaises(TypeError, lambda _: Path('/home/dev/') - 'not int')
+
+    def test_glob(self):
+        envfiles = sorted(Path(__file__, '..').glob('*.properties'))
+        self.assertEqual(len(envfiles), 2)
+        self.assertEqual(basename(envfiles[0]), 'common.properties')
+        self.assertEqual(basename(envfiles[1]), 'env.properties')
 
 class InterpolationTests(unittest.TestCase):
 
