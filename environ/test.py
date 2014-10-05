@@ -2,8 +2,12 @@ from __future__ import print_function
 from __future__ import unicode_literals
 import unittest
 
-from environ import *
-from interpolation import resolve, resolve_files
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from environ._environ import *
 
 def filepath(relpath):
     return Path(__file__, is_file=True)(relpath)
@@ -628,3 +632,4 @@ if __name__ == "__main__":
         pass
 
     unittest.TextTestRunner().run(load_suite())
+

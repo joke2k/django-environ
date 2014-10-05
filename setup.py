@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 from setuptools import setup, find_packages
 
-from environ import environ
+from environ import _environ as environ
 
 
 here = environ.Path(__file__, is_file=True)
