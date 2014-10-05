@@ -32,7 +32,7 @@ else:
     text_type = str
     basestring = str
 
-from .interpolation import resolve_files
+from interpolation import resolve_files
 
 __author__ = 'joke2k'
 __version__ = (0, 3, 1)

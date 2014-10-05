@@ -5,7 +5,7 @@ from itertools import chain
 from string import Template as StringTemplate
 import logging
 
-from .compat import ExitStack, basestring
+from compat import ExitStack, basestring
 
 logger = logging.getLogger(__file__)
 
