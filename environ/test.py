@@ -210,7 +210,7 @@ class SubClassTests(EnvTests):
         self.env = MyEnv()
 
     def test_singleton_environ(self):
-        self.assertIs(self.CONFIG, self.env.ENVIRON)
+        self.assertTrue(self.CONFIG is self.env.ENVIRON)
 
 class SchemaEnvTests(BaseTests):
 
