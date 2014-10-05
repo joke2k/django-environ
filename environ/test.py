@@ -5,6 +5,8 @@ import unittest
 from environ import *
 from interpolation import resolve, resolve_files
 
+def filepath(relpath):
+    return Path(__file__, is_file=True)(relpath)
 
 class BaseTests(unittest.TestCase):
 
@@ -545,6 +547,16 @@ class InterpolationTests(unittest.TestCase):
         self.assertEqual(d['baf'], 'TABLE_bar DB_bar')
         self.assertEqual(d['fit'], 'cat DB_bar TABLE_bar')
         self.assertEqual(d['tif'], 'DB_bar TABLE_bar cat')
+
+    def test_file_input(self):
+        infiles = [filepath("common.properties"), filepath("env.properties")]
+        d = resolve_files(infiles)
+        self.assertEqual(d['foo'], 'TEST')
+        self.assertEqual(d['fee'], 'DB_TEST')
+        self.assertEqual(d['fab'], 'DB_TEST TABLE_TEST')
+        self.assertEqual(d['baf'], 'TABLE_TEST DB_TEST')
+        self.assertEqual(d['fit'], 'cat DB_TEST TABLE_TEST')
+        self.assertEqual(d['tif'], 'DB_TEST TABLE_TEST cat')
 
 def load_suite():
 
