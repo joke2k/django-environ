@@ -565,6 +565,24 @@ class InterpolationTests(unittest.TestCase):
         '''.splitlines()
         self.assertRaises(KeyError, resolve, [lines])
 
+    def test_defaults(self):
+        lines = '''
+        foo := bar
+        fee := DB_$typo
+        '''.splitlines()
+        d = resolve([lines], {'typo': 'TEST'})
+        self.assertEqual(d['foo'], 'bar')
+        self.assertEqual(d['fee'], 'DB_TEST')
+
+    def test_overrides(self):
+        lines = '''
+        foo := bar
+        fee := DB_$typo
+        '''.splitlines()
+        d = resolve([lines], {'typo': 'TEST'}, {'fee': 'OVERRIDE'})
+        self.assertEqual(d['foo'], 'bar')
+        self.assertEqual(d['fee'], 'OVERRIDE')
+
 def load_suite():
 
     test_suite = unittest.TestSuite()
