@@ -558,7 +558,7 @@ class Env(object):
         The default file iterator will determine key/value pairs by splitting
         lines on both '=' and ':='.
         """
-        if isinstance(files, basestring):
+        if isinstance(files, basestring) or hasattr(files, 'read'):
             files = [files]
         cls.ENVIRON.update(resolve_files(files, defaults, overrides, iterator))
 
