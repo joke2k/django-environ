@@ -536,9 +536,9 @@ class InterpolationTests(unittest.TestCase):
         fat := cat
         fee := DB_${foo}
         fab := ${fee} TABLE_${foo}
-        baf := TABLE_${foo} ${fee}
-        fit := ${fat} ${fab}
-        tif := ${fab} ${fat}
+        baf := TABLE_${foo} $fee
+        fit := $fat ${fab}
+        tif := $fab $fat
         '''.splitlines()
         d = resolve([lines])
         self.assertEqual(d['foo'], 'bar')
@@ -557,6 +557,13 @@ class InterpolationTests(unittest.TestCase):
         self.assertEqual(d['baf'], 'TABLE_TEST DB_TEST')
         self.assertEqual(d['fit'], 'cat DB_TEST TABLE_TEST')
         self.assertEqual(d['tif'], 'DB_TEST TABLE_TEST cat')
+
+    def test_bad_input(self):
+        lines = '''
+        foo := bar
+        fee := DB_$typo
+        '''.splitlines()
+        self.assertRaises(KeyError, resolve, [lines])
 
 def load_suite():
 
