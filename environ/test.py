@@ -219,7 +219,11 @@ class OsEnvironTests(unittest.TestCase):
         self.env = Environment()
 
     def test_singleton_environ(self):
-        self.assertTrue(self.env._environ is os.environ.data)
+        try:
+            os_environ = os.environ.data
+        except AttributeError:
+            os_environ = os.environ._data
+        self.assertTrue(self.env._environ is os_environ)
 
 class SchemaEnvTests(BaseTests):
 
