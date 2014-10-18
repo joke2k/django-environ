@@ -50,18 +50,17 @@ class NoValue(object):
         return '<{0}>'.format(self.__class__.__name__)
 
 
-class Env(object):
+class Environment(object):
     """Provide schema-based lookups of environment variables so that each
     caller doesn't have to pass in `cast` and `default` parameters.
 
     Usage:::
 
-        env = Env(MAIL_ENABLED=bool, SMTP_LOGIN=(str, 'DEFAULT'))
+        env = Environment(MAIL_ENABLED=bool, SMTP_LOGIN=(str, 'DEFAULT'))
         if env('MAIL_ENABLED'):
             ...
     """
 
-    ENVIRON = os.environ
     NOTSET = NoValue()
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = urlparse.ParseResult
@@ -116,8 +115,11 @@ class Env(object):
 
 
 
-    def __init__(self, **schema):
-        self.schema = schema
+    def __init__(self, init=None, **schema):
+        if init is None:
+            init = os.environ.data
+        self._environ = init
+        self._schema = schema
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
         return self.get_value(var, cast=cast, default=default, parse_default=parse_default)
@@ -227,14 +229,15 @@ class Env(object):
 
         logger.debug("get '{0}' casted as '{1}' with default '{2}'".format(var, cast, default))
 
-        if var in self.schema:
-            var_info = self.schema[var]
-
+        try:
+            var_info = self._schema[var]
+        except KeyError:
+            pass
+        else:
             try:
                 has_default = len(var_info) == 2
             except TypeError:
                 has_default = False
-
             if has_default:
                 if not cast:
                     cast = var_info[0]
@@ -249,7 +252,7 @@ class Env(object):
                     cast = var_info
 
         try:
-            value = self.ENVIRON[var]
+            value = self._environ[var]
         except KeyError:
             if default is self.NOTSET:
                 error_msg = "Set the {0} environment variable".format(var)
@@ -269,8 +272,7 @@ class Env(object):
 
     # Class and static methods
 
-    @classmethod
-    def parse_value(cls, value, cast):
+    def parse_value(self, value, cast):
         """Parse and cast provided value
 
         :param value: Stringed value.
@@ -284,7 +286,7 @@ class Env(object):
             try:
                 value = int(value) != 0
             except ValueError:
-                value = value.lower() in cls.BOOLEAN_TRUE_STRINGS
+                value = value.lower() in self.BOOLEAN_TRUE_STRINGS
         elif isinstance(cast, list):
             value = list(map(cast[0], [x for x in value.split(',') if x]))
         elif isinstance(cast, dict):
@@ -292,7 +294,7 @@ class Env(object):
             value_cast = cast.get('value', text_type)
             value_cast_by_key = cast.get('cast', dict())
             value = dict(map(
-                lambda kv: (key_cast(kv[0]), cls.parse_value(kv[1], value_cast_by_key.get(kv[0], value_cast))),
+                lambda kv: (key_cast(kv[0]), self.parse_value(kv[1], value_cast_by_key.get(kv[0], value_cast))),
                 [val.split('=') for val in value.split(';') if val]
             ))
         elif cast is dict:
@@ -314,8 +316,7 @@ class Env(object):
             value = cast(value)
         return value
 
-    @classmethod
-    def db_url_config(cls, url, engine=None):
+    def db_url_config(self, url, engine=None):
         """Pulled from DJ-Database-URL, parse an arbitrary Database URL.
         Support currently exists for PostgreSQL, PostGIS, MySQL and SQLite.
 
@@ -323,20 +324,20 @@ class Env(object):
         and using the "file" portion as the filename of the database.
         This has the effect of four slashes being present for an absolute file path:
 
-        >>> from environ import Env
-        >>> Env.db_url_config('sqlite:////full/path/to/your/file.sqlite')
+        >>> from environ import Environment
+        >>> Environment.db_url_config('sqlite:////full/path/to/your/file.sqlite')
         {'ENGINE': 'django.db.backends.sqlite3', 'HOST': None, 'NAME': '/full/path/to/your/file.sqlite', 'PASSWORD': None, 'PORT': None, 'USER': None}
-        >>> Env.db_url_config('postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn')
+        >>> Environment.db_url_config('postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn')
         {'ENGINE': 'django.db.backends.postgresql_psycopg2', 'HOST': 'ec2-107-21-253-135.compute-1.amazonaws.com', 'NAME': 'd8r82722r2kuvn', 'PASSWORD': 'wegauwhgeuioweg', 'PORT': 5431, 'USER': 'uf07k1i6d8ia0v'}
 
         """
-        if not isinstance(url, cls.URL_CLASS):
+        if not isinstance(url, self.URL_CLASS):
             if url == 'sqlite://:memory:':
                 # this is a special case, because if we pass this URL into
                 # urlparse, urlparse will choke trying to interpret "memory"
                 # as a port number
                 return {
-                    'ENGINE': cls.DB_SCHEMES['sqlite'],
+                    'ENGINE': self.DB_SCHEMES['sqlite'],
                     'NAME': ':memory:'
                 }
                 # note: no other settings are required for sqlite
@@ -369,7 +370,7 @@ class Env(object):
         if url.query:
             config_options = {}
             for k, v in urlparse.parse_qs(url.query).items():
-                if k.upper() in cls._DB_BASE_OPTIONS:
+                if k.upper() in self._DB_BASE_OPTIONS:
                     config.update({k.upper(): _cast_int(v[0])})
                 else:
                     config_options.update({k: _cast_int(v[0])})
@@ -377,8 +378,8 @@ class Env(object):
 
         if engine:
             config['ENGINE'] = engine
-        if url.scheme in Env.DB_SCHEMES:
-            config['ENGINE'] = Env.DB_SCHEMES[url.scheme]
+        if url.scheme in Environment.DB_SCHEMES:
+            config['ENGINE'] = Environment.DB_SCHEMES[url.scheme]
 
         if not config.get('ENGINE', False):
             warnings.warn("Engine not recognized from url: {0}".format(config))
@@ -386,22 +387,21 @@ class Env(object):
 
         return config
 
-    @classmethod
-    def cache_url_config(cls, url, backend=None):
+    def cache_url_config(self, url, backend=None):
         """Pulled from DJ-Cache-URL, parse an arbitrary Cache URL.
 
         :param url:
         :param overrides:
         :return:
         """
-        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        url = urlparse.urlparse(url) if not isinstance(url, self.URL_CLASS) else url
 
         location = url.netloc.split(',')
         if len(location) == 1:
             location = location[0]
 
         config = {
-            'BACKEND': cls.CACHE_SCHEMES[url.scheme],
+            'BACKEND': self.CACHE_SCHEMES[url.scheme],
             'LOCATION': location,
         }
 
@@ -419,7 +419,7 @@ class Env(object):
             config_options = {}
             for k, v in urlparse.parse_qs(url.query).items():
                 opt = {k.upper(): _cast_int(v[0])}
-                if k.upper() in cls._CACHE_BASE_OPTIONS:
+                if k.upper() in self._CACHE_BASE_OPTIONS:
                     config.update(opt)
                 else:
                     config_options.update(opt)
@@ -430,13 +430,12 @@ class Env(object):
 
         return config
 
-    @classmethod
-    def email_url_config(cls, url, backend=None):
+    def email_url_config(self, url, backend=None):
         """Parses an email URL."""
 
         config = {}
 
-        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        url = urlparse.urlparse(url) if not isinstance(url, self.URL_CLASS) else url
 
         # Remove query strings
         path = url.path[1:]
@@ -453,8 +452,8 @@ class Env(object):
 
         if backend:
             config['EMAIL_BACKEND'] = backend
-        elif url.scheme in cls.EMAIL_SCHEMES:
-            config['EMAIL_BACKEND'] = cls.EMAIL_SCHEMES[url.scheme]
+        elif url.scheme in self.EMAIL_SCHEMES:
+            config['EMAIL_BACKEND'] = self.EMAIL_SCHEMES[url.scheme]
 
         if url.scheme == 'smtps':
             config['EMAIL_USE_TLS'] = True
@@ -465,7 +464,7 @@ class Env(object):
             config_options = {}
             for k, v in urlparse.parse_qs(url.query).items():
                 opt = {k.upper(): _cast_int(v[0])}
-                if k.upper() in cls._EMAIL_BASE_OPTIONS:
+                if k.upper() in self._EMAIL_BASE_OPTIONS:
                     config.update(opt)
                 else:
                     config_options.update(opt)
@@ -473,18 +472,17 @@ class Env(object):
 
         return config
 
-    @classmethod
-    def search_url_config(cls, url, engine=None):
+    def search_url_config(self, url, engine=None):
         config = {}
 
-        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        url = urlparse.urlparse(url) if not isinstance(url, self.URL_CLASS) else url
 
         # Remove query strings.
         path = url.path[1:]
         path = path.split('?', 2)[0]
 
-        if url.scheme in cls.SEARCH_SCHEMES:
-            config["ENGINE"] = cls.SEARCH_SCHEMES[url.scheme]
+        if url.scheme in self.SEARCH_SCHEMES:
+            config["ENGINE"] = self.SEARCH_SCHEMES[url.scheme]
 
         if path.endswith("/"):
             path = path[:-1]
@@ -513,8 +511,7 @@ class Env(object):
 
         return config
 
-    @classmethod
-    def read_env(cls, env_file=None, **overrides):
+    def read_env(self, env_file=None, **overrides):
         """Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack backtracking
@@ -544,10 +541,9 @@ class Env(object):
                         val = re.sub(r'\\(.)', r'\1', m3.group(1))
                     yield key, text_type(val)
 
-        cls.read(env_file, overrides=overrides, iterator=iterator)
+        self.read(env_file, overrides=overrides, iterator=iterator)
 
-    @classmethod
-    def read(cls, files, defaults=None, overrides=None, iterator=None):
+    def read(self, files, defaults=None, overrides=None, iterator=None):
         """
         Populate the environment dictionary from one or more files.
 
@@ -560,16 +556,15 @@ class Env(object):
         """
         if isinstance(files, basestring) or hasattr(files, 'read'):
             files = [files]
-        cls.ENVIRON.update(resolve_files(files, defaults, overrides, iterator))
+        self._environ.update(resolve_files(files, defaults, overrides, iterator))
 
-    @classmethod
-    def pprint(cls, stream=sys.stdout, maxlines=-1, safe=True, encoding='utf-8'):
+    def pprint(self, stream=sys.stdout, maxlines=-1, safe=True, encoding='utf-8'):
 
         def is_reserved(key):
-            return bool(cls.RESERVED_PATTERN.search(key.lower()))
+            return bool(self.RESERVED_PATTERN.search(key.lower()))
 
         from itertools import groupby
-        env = cls.ENVIRON
+        env = self._environ
         line = -1 * maxlines
         for _, group in groupby(sorted(env.keys()), lambda X: X.split('_')[0]):
             if line == 0:
@@ -586,6 +581,8 @@ class Env(object):
                 stream.write(b'\n')
                 line += 1
         stream.write(b'\n')
+
+environ = Environment()
 
 class Path(object):
     """Inspired to Django Two-scoops, handling File Paths in Settings.
@@ -704,5 +701,9 @@ def register_scheme(scheme):
         getattr(urlparse, method).append(scheme)
 
 # Register database and cache schemes in URLs.
-for schema in list(Env.DB_SCHEMES.keys()) + list(Env.CACHE_SCHEMES.keys()) + list(Env.SEARCH_SCHEMES.keys()) +list(Env.EMAIL_SCHEMES.keys()):
+_SCHEMES = []
+for schtype in ['DB', 'CACHE', 'SEARCH', 'EMAIL']:
+    _SCHEMES.extend(getattr(Environment, schtype + '_SCHEMES').keys())
+for schema in _SCHEMES:
     register_scheme(schema)
+
