@@ -14,7 +14,7 @@ from environ._environ import Path, ImproperlyConfigured, text_type
 basename = os.path.basename
 
 def filepath(relpath):
-    return Path(__file__, is_file=True)(relpath)
+    return Path(__file__, is_file=True)("data", relpath)
 
 class BaseTests(unittest.TestCase):
 
@@ -206,7 +206,7 @@ class FileEnvTests(EnvTests):
 
     def setUp(self):
         self.env = Environment(self.generateData())
-        file_path = Path(__file__, is_file=True)('test_env.txt')
+        file_path = filepath('test_env.txt')
         self.env.read_env(file_path, PATH_VAR=Path(__file__, is_file=True).__root__)
 
     def test_path(self):
@@ -493,7 +493,7 @@ class PathTests(unittest.TestCase):
         self.assertRaises(TypeError, lambda _: Path('/home/dev/') - 'not int')
 
     def test_glob(self):
-        envfiles = sorted(Path(__file__, '..').glob('*.properties'))
+        envfiles = sorted(Path(__file__, '..').glob('data/*.properties'))
         self.assertEqual(len(envfiles), 2)
         self.assertEqual(basename(envfiles[0]), 'common.properties')
         self.assertEqual(basename(envfiles[1]), 'env.properties')
