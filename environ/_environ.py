@@ -117,7 +117,11 @@ class Environment(object):
 
     def __init__(self, init=None, **schema):
         if init is None:
-            init = os.environ.data
+            try:
+                init = os.environ.data
+            except AttributeError:
+                #python3
+                init = os.environ._data
         self._environ = init
         self._schema = schema
 
