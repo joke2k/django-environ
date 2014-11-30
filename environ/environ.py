@@ -196,6 +196,7 @@ class Env(object):
         :rtype: dict
         """
         return self.email_url_config(self.url(var, default=default), backend=backend)
+    email=email_url
 
     def search_url(self, var=DEFAULT_SEARCH_ENV, default=NOTSET, engine=None):
         """Returns a config dictionary, defaulting to SEARCH_URL.
