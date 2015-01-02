@@ -126,6 +126,9 @@ class EnvTests(BaseTests):
         self.assertEqual({'a': 1, 'b': [1.1, 2.2], 'c': 3},
                          self.env.parse_value('a=1;b=1.1,2.2;c=3', dict(value=int, cast=dict(b=[float]))))
 
+        self.assertEqual({'a': "uname", 'c': "http://www.google.com", 'b': True},
+                         self.env.parse_value('a=uname;c=http://www.google.com;b=True', dict(value=text_type, cast=dict(b=bool))))
+
     def test_url_value(self):
         url = self.env.url('URL_VAR')
         self.assertEqual(url.__class__, self.env.URL_CLASS)
@@ -147,7 +150,7 @@ class EnvTests(BaseTests):
         self.assertEqual(mysql_config['USER'], 'bea6eb025ca0d8')
         self.assertEqual(mysql_config['PASSWORD'], '69772142')
         self.assertEqual(mysql_config['PORT'], None)
-        
+
         mysql_gis_config = self.env.db('DATABASE_MYSQL_GIS_URL')
         self.assertEqual(mysql_gis_config['ENGINE'], 'django.contrib.gis.db.backends.mysql')
         self.assertEqual(mysql_gis_config['NAME'], 'some_database')
