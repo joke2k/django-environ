@@ -95,6 +95,8 @@ class Env(object):
     EMAIL_SCHEMES = {
         'smtp': 'django.core.mail.backends.smtp.EmailBackend',
         'smtps': 'django.core.mail.backends.smtp.EmailBackend',
+        'sendgrid': 'django.core.mail.backends.smtp.EmailBackend',
+        'mailgun': 'django.core.mail.backends.smtp.EmailBackend',
         'consolemail': 'django.core.mail.backends.console.EmailBackend',
         'filemail': 'django.core.mail.backends.filebased.EmailBackend',
         'memorymail': 'django.core.mail.backends.locmem.EmailBackend',
@@ -439,20 +441,36 @@ class Env(object):
         path = path.split('?', 2)[0]
 
         # Update with environment configuration
-        config.update({
-            'EMAIL_FILE_PATH': path,
-            'EMAIL_HOST_USER': _cast_str(url.username),
-            'EMAIL_HOST_PASSWORD': _cast_str(url.password),
-            'EMAIL_HOST': _cast_str(url.hostname),
-            'EMAIL_PORT': _cast_int(url.port),
-        })
+        elif url.scheme == 'sendgrid':
+            config.update({
+                'EMAIL_HOST_USER': _cast_str(os.environ['SENDGRID_USERNAME'],
+                'EMAIL_HOST_PASSWORD': _cast_str(os.environ['SENDGRID_PASSWORD'],
+                'EMAIL_HOST': 'smtp.sendgrid.net',
+                'EMAIL_PORT': 587,
+            })
+        elif url.scheme == 'mailgun':
+        if url.scheme == 'mailgun':
+            config.update({
+                'EMAIL_HOST_USER': _cast_str(os.environ['MAILGUN_SMTP_LOGIN']),
+                'EMAIL_HOST_PASSWORD': _cast_str(os.environ['MAILGUN_SMTP_PASSWORD']),
+                'EMAIL_HOST': _cast_str(os.environ['MAILGUN_SMTP_SERVER']),
+                'EMAIL_PORT': _cast_int(os.environ['MAILGUN_SMTP_PORT']),
+            })
+        else:
+            config.update({
+                'EMAIL_FILE_PATH': path,
+                'EMAIL_HOST_USER': _cast_str(url.username),
+                'EMAIL_HOST_PASSWORD': _cast_str(url.password),
+                'EMAIL_HOST': _cast_str(url.hostname),
+                'EMAIL_PORT': _cast_int(url.port),
+            })
 
         if backend:
             config['EMAIL_BACKEND'] = backend
         elif url.scheme in cls.EMAIL_SCHEMES:
             config['EMAIL_BACKEND'] = cls.EMAIL_SCHEMES[url.scheme]
 
-        if url.scheme == 'smtps':
+        if url.scheme in ['smtps', 'sendgrid', 'mailgun']:
             config['EMAIL_USE_TLS'] = True
         else:
             config['EMAIL_USE_TLS'] = False
