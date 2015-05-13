@@ -173,7 +173,7 @@ Supported Types
 - float
 - json
 - list (FOO=a,b,c)
-- dict (BAR=key=val;foo=bar)
+- dict (BAR=key=val,foo=bar)
 - url
 - path (environ.Path)
 - db_url
