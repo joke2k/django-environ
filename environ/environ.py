@@ -59,6 +59,7 @@ class Env(object):
             ...
     """
 
+    ENVIRON = os.environ
     NOTSET = NoValue()
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = urlparse.ParseResult
@@ -246,7 +247,7 @@ class Env(object):
                     cast = var_info
 
         try:
-            value = os.environ[var]
+            value = self.ENVIRON[var]
         except KeyError:
             if default is self.NOTSET:
                 error_msg = "Set the {0} environment variable".format(var)
@@ -510,8 +511,8 @@ class Env(object):
 
         return config
 
-    @staticmethod
-    def read_env(env_file=None, **overrides):
+    @classmethod
+    def read_env(cls, env_file=None, **overrides):
         """Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack backtracking
@@ -547,11 +548,11 @@ class Env(object):
                 m3 = re.match(r'\A"(.*)"\Z', val)
                 if m3:
                     val = re.sub(r'\\(.)', r'\1', m3.group(1))
-                os.environ.setdefault(key, text_type(val))
+                cls.ENVIRON.setdefault(key, text_type(val))
 
         # set defaults
         for key, value in overrides.items():
-            os.environ.setdefault(key, value)
+            cls.ENVIRON.setdefault(key, value)
 
 
 class Path(object):

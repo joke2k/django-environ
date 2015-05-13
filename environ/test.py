@@ -48,13 +48,11 @@ class BaseTests(unittest.TestCase):
                     PATH_VAR=cls.PATH)
 
     def setUp(self):
+        Env.ENVIRON = self.generateData()
         self.env = Env()
-        self.environ = self.generateData()
-        self._orig_environ = os.environ
-        os.environ = self.environ
 
     def tearDown(self):
-        os.environ = self._orig_environ
+        Env.ENVIRON = os.environ
 
     def assertTypeAndValue(self, type_, expected, actual):
         self.assertEqual(type_, type(actual))
@@ -197,12 +195,21 @@ class EnvTests(BaseTests):
 class FileEnvTests(EnvTests):
 
     def setUp(self):
+        Env.ENVIRON = {}
         self.env = Env()
-        self._orig_environ = os.environ
-        os.environ = {}
         file_path = Path(__file__, is_file=True)('test_env.txt')
         self.env.read_env(file_path, PATH_VAR=Path(__file__, is_file=True).__root__)
 
+class SubClassTests(EnvTests):
+
+    def setUp(self):
+        self.CONFIG = self.generateData()
+        class MyEnv(Env):
+            ENVIRON = self.CONFIG
+        self.env = MyEnv()
+
+    def test_singleton_environ(self):
+        self.assertTrue(self.CONFIG is self.env.ENVIRON)
 
 class SchemaEnvTests(BaseTests):
 
@@ -472,7 +479,11 @@ class PathTests(unittest.TestCase):
 def load_suite():
 
     test_suite = unittest.TestSuite()
-    for case in [EnvTests, FileEnvTests, SchemaEnvTests, PathTests, DatabaseTestSuite, CacheTestSuite, EmailTests]:
+    cases = [
+        EnvTests, FileEnvTests, SubClassTests, SchemaEnvTests, PathTests,
+        DatabaseTestSuite, CacheTestSuite, EmailTests
+    ]
+    for case in cases:
         test_suite.addTest(unittest.makeSuite(case))
     return test_suite
 
