@@ -27,7 +27,7 @@ and inspired by:
 
 * `12factor`_
 * `12factor-django`_
-* `Two Scoops of Django (book)`_
+* `Two Scoops of Django`_
 
 This is your `settings.py` file before you have installed **django-environ**
 
@@ -146,7 +146,7 @@ There are only classes, Env and Path
     True
 
     >>> open('.myenv', 'a').write('DEBUG=on')
-    >>> environ.Env.read_env('.`myenv') # or env.read_env('.myenv')
+    >>> environ.Env.read_env('.myenv') # or env.read_env('.myenv')
     >>> env('DEBUG')
     True
 
@@ -284,8 +284,7 @@ Credits
 
 .. _12factor: http://www.12factor.net/
 .. _12factor-django: http://www.wellfireinteractive.com/blog/easier-12-factor-django/
-.. _`Two Scoops of Django (book)`: https://django.2scoops.org
-
+.. _`Two Scoops of Django`: http://twoscoopspress.org/
 
 .. _Distribute: http://pypi.python.org/pypi/distribute
 .. _`modern-package-template`: http://pypi.python.org/pypi/modern-package-template
