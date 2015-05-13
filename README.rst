@@ -27,7 +27,7 @@ and inspired by:
 
 * `12factor`_
 * `12factor-django`_
-* `Two Scoops of Django`_
+* `Two Scoops of Django (book)`_
 
 This is your `settings.py` file before you have installed **django-environ**
 
@@ -284,7 +284,7 @@ Credits
 
 .. _12factor: http://www.12factor.net/
 .. _12factor-django: http://www.wellfireinteractive.com/blog/easier-12-factor-django/
-.. _`Two Scoops of Django`: https://django.2scoops.org (book)
+.. _`Two Scoops of Django (book)`: https://django.2scoops.org
 
 
 .. _Distribute: http://pypi.python.org/pypi/distribute
