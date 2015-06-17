@@ -544,7 +544,7 @@ class Env(object):
                 # Resolve any proxied values
                 if val.startswith('$'):
                     val = val.lstrip('$')
-                    val = self.get_value(value, default='')
+                    val = os.environ.get(val, '')
                 m2 = re.match(r"\A'(.*)'\Z", val)
                 if m2:
                     val = m2.group(1)
