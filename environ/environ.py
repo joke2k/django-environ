@@ -495,18 +495,26 @@ class Env(object):
             path = ""
             index = split[0]
 
-        config.update({
-            "URL": urlparse.urlunparse(("http",) + url[1:2] + (path,) + url[3:]),
-            "INDEX_NAME": index,
-            })
+        if url.scheme == 'solr':
+            if isinstance(path, (tuple, list)):
+                path = '/'.join(path)
 
-        if path:
             config.update({
-                "PATH": path,
+                "URL": urlparse.urlunparse(("http",) + url[1:3] + url[3:]),
             })
+        else:
+            config.update({
+                "URL": urlparse.urlunparse(("http",) + url[1:2] + (path,) + url[3:]),
+                "INDEX_NAME": index,
+                })
 
-        if engine:
-            config['ENGINE'] = engine
+            if path:
+                config.update({
+                    "PATH": path,
+                })
+
+            if engine:
+                config['ENGINE'] = engine
 
         return config
 
