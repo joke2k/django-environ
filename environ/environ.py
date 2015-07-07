@@ -476,37 +476,44 @@ class Env(object):
 
         url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
-        # Remove query strings.
-        path = url.path[1:]
-        path = path.split('?', 2)[0]
-
         if url.scheme in cls.SEARCH_SCHEMES:
             config["ENGINE"] = cls.SEARCH_SCHEMES[url.scheme]
 
-        if path.endswith("/"):
-            path = path[:-1]
-
-        split = path.rsplit("/", 1)
-
-        if len(split) > 1:
-            path = split[:-1]
-            index = split[-1]
-        else:
-            path = ""
-            index = split[0]
-
-        config.update({
-            "URL": urlparse.urlunparse(("http",) + url[1:2] + (path,) + url[3:]),
-            "INDEX_NAME": index,
-            })
-
-        if path:
+        if url.scheme == 'solr':
+            # Supports solr string according to haystack 2.X:
+            #   http://django-haystack.readthedocs.org/en/v2.4.0/tutorial.html#solr
             config.update({
-                "PATH": path,
+                "URL": urlparse.urlunparse(("http",) + url[1:3] + url[3:]),
             })
+        else:
+            # Remove query strings.
+            path = url.path[1:]
+            path = path.split('?', 2)[0]
 
-        if engine:
-            config['ENGINE'] = engine
+            if path.endswith("/"):
+                path = path[:-1]
+
+            split = path.rsplit("/", 1)
+
+            if len(split) > 1:
+                path = split[:-1]
+                index = split[-1]
+            else:
+                path = ""
+                index = split[0]
+
+            config.update({
+                "URL": urlparse.urlunparse(("http",) + url[1:2] + (path,) + url[3:]),
+                "INDEX_NAME": index,
+                })
+
+            if path:
+                config.update({
+                    "PATH": path,
+                })
+
+            if engine:
+                config['ENGINE'] = engine
 
         return config
 
