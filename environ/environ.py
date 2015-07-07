@@ -476,6 +476,8 @@ class Env(object):
 
         url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
+        if url.scheme in cls.SEARCH_SCHEMES:
+            config["ENGINE"] = cls.SEARCH_SCHEMES[url.scheme]
 
         if url.scheme == 'solr':
             # Supports solr string according to haystack 2.X:
@@ -487,9 +489,6 @@ class Env(object):
             # Remove query strings.
             path = url.path[1:]
             path = path.split('?', 2)[0]
-
-            if url.scheme in cls.SEARCH_SCHEMES:
-                config["ENGINE"] = cls.SEARCH_SCHEMES[url.scheme]
 
             if path.endswith("/"):
                 path = path[:-1]
