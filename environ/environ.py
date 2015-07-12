@@ -38,17 +38,20 @@ __version__ = (0, 3, 1)
 
 
 # return int if possible
-_cast_int = lambda v: int(v) if isinstance(v, basestring) and v.isdigit() else v
+_cast_int = lambda v: int(v) if isinstance(
+    v, basestring) and v.isdigit() else v
 # return str if possibile
 _cast_str = lambda v: str(v) if isinstance(v, basestring) else v
 
 
 class NoValue(object):
+
     def __repr__(self):
         return '<{0}>'.format(self.__class__.__name__)
 
 
 class Env(object):
+
     """Provide schema-based lookups of environment variables so that each
     caller doesn't have to pass in `cast` and `default` parameters.
 
@@ -109,8 +112,6 @@ class Env(object):
         "whoosh": "haystack.backends.whoosh_backend.WhooshEngine",
         "simple": "haystack.backends.simple_backend.SimpleEngine",
     }
-
-
 
     def __init__(self, **schema):
         self.schema = schema
@@ -180,7 +181,7 @@ class Env(object):
         :rtype: dict
         """
         return self.db_url_config(self.get_value(var, default=default), engine=engine)
-    db=db_url
+    db = db_url
 
     def cache_url(self, var=DEFAULT_CACHE_ENV, default=NOTSET, backend=None):
         """Returns a config dictionary, defaulting to CACHE_URL.
@@ -188,7 +189,7 @@ class Env(object):
         :rtype: dict
         """
         return self.cache_url_config(self.url(var, default=default), backend=backend)
-    cache=cache_url
+    cache = cache_url
 
     def email_url(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
         """Returns a config dictionary, defaulting to EMAIL_URL.
@@ -196,7 +197,7 @@ class Env(object):
         :rtype: dict
         """
         return self.email_url_config(self.url(var, default=default), backend=backend)
-    email=email_url
+    email = email_url
 
     def search_url(self, var=DEFAULT_SEARCH_ENV, default=NOTSET, engine=None):
         """Returns a config dictionary, defaulting to SEARCH_URL.
@@ -222,7 +223,8 @@ class Env(object):
         :returns: Value from environment or default (if set)
         """
 
-        logger.debug("get '{0}' casted as '{1}' with default '{2}'".format(var, cast, default))
+        logger.debug(
+            "get '{0}' casted as '{1}' with default '{2}'".format(var, cast, default))
 
         if var in self.schema:
             var_info = self.schema[var]
@@ -289,18 +291,20 @@ class Env(object):
             value_cast = cast.get('value', text_type)
             value_cast_by_key = cast.get('cast', dict())
             value = dict(map(
-                lambda kv: (key_cast(kv[0]), cls.parse_value(kv[1], value_cast_by_key.get(kv[0], value_cast))),
+                lambda kv: (key_cast(kv[0]), cls.parse_value(
+                    kv[1], value_cast_by_key.get(kv[0], value_cast))),
                 [val.split('=') for val in value.split(';') if val]
             ))
         elif cast is dict:
-        #elif hasattr(cast, '__name__') and cast.__name__ == 'dict':
+            # elif hasattr(cast, '__name__') and cast.__name__ == 'dict':
             value = dict([val.split('=') for val in value.split(',') if val])
         elif cast is list:
             value = [x for x in value.split(',') if x]
         elif cast is float:
             # clean string
             float_str = re.sub(r'[^\d,\.]', '', value)
-            # split for avoid thousand separator and different locale comma/dot symbol
+            # split for avoid thousand separator and different locale comma/dot
+            # symbol
             parts = re.split(r'[,\.]', float_str)
             if len(parts) == 1:
                 float_str = parts[0]
@@ -350,7 +354,8 @@ class Env(object):
         if url.scheme == 'sqlite' and path == '':
             path = ':memory:'
         if url.scheme == 'ldap':
-            path = '{scheme}://{hostname}'.format(scheme=_cast_str(url.scheme), hostname=_cast_str(url.hostname))
+            path = '{scheme}://{hostname}'.format(
+                scheme=_cast_str(url.scheme), hostname=_cast_str(url.hostname))
             if url.port:
                 path += ':{port}'.format(port=_cast_str(url.port))
 
@@ -391,7 +396,8 @@ class Env(object):
         :param overrides:
         :return:
         """
-        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        url = urlparse.urlparse(url) if not isinstance(
+            url, cls.URL_CLASS) else url
 
         location = url.netloc.split(',')
         if len(location) == 1:
@@ -433,7 +439,8 @@ class Env(object):
 
         config = {}
 
-        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        url = urlparse.urlparse(url) if not isinstance(
+            url, cls.URL_CLASS) else url
 
         # Remove query strings
         path = url.path[1:]
@@ -474,7 +481,8 @@ class Env(object):
     def search_url_config(cls, url, engine=None):
         config = {}
 
-        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        url = urlparse.urlparse(url) if not isinstance(
+            url, cls.URL_CLASS) else url
 
         # Remove query strings.
         path = url.path[1:]
@@ -498,7 +506,7 @@ class Env(object):
         config.update({
             "URL": urlparse.urlunparse(("http",) + url[1:2] + (path,) + url[3:]),
             "INDEX_NAME": index,
-            })
+        })
 
         if path:
             config.update({
@@ -523,7 +531,8 @@ class Env(object):
         """
         if env_file is None:
             frame = sys._getframe()
-            env_file = os.path.join(os.path.dirname(frame.f_back.f_code.co_filename), '.env')
+            env_file = os.path.join(
+                os.path.dirname(frame.f_back.f_code.co_filename), '.env')
             if not os.path.exists(env_file):
                 warnings.warn("not reading %s - it doesn't exist." % env_file)
                 return
@@ -555,6 +564,7 @@ class Env(object):
 
 
 class Path(object):
+
     """Inspired to Django Two-scoops, handling File Paths in Settings.
 
         >>> from environ import Path
@@ -635,7 +645,8 @@ class Path(object):
             return self.path('../' * other)
         elif isinstance(other, (str, text_type)):
             return Path(self.__root__.rstrip(other))
-        raise TypeError("unsupported operand type(s) for -: '{0}' and '{1}'".format(self, type(other)))
+        raise TypeError(
+            "unsupported operand type(s) for -: '{0}' and '{1}'".format(self, type(other)))
 
     def __invert__(self):
         return self.path('..')
@@ -655,17 +666,25 @@ class Path(object):
     def __unicode__(self):
         return self.__str__()
 
+    def rfind(self, *args, **kwargs):
+        return self.__str__().rfind(*args, **kwargs)
+
+    def find(self, *args, **kwargs):
+        return self.__str__().find(*args, **kwargs)
+
     @staticmethod
     def _absolute_join(base, *paths, **kwargs):
         absolute_path = os.path.abspath(os.path.join(base, *paths))
         if kwargs.get('required', False) and not os.path.exists(absolute_path):
-            raise ImproperlyConfigured("Create required path: {0}".format(absolute_path))
+            raise ImproperlyConfigured(
+                "Create required path: {0}".format(absolute_path))
         return absolute_path
+
 
 def register_scheme(scheme):
     for method in filter(lambda s: s.startswith('uses_'), dir(urlparse)):
         getattr(urlparse, method).append(scheme)
 
 # Register database and cache schemes in URLs.
-for schema in list(Env.DB_SCHEMES.keys()) + list(Env.CACHE_SCHEMES.keys()) + list(Env.SEARCH_SCHEMES.keys()) +list(Env.EMAIL_SCHEMES.keys()):
+for schema in list(Env.DB_SCHEMES.keys()) + list(Env.CACHE_SCHEMES.keys()) + list(Env.SEARCH_SCHEMES.keys()) + list(Env.EMAIL_SCHEMES.keys()):
     register_scheme(schema)
