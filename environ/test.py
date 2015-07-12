@@ -78,31 +78,40 @@ class EnvTests(BaseTests):
         self.assertTypeAndValue(int, 42, self.env.int('INT_VAR'))
 
     def test_int_with_none_default(self):
-        self.assertTrue(self.env('NOT_PRESENT_VAR', cast=int, default=None) is None)
+        self.assertTrue(
+            self.env('NOT_PRESENT_VAR', cast=int, default=None) is None)
 
     def test_float(self):
         self.assertTypeAndValue(float, 33.3, self.env('FLOAT_VAR', cast=float))
         self.assertTypeAndValue(float, 33.3, self.env.float('FLOAT_VAR'))
 
-        self.assertTypeAndValue(float, 33.3, self.env('FLOAT_COMMA_VAR', cast=float))
-        self.assertTypeAndValue(float, 123420333.3, self.env('FLOAT_STRANGE_VAR1', cast=float))
-        self.assertTypeAndValue(float, 123420333.3, self.env('FLOAT_STRANGE_VAR2', cast=float))
+        self.assertTypeAndValue(
+            float, 33.3, self.env('FLOAT_COMMA_VAR', cast=float))
+        self.assertTypeAndValue(
+            float, 123420333.3, self.env('FLOAT_STRANGE_VAR1', cast=float))
+        self.assertTypeAndValue(
+            float, 123420333.3, self.env('FLOAT_STRANGE_VAR2', cast=float))
 
     def test_bool_true(self):
-        self.assertTypeAndValue(bool, True, self.env('BOOL_TRUE_VAR', cast=bool))
-        self.assertTypeAndValue(bool, True, self.env('BOOL_TRUE_VAR2', cast=bool))
+        self.assertTypeAndValue(
+            bool, True, self.env('BOOL_TRUE_VAR', cast=bool))
+        self.assertTypeAndValue(
+            bool, True, self.env('BOOL_TRUE_VAR2', cast=bool))
         self.assertTypeAndValue(bool, True, self.env.bool('BOOL_TRUE_VAR'))
 
     def test_bool_false(self):
-        self.assertTypeAndValue(bool, False, self.env('BOOL_FALSE_VAR', cast=bool))
-        self.assertTypeAndValue(bool, False, self.env('BOOL_FALSE_VAR2', cast=bool))
+        self.assertTypeAndValue(
+            bool, False, self.env('BOOL_FALSE_VAR', cast=bool))
+        self.assertTypeAndValue(
+            bool, False, self.env('BOOL_FALSE_VAR2', cast=bool))
         self.assertTypeAndValue(bool, False, self.env.bool('BOOL_FALSE_VAR'))
 
     def test_proxied_value(self):
         self.assertTypeAndValue(text_type, 'bar', self.env('PROXIED_VAR'))
 
     def test_int_list(self):
-        self.assertTypeAndValue(list, [42, 33], self.env('INT_LIST', cast=[int]))
+        self.assertTypeAndValue(
+            list, [42, 33], self.env('INT_LIST', cast=[int]))
         self.assertTypeAndValue(list, [42, 33], self.env.list('INT_LIST', int))
 
     def test_str_list_with_spaces(self):
@@ -120,9 +129,12 @@ class EnvTests(BaseTests):
     def test_dict_parsing(self):
 
         self.assertEqual({'a': '1'}, self.env.parse_value('a=1', dict))
-        self.assertEqual({'a': 1}, self.env.parse_value('a=1', dict(value=int)))
-        self.assertEqual({'a': ['1', '2', '3']}, self.env.parse_value('a=1,2,3', dict(value=[text_type])))
-        self.assertEqual({'a': [1, 2, 3]}, self.env.parse_value('a=1,2,3', dict(value=[int])))
+        self.assertEqual(
+            {'a': 1}, self.env.parse_value('a=1', dict(value=int)))
+        self.assertEqual({'a': ['1', '2', '3']}, self.env.parse_value(
+            'a=1,2,3', dict(value=[text_type])))
+        self.assertEqual(
+            {'a': [1, 2, 3]}, self.env.parse_value('a=1,2,3', dict(value=[int])))
         self.assertEqual({'a': 1, 'b': [1.1, 2.2], 'c': 3},
                          self.env.parse_value('a=1;b=1.1,2.2;c=3', dict(value=int, cast=dict(b=[float]))))
 
@@ -133,9 +145,11 @@ class EnvTests(BaseTests):
 
     def test_db_url_value(self):
         pg_config = self.env.db()
-        self.assertEqual(pg_config['ENGINE'], 'django.db.backends.postgresql_psycopg2')
+        self.assertEqual(
+            pg_config['ENGINE'], 'django.db.backends.postgresql_psycopg2')
         self.assertEqual(pg_config['NAME'], 'd8r82722r2kuvn')
-        self.assertEqual(pg_config['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
+        self.assertEqual(
+            pg_config['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
         self.assertEqual(pg_config['USER'], 'uf07k1i6d8ia0v')
         self.assertEqual(pg_config['PASSWORD'], 'wegauwhgeuioweg')
         self.assertEqual(pg_config['PORT'], 5431)
@@ -147,9 +161,10 @@ class EnvTests(BaseTests):
         self.assertEqual(mysql_config['USER'], 'bea6eb025ca0d8')
         self.assertEqual(mysql_config['PASSWORD'], '69772142')
         self.assertEqual(mysql_config['PORT'], None)
-        
+
         mysql_gis_config = self.env.db('DATABASE_MYSQL_GIS_URL')
-        self.assertEqual(mysql_gis_config['ENGINE'], 'django.contrib.gis.db.backends.mysql')
+        self.assertEqual(
+            mysql_gis_config['ENGINE'], 'django.contrib.gis.db.backends.mysql')
         self.assertEqual(mysql_gis_config['NAME'], 'some_database')
         self.assertEqual(mysql_gis_config['HOST'], '127.0.0.1')
         self.assertEqual(mysql_gis_config['USER'], 'user')
@@ -158,16 +173,19 @@ class EnvTests(BaseTests):
 
         sqlite_config = self.env.db('DATABASE_SQLITE_URL')
         self.assertEqual(sqlite_config['ENGINE'], 'django.db.backends.sqlite3')
-        self.assertEqual(sqlite_config['NAME'], '/full/path/to/your/database/file.sqlite')
+        self.assertEqual(
+            sqlite_config['NAME'], '/full/path/to/your/database/file.sqlite')
 
     def test_cache_url_value(self):
 
         cache_config = self.env.cache_url()
-        self.assertEqual(cache_config['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(
+            cache_config['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
         self.assertEqual(cache_config['LOCATION'], '127.0.0.1:11211')
 
         redis_config = self.env.cache_url('CACHE_REDIS')
-        self.assertEqual(redis_config['BACKEND'], 'redis_cache.cache.RedisCache')
+        self.assertEqual(
+            redis_config['BACKEND'], 'redis_cache.cache.RedisCache')
         self.assertEqual(redis_config['LOCATION'], '127.0.0.1:6379:1')
         self.assertEqual(redis_config['OPTIONS'], {
             'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
@@ -178,13 +196,12 @@ class EnvTests(BaseTests):
 
         email_config = self.env.email_url()
         self.assertEqual(email_config['EMAIL_BACKEND'],
-                'django.core.mail.backends.smtp.EmailBackend')
+                         'django.core.mail.backends.smtp.EmailBackend')
         self.assertEqual(email_config['EMAIL_HOST'], 'smtp.example.com')
         self.assertEqual(email_config['EMAIL_HOST_PASSWORD'], 'password')
         self.assertEqual(email_config['EMAIL_HOST_USER'], 'user@domain.com')
         self.assertEqual(email_config['EMAIL_PORT'], 587)
         self.assertEqual(email_config['EMAIL_USE_TLS'], True)
-
 
     def test_json_value(self):
         self.assertEqual(self.JSON, self.env.json('JSON_VAR'))
@@ -201,7 +218,8 @@ class FileEnvTests(EnvTests):
         self._orig_environ = os.environ
         os.environ = {}
         file_path = Path(__file__, is_file=True)('test_env.txt')
-        self.env.read_env(file_path, PATH_VAR=Path(__file__, is_file=True).__root__)
+        self.env.read_env(
+            file_path, PATH_VAR=Path(__file__, is_file=True).__root__)
 
 
 class SchemaEnvTests(BaseTests):
@@ -214,13 +232,15 @@ class SchemaEnvTests(BaseTests):
         self.assertTypeAndValue(float, 33.3, env('NOT_PRESENT_VAR'))
 
         self.assertTypeAndValue(text_type, 'bar', env('STR_VAR'))
-        self.assertTypeAndValue(text_type, 'foo', env('NOT_PRESENT2', default='foo'))
+        self.assertTypeAndValue(
+            text_type, 'foo', env('NOT_PRESENT2', default='foo'))
 
         self.assertTypeAndValue(list, [42, 33], env('INT_LIST'))
         self.assertTypeAndValue(list, [2], env('DEFAULT_LIST'))
 
         # Override schema in this one case
-        self.assertTypeAndValue(text_type, '42', env('INT_VAR', cast=text_type))
+        self.assertTypeAndValue(
+            text_type, '42', env('INT_VAR', cast=text_type))
 
 
 class DatabaseTestSuite(unittest.TestCase):
@@ -229,9 +249,11 @@ class DatabaseTestSuite(unittest.TestCase):
         url = 'postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
         url = Env.db_url_config(url)
 
-        self.assertEqual(url['ENGINE'], 'django.db.backends.postgresql_psycopg2')
+        self.assertEqual(
+            url['ENGINE'], 'django.db.backends.postgresql_psycopg2')
         self.assertEqual(url['NAME'], 'd8r82722r2kuvn')
-        self.assertEqual(url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
+        self.assertEqual(
+            url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
         self.assertEqual(url['USER'], 'uf07k1i6d8ia0v')
         self.assertEqual(url['PASSWORD'], 'wegauwhgeuioweg')
         self.assertEqual(url['PORT'], 5431)
@@ -240,9 +262,11 @@ class DatabaseTestSuite(unittest.TestCase):
         url = 'postgis://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
         url = Env.db_url_config(url)
 
-        self.assertEqual(url['ENGINE'], 'django.contrib.gis.db.backends.postgis')
+        self.assertEqual(
+            url['ENGINE'], 'django.contrib.gis.db.backends.postgis')
         self.assertEqual(url['NAME'], 'd8r82722r2kuvn')
-        self.assertEqual(url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
+        self.assertEqual(
+            url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
         self.assertEqual(url['USER'], 'uf07k1i6d8ia0v')
         self.assertEqual(url['PASSWORD'], 'wegauwhgeuioweg')
         self.assertEqual(url['PORT'], 5431)
@@ -253,7 +277,8 @@ class DatabaseTestSuite(unittest.TestCase):
 
         self.assertEqual(url['ENGINE'], 'django.contrib.gis.db.backends.mysql')
         self.assertEqual(url['NAME'], 'd8r82722r2kuvn')
-        self.assertEqual(url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
+        self.assertEqual(
+            url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
         self.assertEqual(url['USER'], 'uf07k1i6d8ia0v')
         self.assertEqual(url['PASSWORD'], 'wegauwhgeuioweg')
         self.assertEqual(url['PORT'], 5431)
@@ -305,76 +330,88 @@ class DatabaseTestSuite(unittest.TestCase):
         self.assertEqual(url['USER'], 'cn=admin,dc=nodomain,dc=org')
         self.assertEqual(url['PASSWORD'], 'some_secret_password')
 
+
 class CacheTestSuite(unittest.TestCase):
 
     def test_memcache_parsing(self):
         url = 'memcache://127.0.0.1:11211'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(
+            url['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
         self.assertEqual(url['LOCATION'], '127.0.0.1:11211')
 
     def test_memcache_pylib_parsing(self):
         url = 'pymemcache://127.0.0.1:11211'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.memcached.PyLibMCCache')
+        self.assertEqual(
+            url['BACKEND'], 'django.core.cache.backends.memcached.PyLibMCCache')
         self.assertEqual(url['LOCATION'], '127.0.0.1:11211')
 
     def test_memcache_multiple_parsing(self):
         url = 'memcache://172.19.26.240:11211,172.19.26.242:11212'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
-        self.assertEqual(url['LOCATION'], ['172.19.26.240:11211', '172.19.26.242:11212'])
+        self.assertEqual(
+            url['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(
+            url['LOCATION'], ['172.19.26.240:11211', '172.19.26.242:11212'])
 
     def test_memcache_socket_parsing(self):
         url = 'memcache:///tmp/memcached.sock'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(
+            url['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
         self.assertEqual(url['LOCATION'], 'unix:/tmp/memcached.sock')
 
     def test_dbcache_parsing(self):
         url = 'dbcache://my_cache_table'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.db.DatabaseCache')
+        self.assertEqual(
+            url['BACKEND'], 'django.core.cache.backends.db.DatabaseCache')
         self.assertEqual(url['LOCATION'], 'my_cache_table')
 
     def test_filecache_parsing(self):
         url = 'filecache:///var/tmp/django_cache'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
+        self.assertEqual(
+            url['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
         self.assertEqual(url['LOCATION'], '/var/tmp/django_cache')
 
     def test_filecache_windows_parsing(self):
         url = 'filecache://C:/foo/bar'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
+        self.assertEqual(
+            url['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
         self.assertEqual(url['LOCATION'], 'C:/foo/bar')
 
     def test_locmem_parsing(self):
         url = 'locmemcache://'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.locmem.LocMemCache')
+        self.assertEqual(
+            url['BACKEND'], 'django.core.cache.backends.locmem.LocMemCache')
         self.assertEqual(url['LOCATION'], '')
 
     def test_locmem_named_parsing(self):
         url = 'locmemcache://unique-snowflake'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.locmem.LocMemCache')
+        self.assertEqual(
+            url['BACKEND'], 'django.core.cache.backends.locmem.LocMemCache')
         self.assertEqual(url['LOCATION'], 'unique-snowflake')
 
     def test_dummycache_parsing(self):
         url = 'dummycache://'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.dummy.DummyCache')
+        self.assertEqual(
+            url['BACKEND'], 'django.core.cache.backends.dummy.DummyCache')
         self.assertEqual(url['LOCATION'], '')
 
     def test_redis_parsing(self):
@@ -398,7 +435,8 @@ class CacheTestSuite(unittest.TestCase):
         url = 'filecache:///var/tmp/django_cache?timeout=60&max_entries=1000&cull_frequency=0'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
+        self.assertEqual(
+            url['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
         self.assertEqual(url['LOCATION'], '/var/tmp/django_cache')
         self.assertEqual(url['TIMEOUT'], 60)
         self.assertEqual(url['OPTIONS'], {
@@ -426,7 +464,7 @@ class EmailTests(unittest.TestCase):
         url = Env.email_url_config(url)
 
         self.assertEqual(url['EMAIL_BACKEND'],
-                'django.core.mail.backends.smtp.EmailBackend')
+                         'django.core.mail.backends.smtp.EmailBackend')
         self.assertEqual(url['EMAIL_HOST'], 'smtp.example.com')
         self.assertEqual(url['EMAIL_HOST_PASSWORD'], 'password')
         self.assertEqual(url['EMAIL_HOST_USER'], 'user@domain.com')
@@ -439,7 +477,8 @@ class PathTests(unittest.TestCase):
     def test_path_class(self):
 
         root = Path(__file__, '..', is_file=True)
-        root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
+        root_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), '../'))
         self.assertEqual(root(), root_path)
         self.assertEqual(root.__root__, root_path)
 
@@ -449,8 +488,11 @@ class PathTests(unittest.TestCase):
 
     def test_required_path(self):
 
-        self.assertRaises(ImproperlyConfigured, Path, '/not/existing/path/', required=True)
-        self.assertRaises(ImproperlyConfigured, Path(__file__), 'not_existing_path', required=True)
+        self.assertRaises(
+            ImproperlyConfigured, Path, '/not/existing/path/', required=True)
+        self.assertRaises(
+            ImproperlyConfigured, Path(__file__), 'not_existing_path',
+            required=True)
 
     def test_comparison(self):
 
@@ -460,11 +502,18 @@ class PathTests(unittest.TestCase):
         self.assertTrue(Path('/home') == Path('/home'))
         self.assertTrue(Path('/home') != Path('/home/dev'))
 
+        self.assertTrue(Path('/home/foo/').rfind('/')
+                        == str(Path('/home/foo')).rfind('/'))
+
+        self.assertTrue(Path('/home/foo/').find('/home')
+                        == str(Path('/home/foo/')).find('/home'))
+
         self.assertEqual(~Path('/home'), Path('/'))
         self.assertEqual(Path('/') + 'home', Path('/home'))
-        self.assertEqual(Path('/')+ '/home/public', Path('/home/public'))
+        self.assertEqual(Path('/') + '/home/public', Path('/home/public'))
         self.assertEqual(Path('/home/dev/public') - 2, Path('/home'))
-        self.assertEqual(Path('/home/dev/public') - 'public', Path('/home/dev'))
+        self.assertEqual(
+            Path('/home/dev/public') - 'public', Path('/home/dev'))
 
         self.assertRaises(TypeError, lambda _: Path('/home/dev/') - 'not int')
 
@@ -472,7 +521,8 @@ class PathTests(unittest.TestCase):
 def load_suite():
 
     test_suite = unittest.TestSuite()
-    for case in [EnvTests, FileEnvTests, SchemaEnvTests, PathTests, DatabaseTestSuite, CacheTestSuite, EmailTests]:
+    for case in [EnvTests, FileEnvTests, SchemaEnvTests, PathTests,
+                 DatabaseTestSuite, CacheTestSuite, EmailTests]:
         test_suite.addTest(unittest.makeSuite(case))
     return test_suite
 
