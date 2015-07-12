@@ -502,11 +502,11 @@ class PathTests(unittest.TestCase):
         self.assertTrue(Path('/home') == Path('/home'))
         self.assertTrue(Path('/home') != Path('/home/dev'))
 
-        self.assertTrue(Path('/home/foo/').rfind('/')
-                        == str(Path('/home/foo')).rfind('/'))
+        self.assertEqual(Path('/home/foo/').rfind('/'),
+                         str(Path('/home/foo')).rfind('/'))
 
-        self.assertTrue(Path('/home/foo/').find('/home')
-                        == str(Path('/home/foo/')).find('/home'))
+        self.assertEqual(Path('/home/foo/').find('/home'),
+                         str(Path('/home/foo/')).find('/home'))
 
         self.assertEqual(~Path('/home'), Path('/'))
         self.assertEqual(Path('/') + 'home', Path('/home'))
