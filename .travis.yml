@@ -21,6 +21,8 @@ branches:
 script: coverage run --source=environ setup.py test
 matrix:
   exclude:
+    - python: "2.6"
+      env: DJANGO=Django==1.8
     - python: "3.3"
       env: DJANGO=Django==1.4
 after_success:
