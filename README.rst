@@ -173,6 +173,7 @@ Supported Types
 - float
 - json
 - list (FOO=a,b,c)
+- tuple (FOO=(a,b,c))
 - dict (BAR=key=val,foo=bar)
 - url
 - path (environ.Path)
@@ -217,6 +218,8 @@ Tests
 
 Changelog
 ---------
+=== 0.3.2 (2015-08-11)
+    * Add tuple support
 
 === 0.3.1 (2014-09-03)
   * Add LDAP url support for database (django-ldapdb)
