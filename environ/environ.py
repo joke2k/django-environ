@@ -86,8 +86,8 @@ class Env(object):
         'locmemcache': 'django.core.cache.backends.locmem.LocMemCache',
         'memcache': 'django.core.cache.backends.memcached.MemcachedCache',
         'pymemcache': 'django.core.cache.backends.memcached.PyLibMCCache',
-        'rediscache': 'redis_cache.cache.RedisCache',
-        'redis': 'redis_cache.cache.RedisCache',
+        'rediscache': 'django_redis.cache.RedisCache',
+        'redis': 'django_redis.cache.RedisCache',
     }
     _CACHE_BASE_OPTIONS = ['TIMEOUT', 'KEY_PREFIX', 'VERSION', 'KEY_FUNCTION']
 
