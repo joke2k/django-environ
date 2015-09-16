@@ -95,12 +95,14 @@ class Env(object):
     EMAIL_SCHEMES = {
         'smtp': 'django.core.mail.backends.smtp.EmailBackend',
         'smtps': 'django.core.mail.backends.smtp.EmailBackend',
+        'smtp+tls': 'django.core.mail.backends.smtp.EmailBackend',
+        'smtp+ssl': 'django.core.mail.backends.smtp.EmailBackend',
         'consolemail': 'django.core.mail.backends.console.EmailBackend',
         'filemail': 'django.core.mail.backends.filebased.EmailBackend',
         'memorymail': 'django.core.mail.backends.locmem.EmailBackend',
         'dummymail': 'django.core.mail.backends.dummy.EmailBackend'
     }
-    _EMAIL_BASE_OPTIONS = ['EMAIL_USE_TLS', ]
+    _EMAIL_BASE_OPTIONS = ['EMAIL_USE_TLS', 'EMAIL_USE_SSL']
 
     DEFAULT_SEARCH_ENV = 'SEARCH_URL'
     SEARCH_SCHEMES = {
@@ -109,8 +111,6 @@ class Env(object):
         "whoosh": "haystack.backends.whoosh_backend.WhooshEngine",
         "simple": "haystack.backends.simple_backend.SimpleEngine",
     }
-
-
 
     def __init__(self, **schema):
         self.schema = schema
@@ -453,10 +453,10 @@ class Env(object):
         elif url.scheme in cls.EMAIL_SCHEMES:
             config['EMAIL_BACKEND'] = cls.EMAIL_SCHEMES[url.scheme]
 
-        if url.scheme == 'smtps':
+        if url.scheme in ('smtps', 'smtp+tls'):
             config['EMAIL_USE_TLS'] = True
-        else:
-            config['EMAIL_USE_TLS'] = False
+        elif url.scheme == 'smtp+ssl':
+            config['EMAIL_USE_SSL'] = True
 
         if url.query:
             config_options = {}

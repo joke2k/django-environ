@@ -199,7 +199,8 @@ Supported Types
     - Simple cache: simple://
 - email_url
     - SMTP: smtp://
-    - SMTPS: smtps://
+    - SMTP+SSL: smtp+ssl://
+    - SMTP+TLS: smtp+tls://
     - Console mail: consolemail://
     - File mail: filemail://
     - LocMem mail: memorymail://
