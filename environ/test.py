@@ -1,14 +1,19 @@
 from __future__ import print_function
+import json
+import os
+import sys
 import unittest
 
-from environ import *
+from django.core.exceptions import ImproperlyConfigured
+
+from environ import Env, Path
 
 
 class BaseTests(unittest.TestCase):
 
     URL = 'http://www.google.com/'
-    POSTGRES = 'postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
-    MYSQL = 'mysql://bea6eb025ca0d8:69772142@us-cdbr-east.cleardb.com/heroku_97681db3eff7580?reconnect=true'
+    POSTGRES = 'postgres://uf07k1:wegauwhg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722'
+    MYSQL = 'mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/heroku_97681?reconnect=true'
     MYSQLGIS = 'mysqlgis://user:password@127.0.0.1/some_database'
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
     MEMCACHE = 'memcache://127.0.0.1:11211'
@@ -133,20 +138,20 @@ class EnvTests(BaseTests):
     def test_db_url_value(self):
         pg_config = self.env.db()
         self.assertEqual(pg_config['ENGINE'], 'django.db.backends.postgresql_psycopg2')
-        self.assertEqual(pg_config['NAME'], 'd8r82722r2kuvn')
+        self.assertEqual(pg_config['NAME'], 'd8r82722')
         self.assertEqual(pg_config['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
-        self.assertEqual(pg_config['USER'], 'uf07k1i6d8ia0v')
-        self.assertEqual(pg_config['PASSWORD'], 'wegauwhgeuioweg')
+        self.assertEqual(pg_config['USER'], 'uf07k1')
+        self.assertEqual(pg_config['PASSWORD'], 'wegauwhg')
         self.assertEqual(pg_config['PORT'], 5431)
 
         mysql_config = self.env.db('DATABASE_MYSQL_URL')
         self.assertEqual(mysql_config['ENGINE'], 'django.db.backends.mysql')
-        self.assertEqual(mysql_config['NAME'], 'heroku_97681db3eff7580')
+        self.assertEqual(mysql_config['NAME'], 'heroku_97681')
         self.assertEqual(mysql_config['HOST'], 'us-cdbr-east.cleardb.com')
-        self.assertEqual(mysql_config['USER'], 'bea6eb025ca0d8')
+        self.assertEqual(mysql_config['USER'], 'bea6eb0')
         self.assertEqual(mysql_config['PASSWORD'], '69772142')
         self.assertEqual(mysql_config['PORT'], None)
-        
+
         mysql_gis_config = self.env.db('DATABASE_MYSQL_GIS_URL')
         self.assertEqual(mysql_gis_config['ENGINE'], 'django.contrib.gis.db.backends.mysql')
         self.assertEqual(mysql_gis_config['NAME'], 'some_database')
@@ -176,14 +181,12 @@ class EnvTests(BaseTests):
     def test_email_url_value(self):
 
         email_config = self.env.email_url()
-        self.assertEqual(email_config['EMAIL_BACKEND'],
-                'django.core.mail.backends.smtp.EmailBackend')
+        self.assertEqual(email_config['EMAIL_BACKEND'], 'django.core.mail.backends.smtp.EmailBackend')
         self.assertEqual(email_config['EMAIL_HOST'], 'smtp.example.com')
         self.assertEqual(email_config['EMAIL_HOST_PASSWORD'], 'password')
         self.assertEqual(email_config['EMAIL_HOST_USER'], 'user@domain.com')
         self.assertEqual(email_config['EMAIL_PORT'], 587)
         self.assertEqual(email_config['EMAIL_USE_TLS'], True)
-
 
     def test_json_value(self):
         self.assertEqual(self.JSON, self.env.json('JSON_VAR'))
@@ -303,6 +306,7 @@ class DatabaseTestSuite(unittest.TestCase):
         self.assertEqual(url['NAME'], 'ldap://ldap.nodomain.org')
         self.assertEqual(url['USER'], 'cn=admin,dc=nodomain,dc=org')
         self.assertEqual(url['PASSWORD'], 'some_secret_password')
+
 
 class CacheTestSuite(unittest.TestCase):
 
@@ -424,8 +428,7 @@ class EmailTests(unittest.TestCase):
         url = 'smtps://user@domain.com:password@smtp.example.com:587'
         url = Env.email_url_config(url)
 
-        self.assertEqual(url['EMAIL_BACKEND'],
-                'django.core.mail.backends.smtp.EmailBackend')
+        self.assertEqual(url['EMAIL_BACKEND'], 'django.core.mail.backends.smtp.EmailBackend')
         self.assertEqual(url['EMAIL_HOST'], 'smtp.example.com')
         self.assertEqual(url['EMAIL_HOST_PASSWORD'], 'password')
         self.assertEqual(url['EMAIL_HOST_USER'], 'user@domain.com')
@@ -461,7 +464,7 @@ class PathTests(unittest.TestCase):
 
         self.assertEqual(~Path('/home'), Path('/'))
         self.assertEqual(Path('/') + 'home', Path('/home'))
-        self.assertEqual(Path('/')+ '/home/public', Path('/home/public'))
+        self.assertEqual(Path('/') + '/home/public', Path('/home/public'))
         self.assertEqual(Path('/home/dev/public') - 2, Path('/home'))
         self.assertEqual(Path('/home/dev/public') - 'public', Path('/home/dev'))
 

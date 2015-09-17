@@ -1,6 +1,6 @@
 DICT_VAR=foo=bar,test=on
 BOOL_FALSE_VAR2=False
-DATABASE_MYSQL_URL=mysql://bea6eb025ca0d8:69772142@us-cdbr-east.cleardb.com/heroku_97681db3eff7580?reconnect=true
+DATABASE_MYSQL_URL=mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/heroku_97681?reconnect=true
 DATABASE_MYSQL_GIS_URL=mysqlgis://user:password@127.0.0.1/some_database
 CACHE_URL=memcache://127.0.0.1:11211
 CACHE_REDIS=rediscache://127.0.0.1:6379:1?client_class=django_redis.client.DefaultClient&password=secret
@@ -12,7 +12,7 @@ BOOL_TRUE_VAR2=True
 DATABASE_SQLITE_URL=sqlite:////full/path/to/your/database/file.sqlite
 JSON_VAR={"three": 33.44, "two": 2, "one": "bar"}
 BOOL_TRUE_VAR=1
-DATABASE_URL=postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn
+DATABASE_URL=postgres://uf07k1:wegauwhg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722
 FLOAT_VAR=33.3
 FLOAT_COMMA_VAR=33,3
 FLOAT_STRANGE_VAR1=123,420,333.3
