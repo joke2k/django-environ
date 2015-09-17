@@ -2,35 +2,20 @@
 Django-environ allows you to utilize 12factor inspired environment
 variables to configure your Django application.
 """
-from __future__ import unicode_literals
-import os
-import sys
-import re
 import json
+import logging
+import os
+import re
+import sys
 import warnings
 
-import logging
+from django.core.exceptions import ImproperlyConfigured
+
+from six.moves import urllib_parse as urlparse
+from six import string_types
+
 
 logger = logging.getLogger(__file__)
-
-try:
-    from django.core.exceptions import ImproperlyConfigured
-except ImportError:
-    class ImproperlyConfigured(Exception):
-        pass
-
-try:
-    import urllib.parse as urlparse
-except ImportError:
-    # Python <= 2.6
-    import urlparse
-
-
-if sys.version < '3':
-    text_type = unicode
-else:
-    text_type = str
-    basestring = str
 
 
 __author__ = 'joke2k'
@@ -38,9 +23,8 @@ __version__ = (0, 3, 1)
 
 
 # return int if possible
-_cast_int = lambda v: int(v) if isinstance(v, basestring) and v.isdigit() else v
-# return str if possibile
-_cast_str = lambda v: str(v) if isinstance(v, basestring) else v
+def _cast_int(v):
+    return int(v) if hasattr(v, 'isdigit') and v.isdigit() else v
 
 
 class NoValue(object):
@@ -49,7 +33,7 @@ class NoValue(object):
 
 
 class Env(object):
-    """Provide schema-based lookups of environment variables so that each
+    """Provide scheme-based lookups of environment variables so that each
     caller doesn't have to pass in `cast` and `default` parameters.
 
     Usage:::
@@ -112,8 +96,8 @@ class Env(object):
         "simple": "haystack.backends.simple_backend.SimpleEngine",
     }
 
-    def __init__(self, **schema):
-        self.schema = schema
+    def __init__(self, **scheme):
+        self.scheme = scheme
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
         return self.get_value(var, cast=cast, default=default, parse_default=parse_default)
@@ -130,7 +114,7 @@ class Env(object):
         """Helper for python2
         :rtype: unicode
         """
-        return self.get_value(var, cast=text_type, default=default)
+        return self.get_value(var, cast=str, default=default)
 
     def bool(self, var, default=NOTSET):
         """
@@ -180,7 +164,7 @@ class Env(object):
         :rtype: dict
         """
         return self.db_url_config(self.get_value(var, default=default), engine=engine)
-    db=db_url
+    db = db_url
 
     def cache_url(self, var=DEFAULT_CACHE_ENV, default=NOTSET, backend=None):
         """Returns a config dictionary, defaulting to CACHE_URL.
@@ -188,7 +172,7 @@ class Env(object):
         :rtype: dict
         """
         return self.cache_url_config(self.url(var, default=default), backend=backend)
-    cache=cache_url
+    cache = cache_url
 
     def email_url(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
         """Returns a config dictionary, defaulting to EMAIL_URL.
@@ -196,7 +180,7 @@ class Env(object):
         :rtype: dict
         """
         return self.email_url_config(self.url(var, default=default), backend=backend)
-    email=email_url
+    email = email_url
 
     def search_url(self, var=DEFAULT_SEARCH_ENV, default=NOTSET, engine=None):
         """Returns a config dictionary, defaulting to SEARCH_URL.
@@ -224,8 +208,8 @@ class Env(object):
 
         logger.debug("get '{0}' casted as '{1}' with default '{2}'".format(var, cast, default))
 
-        if var in self.schema:
-            var_info = self.schema[var]
+        if var in self.scheme:
+            var_info = self.scheme[var]
 
             try:
                 has_default = len(var_info) == 2
@@ -286,14 +270,13 @@ class Env(object):
             value = list(map(cast[0], [x for x in value.split(',') if x]))
         elif isinstance(cast, dict):
             key_cast = cast.get('key', str)
-            value_cast = cast.get('value', text_type)
+            value_cast = cast.get('value', str)
             value_cast_by_key = cast.get('cast', dict())
             value = dict(map(
                 lambda kv: (key_cast(kv[0]), cls.parse_value(kv[1], value_cast_by_key.get(kv[0], value_cast))),
                 [val.split('=') for val in value.split(';') if val]
             ))
         elif cast is dict:
-        #elif hasattr(cast, '__name__') and cast.__name__ == 'dict':
             value = dict([val.split('=') for val in value.split(',') if val])
         elif cast is list:
             value = [x for x in value.split(',') if x]
@@ -350,16 +333,16 @@ class Env(object):
         if url.scheme == 'sqlite' and path == '':
             path = ':memory:'
         if url.scheme == 'ldap':
-            path = '{scheme}://{hostname}'.format(scheme=_cast_str(url.scheme), hostname=_cast_str(url.hostname))
+            path = '{scheme}://{hostname}'.format(scheme=url.scheme, hostname=url.hostname)
             if url.port:
-                path += ':{port}'.format(port=_cast_str(url.port))
+                path += ':{port}'.format(port=url.port)
 
         # Update with environment configuration.
         config.update({
             'NAME': path,
-            'USER': _cast_str(url.username),
-            'PASSWORD': _cast_str(url.password),
-            'HOST': _cast_str(url.hostname),
+            'USER': url.username,
+            'PASSWORD': url.password,
+            'HOST': url.hostname,
             'PORT': _cast_int(url.port),
         })
 
@@ -404,7 +387,7 @@ class Env(object):
 
         if url.scheme == 'filecache':
             config.update({
-                'LOCATION': _cast_str(url.netloc + url.path),
+                'LOCATION': url.netloc + url.path,
             })
 
         if url.path and url.scheme in ['memcache', 'pymemcache', 'rediscache']:
@@ -442,9 +425,9 @@ class Env(object):
         # Update with environment configuration
         config.update({
             'EMAIL_FILE_PATH': path,
-            'EMAIL_HOST_USER': _cast_str(url.username),
-            'EMAIL_HOST_PASSWORD': _cast_str(url.password),
-            'EMAIL_HOST': _cast_str(url.hostname),
+            'EMAIL_HOST_USER': url.username,
+            'EMAIL_HOST_PASSWORD': url.password,
+            'EMAIL_HOST': url.hostname,
             'EMAIL_PORT': _cast_int(url.port),
         })
 
@@ -529,7 +512,7 @@ class Env(object):
                 return
 
         try:
-            with open(env_file) if isinstance(env_file, basestring) else env_file as f:
+            with open(env_file) if isinstance(env_file, string_types) else env_file as f:
                 content = f.read()
         except IOError:
             warnings.warn("not reading %s - it doesn't exist." % env_file)
@@ -547,7 +530,7 @@ class Env(object):
                 m3 = re.match(r'\A"(.*)"\Z', val)
                 if m3:
                     val = re.sub(r'\\(.)', r'\1', m3.group(1))
-                os.environ.setdefault(key, text_type(val))
+                os.environ.setdefault(key, str(val))
 
         # set defaults
         for key, value in overrides.items():
@@ -633,7 +616,7 @@ class Path(object):
     def __sub__(self, other):
         if isinstance(other, int):
             return self.path('../' * other)
-        elif isinstance(other, (str, text_type)):
+        elif isinstance(other, string_types):
             return Path(self.__root__.rstrip(other))
         raise TypeError("unsupported operand type(s) for -: '{0}' and '{1}'".format(self, type(other)))
 
@@ -662,10 +645,20 @@ class Path(object):
             raise ImproperlyConfigured("Create required path: {0}".format(absolute_path))
         return absolute_path
 
+
 def register_scheme(scheme):
-    for method in filter(lambda s: s.startswith('uses_'), dir(urlparse)):
-        getattr(urlparse, method).append(scheme)
+    for method in dir(urlparse):
+        if method.startswith('uses_'):
+            getattr(urlparse, method).append(scheme)
+
+
+def register_schemes(schemes):
+    for scheme in schemes:
+        register_scheme(scheme)
+
 
 # Register database and cache schemes in URLs.
-for schema in list(Env.DB_SCHEMES.keys()) + list(Env.CACHE_SCHEMES.keys()) + list(Env.SEARCH_SCHEMES.keys()) +list(Env.EMAIL_SCHEMES.keys()):
-    register_scheme(schema)
+register_schemes(Env.DB_SCHEMES.keys())
+register_schemes(Env.CACHE_SCHEMES.keys())
+register_schemes(Env.SEARCH_SCHEMES.keys())
+register_schemes(Env.EMAIL_SCHEMES.keys())

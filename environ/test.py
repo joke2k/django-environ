@@ -1,5 +1,4 @@
 from __future__ import print_function
-from __future__ import unicode_literals
 import unittest
 
 from environ import *
@@ -70,8 +69,8 @@ class EnvTests(BaseTests):
         self.assertRaises(ImproperlyConfigured, self.env, 'not_present')
 
     def test_str(self):
-        self.assertTypeAndValue(text_type, 'bar', self.env('STR_VAR'))
-        self.assertTypeAndValue(text_type, 'bar', self.env.str('STR_VAR'))
+        self.assertTypeAndValue(str, 'bar', self.env('STR_VAR'))
+        self.assertTypeAndValue(str, 'bar', self.env.str('STR_VAR'))
 
     def test_int(self):
         self.assertTypeAndValue(int, 42, self.env('INT_VAR', cast=int))
@@ -99,7 +98,7 @@ class EnvTests(BaseTests):
         self.assertTypeAndValue(bool, False, self.env.bool('BOOL_FALSE_VAR'))
 
     def test_proxied_value(self):
-        self.assertTypeAndValue(text_type, 'bar', self.env('PROXIED_VAR'))
+        self.assertTypeAndValue(str, 'bar', self.env('PROXIED_VAR'))
 
     def test_int_list(self):
         self.assertTypeAndValue(list, [42, 33], self.env('INT_LIST', cast=[int]))
@@ -107,7 +106,7 @@ class EnvTests(BaseTests):
 
     def test_str_list_with_spaces(self):
         self.assertTypeAndValue(list, [' foo', '  bar'],
-                                self.env('STR_LIST_WITH_SPACES', cast=[text_type]))
+                                self.env('STR_LIST_WITH_SPACES', cast=[str]))
         self.assertTypeAndValue(list, [' foo', '  bar'],
                                 self.env.list('STR_LIST_WITH_SPACES'))
 
@@ -121,7 +120,7 @@ class EnvTests(BaseTests):
 
         self.assertEqual({'a': '1'}, self.env.parse_value('a=1', dict))
         self.assertEqual({'a': 1}, self.env.parse_value('a=1', dict(value=int)))
-        self.assertEqual({'a': ['1', '2', '3']}, self.env.parse_value('a=1,2,3', dict(value=[text_type])))
+        self.assertEqual({'a': ['1', '2', '3']}, self.env.parse_value('a=1,2,3', dict(value=[str])))
         self.assertEqual({'a': [1, 2, 3]}, self.env.parse_value('a=1,2,3', dict(value=[int])))
         self.assertEqual({'a': 1, 'b': [1.1, 2.2], 'c': 3},
                          self.env.parse_value('a=1;b=1.1,2.2;c=3', dict(value=int, cast=dict(b=[float]))))
@@ -207,20 +206,20 @@ class FileEnvTests(EnvTests):
 class SchemaEnvTests(BaseTests):
 
     def test_schema(self):
-        env = Env(INT_VAR=int, NOT_PRESENT_VAR=(float, 33.3), STR_VAR=text_type,
+        env = Env(INT_VAR=int, NOT_PRESENT_VAR=(float, 33.3), STR_VAR=str,
                   INT_LIST=[int], DEFAULT_LIST=([int], [2]))
 
         self.assertTypeAndValue(int, 42, env('INT_VAR'))
         self.assertTypeAndValue(float, 33.3, env('NOT_PRESENT_VAR'))
 
-        self.assertTypeAndValue(text_type, 'bar', env('STR_VAR'))
-        self.assertTypeAndValue(text_type, 'foo', env('NOT_PRESENT2', default='foo'))
+        self.assertTypeAndValue(str, 'bar', env('STR_VAR'))
+        self.assertTypeAndValue(str, 'foo', env('NOT_PRESENT2', default='foo'))
 
         self.assertTypeAndValue(list, [42, 33], env('INT_LIST'))
         self.assertTypeAndValue(list, [2], env('DEFAULT_LIST'))
 
         # Override schema in this one case
-        self.assertTypeAndValue(text_type, '42', env('INT_VAR', cast=text_type))
+        self.assertTypeAndValue(str, '42', env('INT_VAR', cast=str))
 
 
 class DatabaseTestSuite(unittest.TestCase):
