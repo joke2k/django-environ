@@ -10,7 +10,7 @@ README = open(here('README.rst')).read()
 version = ".".join(map(str, environ.__version__))
 author = environ.__author__
 description = environ.__doc__
-install_requires = [] # 'django'
+install_requires = ['django', 'six']
 
 setup(name='django-environ',
       version=version,
@@ -35,9 +35,7 @@ setup(name='django-environ',
       license='MIT License',
       packages=find_packages(),
       include_package_data=True,
-      #py_modules=['environ'],
       test_suite='environ.test.load_suite',
       zip_safe=False,
       install_requires=install_requires,
-)
-
+      )
