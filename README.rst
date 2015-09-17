@@ -219,6 +219,11 @@ Tests
 Changelog
 ---------
 
+=== 0.4.0 (2015-09-17)
+  * Fix non-ascii values (broken in Python 2.x)
+  * New email schemes - smtp+ssl and smtp+tls (smtps would be deprecated)
+  * redis_cache replaced by django_redis
+
 === 0.3.1 (2014-09-03)
   * Add LDAP url support for database (django-ldapdb)
   * Fix psql/pgsql url

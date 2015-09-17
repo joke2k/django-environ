@@ -19,7 +19,7 @@ logger = logging.getLogger(__file__)
 
 
 __author__ = 'joke2k'
-__version__ = (0, 3, 1)
+__version__ = (0, 4, 0)
 
 
 # return int if possible
