@@ -3,6 +3,7 @@ python:
  - "2.6"
  - "2.7"
  - "3.3"
+ - "3.4"
 env:
   matrix:
    - DJANGO=Django==1.4
@@ -20,8 +21,18 @@ branches:
 script: coverage run --source=environ setup.py test
 matrix:
   exclude:
+    - python: "2.6"
+      env: DJANGO=Django==1.7
+    - python: "2.6"
+      env: DJANGO=Django==1.8
     - python: "3.3"
       env: DJANGO=Django==1.4
+    - python: "3.3"
+      env: DJANGO=Django==1.5
+    - python: "3.4"
+      env: DJANGO=Django==1.4
+    - python: "3.4"
+      env: DJANGO=Django==1.5
 after_success:
   - coverage report
   - pip install --quiet python-coveralls
