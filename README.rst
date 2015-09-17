@@ -69,10 +69,10 @@ This is your `settings.py` file before you have installed **django-environ**
             ]
         },
         'redis': {
-            'BACKEND': 'redis_cache.cache.RedisCache',
+            'BACKEND': 'django_redis.cache.RedisCache',
             'LOCATION': '127.0.0.1:6379:1',
             'OPTIONS': {
-                'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
                 'PASSWORD': 'redis-githubbed-password',
             }
         }
@@ -118,7 +118,7 @@ Create a `.env` file::
     DATABASE_URL=psql://urser:un-githubbedpassword@127.0.0.1:8458/database
     # SQLITE_URL=sqlite:///my-local-sqlite.db
     CACHE_URL=memcache://127.0.0.1:11211,127.0.0.1:11212,127.0.0.1:11213
-    REDIS_URL=rediscache://127.0.0.1:6379:1?client_class=redis_cache.client.DefaultClient&password=redis-un-githubbed-password
+    REDIS_URL=rediscache://127.0.0.1:6379:1?client_class=django_redis.client.DefaultClient&password=redis-un-githubbed-password
 
 
 How to install

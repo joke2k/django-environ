@@ -12,7 +12,7 @@ class BaseTests(unittest.TestCase):
     MYSQLGIS = 'mysqlgis://user:password@127.0.0.1/some_database'
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
     MEMCACHE = 'memcache://127.0.0.1:11211'
-    REDIS = 'rediscache://127.0.0.1:6379:1?client_class=redis_cache.client.DefaultClient&password=secret'
+    REDIS = 'rediscache://127.0.0.1:6379:1?client_class=django_redis.client.DefaultClient&password=secret'
     EMAIL = 'smtps://user@domain.com:password@smtp.example.com:587'
     JSON = dict(one='bar', two=2, three=33.44)
     DICT = dict(foo='bar', test='on')
@@ -166,10 +166,10 @@ class EnvTests(BaseTests):
         self.assertEqual(cache_config['LOCATION'], '127.0.0.1:11211')
 
         redis_config = self.env.cache_url('CACHE_REDIS')
-        self.assertEqual(redis_config['BACKEND'], 'redis_cache.cache.RedisCache')
+        self.assertEqual(redis_config['BACKEND'], 'django_redis.cache.RedisCache')
         self.assertEqual(redis_config['LOCATION'], '127.0.0.1:6379:1')
         self.assertEqual(redis_config['OPTIONS'], {
-            'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'PASSWORD': 'secret',
         })
 
@@ -377,20 +377,20 @@ class CacheTestSuite(unittest.TestCase):
         self.assertEqual(url['LOCATION'], '')
 
     def test_redis_parsing(self):
-        url = 'rediscache://127.0.0.1:6379:1?client_class=redis_cache.client.DefaultClient&password=secret'
+        url = 'rediscache://127.0.0.1:6379:1?client_class=django_redis.client.DefaultClient&password=secret'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'redis_cache.cache.RedisCache')
+        self.assertEqual(url['BACKEND'], 'django_redis.cache.RedisCache')
         self.assertEqual(url['LOCATION'], '127.0.0.1:6379:1')
         self.assertEqual(url['OPTIONS'], {
-            'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'PASSWORD': 'secret',
         })
 
     def test_redis_socket_parsing(self):
         url = 'rediscache:///path/to/socket:1'
         url = Env.cache_url_config(url)
-        self.assertEqual(url['BACKEND'], 'redis_cache.cache.RedisCache')
+        self.assertEqual(url['BACKEND'], 'django_redis.cache.RedisCache')
         self.assertEqual(url['LOCATION'], 'unix:/path/to/socket:1')
 
     def test_options_parsing(self):
@@ -407,7 +407,7 @@ class CacheTestSuite(unittest.TestCase):
 
     def test_custom_backend(self):
         url = 'memcache://127.0.0.1:5400?foo=option&bars=9001'
-        backend = 'redis_cache.cache.RedisCache'
+        backend = 'django_redis.cache.RedisCache'
         url = Env.cache_url_config(url, backend)
 
         self.assertEqual(url['BACKEND'], backend)
