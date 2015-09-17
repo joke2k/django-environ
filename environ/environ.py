@@ -28,11 +28,13 @@ def _cast_int(v):
 
 
 class NoValue(object):
+
     def __repr__(self):
         return '<{0}>'.format(self.__class__.__name__)
 
 
 class Env(object):
+
     """Provide scheme-based lookups of environment variables so that each
     caller doesn't have to pass in `cast` and `default` parameters.
 
@@ -481,7 +483,7 @@ class Env(object):
         config.update({
             "URL": urlparse.urlunparse(("http",) + url[1:2] + (path,) + url[3:]),
             "INDEX_NAME": index,
-            })
+        })
 
         if path:
             config.update({
@@ -538,6 +540,7 @@ class Env(object):
 
 
 class Path(object):
+
     """Inspired to Django Two-scoops, handling File Paths in Settings.
 
         >>> from environ import Path
