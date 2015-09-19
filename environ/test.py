@@ -445,8 +445,8 @@ class SearchTestSuite(unittest.TestCase):
         self.assertEqual(url['ENGINE'], 'haystack.backends.solr_backend.SolrEngine')
         self.assertEqual(url['URL'], 'http://127.0.0.1:8983/solr/solr_index')
         self.assertEqual(url['TIMEOUT'], timeout)
-        self.assertNotIn('INDEX_NAME', url)
-        self.assertNotIn('PATH', url)
+        self.assertTrue('INDEX_NAME' not in url)
+        self.assertTrue('PATH' not in url)
 
     def test_elasticsearch_parsing(self):
         timeout = 360
@@ -454,11 +454,11 @@ class SearchTestSuite(unittest.TestCase):
         url = Env.search_url_config(url)
 
         self.assertEqual(url['ENGINE'], 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine')
-        self.assertIn('INDEX_NAME', url.keys())
+        self.assertTrue('INDEX_NAME' in url.keys())
         self.assertEqual(url['INDEX_NAME'], 'index')
-        self.assertIn('TIMEOUT', url.keys())
+        self.assertTrue('TIMEOUT' in url.keys())
         self.assertEqual(url['TIMEOUT'], timeout)
-        self.assertNotIn('PATH', url)
+        self.assertTrue('PATH' not in url)
 
     def test_whoosh_parsing(self):
         storage = 'file'  # or ram
@@ -467,13 +467,13 @@ class SearchTestSuite(unittest.TestCase):
         url = Env.search_url_config(url)
 
         self.assertEqual(url['ENGINE'], 'haystack.backends.whoosh_backend.WhooshEngine')
-        self.assertIn('PATH', url.keys())
+        self.assertTrue('PATH' in url.keys())
         self.assertEqual(url['PATH'], '/home/search/whoosh_index')
-        self.assertIn('STORAGE', url.keys())
+        self.assertTrue('STORAGE' in url.keys())
         self.assertEqual(url['STORAGE'], storage)
-        self.assertIn('POST_LIMIT', url.keys())
+        self.assertTrue('POST_LIMIT' in url.keys())
         self.assertEqual(url['POST_LIMIT'], post_limit)
-        self.assertNotIn('INDEX_NAME', url)
+        self.assertTrue('INDEX_NAME' not in url)
 
     def test_xapian_parsing(self):
         flags = 'myflags'
@@ -481,18 +481,18 @@ class SearchTestSuite(unittest.TestCase):
         url = Env.search_url_config(url)
 
         self.assertEqual(url['ENGINE'], 'haystack.backends.xapian_backend.XapianEngine')
-        self.assertIn('PATH', url.keys())
+        self.assertTrue('PATH' in url.keys())
         self.assertEqual(url['PATH'], '/home/search/xapian_index')
-        self.assertIn('FLAGS', url.keys())
+        self.assertTrue('FLAGS' in url.keys())
         self.assertEqual(url['FLAGS'], flags)
-        self.assertNotIn('INDEX_NAME', url)
+        self.assertTrue('INDEX_NAME' not in url)
 
     def test_simple_parsing(self):
         url = Env.search_url_config(self.simple_url)
 
         self.assertEqual(url['ENGINE'], 'haystack.backends.simple_backend.SimpleEngine')
-        self.assertNotIn('INDEX_NAME', url)
-        self.assertNotIn('PATH', url)
+        self.assertTrue('INDEX_NAME' not in url)
+        self.assertTrue('PATH' not in url)
 
     def test_common_args_parsing(self):
         excluded_indexes = 'myapp.indexes.A,myapp.indexes.B'
@@ -513,12 +513,12 @@ class SearchTestSuite(unittest.TestCase):
             url = '?'.join([url, params])
             url = Env.search_url_config(url)
 
-            self.assertIn('EXCLUDED_INDEXES', url.keys())
-            self.assertIn('myapp.indexes.A', url['EXCLUDED_INDEXES'])
-            self.assertIn('myapp.indexes.B', url['EXCLUDED_INDEXES'])
-            self.assertIn('INCLUDE_SPELLING', url.keys())
+            self.assertTrue('EXCLUDED_INDEXES' in url.keys())
+            self.assertTrue('myapp.indexes.A' in url['EXCLUDED_INDEXES'])
+            self.assertTrue('myapp.indexes.B' in url['EXCLUDED_INDEXES'])
+            self.assertTrue('INCLUDE_SPELLING'in url.keys())
             self.assertTrue(url['INCLUDE_SPELLING'])
-            self.assertIn('BATCH_SIZE', url.keys())
+            self.assertTrue('BATCH_SIZE' in url.keys())
             self.assertEqual(url['BATCH_SIZE'], 100)
 
 
