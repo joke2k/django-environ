@@ -4,16 +4,8 @@ Django-environ
 
 Django-environ allows you to utilize 12factor inspired environment variables to configure your Django application.
 
-.. image:: https://travis-ci.org/joke2k/django-environ.svg?branch=master
-  :target: https://travis-ci.org/joke2k/django-environ
-.. image:: https://ci.appveyor.com/api/projects/status/o6p7l2o0xoatqcin
-  :target: https://ci.appveyor.com/project/joke2k/django-environ
-.. image:: https://coveralls.io/repos/joke2k/django-environ/badge.png?branch=master
-  :target: https://coveralls.io/r/joke2k/django-environ?branch=master
-.. image:: https://badge.fury.io/py/django-environ.png
-  :target: http://badge.fury.io/py/django-environ
-.. image:: https://pypip.in/d/django-environ/badge.png
-  :target: https://crate.io/packages/django-environ
+|pypi| |unix_build| |windows_build| |coverage| |downloads| |license|
+
 
 This module is a merge of:
 
@@ -295,3 +287,27 @@ Credits
 
 .. _Distribute: http://pypi.python.org/pypi/distribute
 .. _`modern-package-template`: http://pypi.python.org/pypi/modern-package-template
+
+.. |pypi| image:: https://img.shields.io/pypi/v/django-environ.svg?style=flat-square&label=version
+    :target: https://pypi.python.org/pypi/fake-factory
+    :alt: Latest version released on PyPi
+
+.. |coverage| image:: https://img.shields.io/coveralls/joke2k/django-environ/master.svg?style=flat-square
+    :target: https://coveralls.io/r/joke2k/django-environ?branch=master
+    :alt: Test coverage
+
+.. |unix_build| image:: https://img.shields.io/travis/joke2k/django-environ/master.svg?style=flat-square&label=unix%20build
+    :target: http://travis-ci.org/joke2k/django-environ
+    :alt: Build status of the master branch on Mac/Linux
+
+.. |windows_build|  image:: https://img.shields.io/appveyor/ci/joke2k/django-environ.svg?style=flat-square&label=windows%20build
+    :target: https://ci.appveyor.com/project/joke2k/django-environ
+    :alt: Build status of the master branch on Windows
+
+.. |downloads| image:: https://img.shields.io/pypi/dm/django-environ.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/django-environ
+    :alt: Monthly downloads
+
+.. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
+    :target: https://raw.githubusercontent.com/joke2k/django-environ/master/LICENSE.txt
+    :alt: Package license
