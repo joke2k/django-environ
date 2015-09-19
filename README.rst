@@ -1,3 +1,4 @@
+==============
 Django-environ
 ==============
 
@@ -122,7 +123,7 @@ Create a `.env` file::
 
 
 How to install
---------------
+==============
 
 ::
 
@@ -130,7 +131,7 @@ How to install
 
 
 How to use
-----------
+==========
 
 There are only classes, Env and Path
 
@@ -165,7 +166,7 @@ There are only classes, Env and Path
 
 
 Supported Types
----------------
+===============
 
 - str
 - bool
@@ -207,7 +208,7 @@ Supported Types
     - Dummy mail: dummymail://
 
 Tests
------
+=====
 
 ::
 
@@ -216,42 +217,42 @@ Tests
     $ python setup.py test
 
 
+License
+=======
+
+Django-environ is licensed under the MIT License - see the LICENSE.rst file for details
+
 Changelog
----------
+=========
 
-=== 0.4.0 (2015-09-17)
-  * Fix non-ascii values (broken in Python 2.x)
-  * New email schemes - smtp+ssl and smtp+tls (smtps would be deprecated)
-  * redis_cache replaced by django_redis
+**0.4.0 (2015-09-19)**
+  - Fix non-ascii values (broken in Python 2.x)
+  - New email schemes - smtp+ssl and smtp+tls (smtps would be deprecated)
+  - redis_cache replaced by django_redis
 
-=== 0.3.1 (2014-09-03)
-  * Add LDAP url support for database (django-ldapdb)
-  * Fix psql/pgsql url
+**0.3.1 (2014-09-03)**
+  - Add LDAP url support for database (django-ldapdb)
+  - Fix psql/pgsql url
 
-=== 0.3 (2014-06-03) ===
+**0.3 (2014-06-03)**
+  - Add cache url support
+  - Add email url support
+  - Add search url support
+  - Rewriting README.rst
 
-  * Add cache url support
-  * Add email url support
-  * Add search url support
-  * Rewriting README.rst
+**0.2.1 (2013-04-19)**
+  - environ/environ.py: Env.__call__ now uses Env.get_value instance method
 
-=== 0.2.1 (2013-04-19) ===
-
-  * environ/environ.py: Env.__call__ now uses Env.get_value instance method
-
-=== 0.2 (2013-04-16) ===
-
-  * environ/environ.py, environ/test.py, environ/test_env.txt: add advanced
+**0.2 (2013-04-16)**
+  - environ/environ.py, environ/test.py, environ/test_env.txt: add advanced
     float parsing (comma and dot symbols to separate thousands and decimals)
+  - README.rst, docs/index.rst: fix TYPO in documentation
 
-  * README.rst, docs/index.rst: fix TYPO in documentation
-
-=== 0.1 (2013-04-02) ===
-
-  * initial release
+**0.1 (2013-04-02)**
+  - initial release
 
 Credits
--------
+=======
 
 - `12factor`_
 - `12factor-django`_

@@ -9,7 +9,11 @@ import re
 import sys
 import warnings
 
-from django.core.exceptions import ImproperlyConfigured
+try:
+    from django.core.exceptions import ImproperlyConfigured
+except ImportError:
+    class ImproperlyConfigured(Exception):
+        pass
 
 from six.moves import urllib_parse as urlparse
 from six import string_types
@@ -18,8 +22,9 @@ from six import string_types
 logger = logging.getLogger(__file__)
 
 
+VERSION = '0.4.0'
 __author__ = 'joke2k'
-__version__ = (0, 4, 0)
+__version__ = tuple(VERSION.split('.'))
 
 
 # return int if possible
