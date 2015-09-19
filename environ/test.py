@@ -422,6 +422,106 @@ class CacheTestSuite(unittest.TestCase):
         })
 
 
+class SearchTestSuite(unittest.TestCase):
+
+    solr_url = 'solr://127.0.0.1:8983/solr'
+    elasticsearch_url = 'elasticsearch://127.0.0.1:9200/index'
+    whoosh_url = 'whoosh:///home/search/whoosh_index'
+    xapian_url = 'xapian:///home/search/xapian_index'
+    simple_url = 'simple:///'
+
+    def test_solr_parsing(self):
+        url = Env.search_url_config(self.solr_url)
+
+        self.assertEqual(url['ENGINE'], 'haystack.backends.solr_backend.SolrEngine')
+        self.assertEqual(url['URL'], 'http://127.0.0.1:8983/solr')
+
+    def test_solr_multicore_parsing(self):
+        timeout = 360
+        index = 'solr_index'
+        url = '%s/%s?TIMEOUT=%s' % (self.solr_url, index, timeout)
+        url = Env.search_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'haystack.backends.solr_backend.SolrEngine')
+        self.assertEqual(url['URL'], 'http://127.0.0.1:8983/solr/solr_index')
+        self.assertEqual(url['TIMEOUT'], timeout)
+        self.assertNotIn('INDEX_NAME', url)
+        self.assertNotIn('PATH', url)
+
+    def test_elasticsearch_parsing(self):
+        timeout = 360
+        url = '%s?TIMEOUT=%s' % (self.elasticsearch_url, timeout)
+        url = Env.search_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine')
+        self.assertIn('INDEX_NAME', url.keys())
+        self.assertEqual(url['INDEX_NAME'], 'index')
+        self.assertIn('TIMEOUT', url.keys())
+        self.assertEqual(url['TIMEOUT'], timeout)
+        self.assertNotIn('PATH', url)
+
+    def test_whoosh_parsing(self):
+        storage = 'file' # or ram
+        post_limit = 128 * 1024 * 1024
+        url = '%s?STORAGE=%s&POST_LIMIT=%s' % (self.whoosh_url, storage, post_limit)
+        url = Env.search_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'haystack.backends.whoosh_backend.WhooshEngine')
+        self.assertIn('PATH', url.keys())
+        self.assertEqual(url['PATH'], '/home/search/whoosh_index')
+        self.assertIn('STORAGE', url.keys())
+        self.assertEqual(url['STORAGE'], storage)
+        self.assertIn('POST_LIMIT', url.keys())
+        self.assertEqual(url['POST_LIMIT'], post_limit)
+        self.assertNotIn('INDEX_NAME', url)
+
+    def test_xapian_parsing(self):
+        flags = 'myflags'
+        url = '%s?FLAGS=%s' % (self.xapian_url, flags)
+        url = Env.search_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'haystack.backends.xapian_backend.XapianEngine')
+        self.assertIn('PATH', url.keys())
+        self.assertEqual(url['PATH'], '/home/search/xapian_index')
+        self.assertIn('FLAGS', url.keys())
+        self.assertEqual(url['FLAGS'], flags)
+        self.assertNotIn('INDEX_NAME', url)
+
+    def test_simple_parsing(self):
+        url = Env.search_url_config(self.simple_url)
+
+        self.assertEqual(url['ENGINE'], 'haystack.backends.simple_backend.SimpleEngine')
+        self.assertNotIn('INDEX_NAME', url)
+        self.assertNotIn('PATH', url)
+
+    def test_common_args_parsing(self):
+        excluded_indexes = 'myapp.indexes.A,myapp.indexes.B'
+        include_spelling = 1
+        batch_size = 100
+        params = 'EXCLUDED_INDEXES=%s&INCLUDE_SPELLING=%s&BATCH_SIZE=%s' % (
+            excluded_indexes,
+            include_spelling,
+            batch_size
+        )
+        for url in [
+            self.solr_url,
+            self.elasticsearch_url,
+            self.whoosh_url,
+            self.xapian_url,
+            self.simple_url,
+        ]:
+            url = '?'.join([url, params])
+            url = Env.search_url_config(url)
+
+            self.assertIn('EXCLUDED_INDEXES', url.keys())
+            self.assertIn('myapp.indexes.A', url['EXCLUDED_INDEXES'])
+            self.assertIn('myapp.indexes.B', url['EXCLUDED_INDEXES'])
+            self.assertIn('INCLUDE_SPELLING', url.keys())
+            self.assertTrue(url['INCLUDE_SPELLING'])
+            self.assertIn('BATCH_SIZE', url.keys())
+            self.assertEqual(url['BATCH_SIZE'], 100)
+
+
 class EmailTests(unittest.TestCase):
 
     def test_smtp_parsing(self):

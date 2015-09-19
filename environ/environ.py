@@ -100,6 +100,7 @@ class Env(object):
         "elasticsearch": "haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine",
         "solr": "haystack.backends.solr_backend.SolrEngine",
         "whoosh": "haystack.backends.whoosh_backend.WhooshEngine",
+        "xapian": "haystack.backends.xapian_backend.XapianEngine",
         "simple": "haystack.backends.simple_backend.SimpleEngine",
     }
 
@@ -440,6 +441,8 @@ class Env(object):
 
         if backend:
             config['EMAIL_BACKEND'] = backend
+        elif url.scheme not in cls.EMAIL_SCHEMES:
+            raise ImproperlyConfigured('Invalid email schema %s' % url.scheme)
         elif url.scheme in cls.EMAIL_SCHEMES:
             config['EMAIL_BACKEND'] = cls.EMAIL_SCHEMES[url.scheme]
 
@@ -470,30 +473,64 @@ class Env(object):
         path = url.path[1:]
         path = path.split('?', 2)[0]
 
-        if url.scheme in cls.SEARCH_SCHEMES:
-            config["ENGINE"] = cls.SEARCH_SCHEMES[url.scheme]
+        if url.scheme not in cls.SEARCH_SCHEMES:
+            raise ImproperlyConfigured('Invalid search schema %s' % url.scheme)
+        config["ENGINE"] = cls.SEARCH_SCHEMES[url.scheme]
 
+        # check commons params
+        params = {}
+        if url.query:
+            params = urlparse.parse_qs(url.query)
+            if 'EXCLUDED_INDEXES' in params.keys():
+                config['EXCLUDED_INDEXES'] = params['EXCLUDED_INDEXES'][0].split(',')
+            if 'INCLUDE_SPELLING' in params.keys():
+                config['INCLUDE_SPELLING'] = cls.parse_value(params['INCLUDE_SPELLING'][0], bool)
+            if 'BATCH_SIZE' in params.keys():
+                config['BATCH_SIZE'] = cls.parse_value(params['BATCH_SIZE'][0], int)
+
+        if url.scheme == 'simple':
+            return config
+        elif url.scheme in ['solr', 'elasticsearch']:
+            if 'KWARGS' in params.keys():
+                config['KWARGS'] = params['KWARGS'][0]
+
+        # remove trailing slash
         if path.endswith("/"):
             path = path[:-1]
 
-        split = path.rsplit("/", 1)
+        if url.scheme == 'solr':
+            config['URL'] = urlparse.urlunparse(('http',) + url[1:2] + (path,) + ('', '', ''))
+            if 'TIMEOUT' in params.keys():
+                config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
+            return config
 
-        if len(split) > 1:
-            path = split[:-1]
-            index = split[-1]
-        else:
-            path = ""
-            index = split[0]
+        if url.scheme == 'elasticsearch':
 
-        config.update({
-            "URL": urlparse.urlunparse(("http",) + url[1:2] + (path,) + url[3:]),
-            "INDEX_NAME": index,
-        })
+            split = path.rsplit("/", 1)
 
-        if path:
-            config.update({
-                "PATH": path,
-            })
+            if len(split) > 1:
+                path = "/".join(split[:-1])
+                index = split[-1]
+            else:
+                path = ""
+                index = split[0]
+
+            config['URL'] = urlparse.urlunparse(('http',) + url[1:2] + (path,) + ('', '', ''))
+            if 'TIMEOUT' in params.keys():
+                config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
+            config['INDEX_NAME'] = index
+            return config
+
+        config['PATH'] = '/' + path
+
+        if url.scheme == 'whoosh':
+            if 'STORAGE' in params.keys():
+                config['STORAGE'] = params['STORAGE'][0]
+            if 'POST_LIMIT' in params.keys():
+                config['POST_LIMIT'] = cls.parse_value(params['POST_LIMIT'][0], int)
+        elif url.scheme == 'xapian':
+            if 'FLAGS' in params.keys():
+                config['FLAGS'] = params['FLAGS'][0]
 
         if engine:
             config['ENGINE'] = engine
