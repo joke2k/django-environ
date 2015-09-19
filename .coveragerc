@@ -1,2 +1,3 @@
 [paths]
-source = environ/environ.py
+source = environ/
+omit = environ/test.py

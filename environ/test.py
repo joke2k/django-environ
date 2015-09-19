@@ -461,7 +461,7 @@ class SearchTestSuite(unittest.TestCase):
         self.assertNotIn('PATH', url)
 
     def test_whoosh_parsing(self):
-        storage = 'file' # or ram
+        storage = 'file'  # or ram
         post_limit = 128 * 1024 * 1024
         url = '%s?STORAGE=%s&POST_LIMIT=%s' % (self.whoosh_url, storage, post_limit)
         url = Env.search_url_config(url)
@@ -574,7 +574,10 @@ class PathTests(unittest.TestCase):
 def load_suite():
 
     test_suite = unittest.TestSuite()
-    for case in [EnvTests, FileEnvTests, SchemaEnvTests, PathTests, DatabaseTestSuite, CacheTestSuite, EmailTests]:
+    for case in [
+        EnvTests, FileEnvTests, SchemaEnvTests, PathTests, DatabaseTestSuite,
+        CacheTestSuite, EmailTests, SearchTestSuite
+    ]:
         test_suite.addTest(unittest.makeSuite(case))
     return test_suite
 
