@@ -1,0 +1,3 @@
+[paths]
+source = environ/
+omit = environ/test.py

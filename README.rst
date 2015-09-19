@@ -1,18 +1,11 @@
+==============
 Django-environ
 ==============
 
 Django-environ allows you to utilize 12factor inspired environment variables to configure your Django application.
 
-.. image:: https://travis-ci.org/joke2k/django-environ.svg?branch=master
-  :target: https://travis-ci.org/joke2k/django-environ
-.. image:: https://ci.appveyor.com/api/projects/status/o6p7l2o0xoatqcin
-  :target: https://ci.appveyor.com/project/joke2k/django-environ
-.. image:: https://coveralls.io/repos/joke2k/django-environ/badge.png?branch=master
-  :target: https://coveralls.io/r/joke2k/django-environ?branch=master
-.. image:: https://badge.fury.io/py/django-environ.png
-  :target: http://badge.fury.io/py/django-environ
-.. image:: https://pypip.in/d/django-environ/badge.png
-  :target: https://crate.io/packages/django-environ
+|pypi| |unix_build| |windows_build| |coverage| |downloads| |license|
+
 
 This module is a merge of:
 
@@ -69,10 +62,10 @@ This is your `settings.py` file before you have installed **django-environ**
             ]
         },
         'redis': {
-            'BACKEND': 'redis_cache.cache.RedisCache',
+            'BACKEND': 'django_redis.cache.RedisCache',
             'LOCATION': '127.0.0.1:6379:1',
             'OPTIONS': {
-                'CLIENT_CLASS': 'redis_cache.client.DefaultClient',
+                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
                 'PASSWORD': 'redis-githubbed-password',
             }
         }
@@ -118,11 +111,11 @@ Create a `.env` file::
     DATABASE_URL=psql://urser:un-githubbedpassword@127.0.0.1:8458/database
     # SQLITE_URL=sqlite:///my-local-sqlite.db
     CACHE_URL=memcache://127.0.0.1:11211,127.0.0.1:11212,127.0.0.1:11213
-    REDIS_URL=rediscache://127.0.0.1:6379:1?client_class=redis_cache.client.DefaultClient&password=redis-un-githubbed-password
+    REDIS_URL=rediscache://127.0.0.1:6379:1?client_class=django_redis.client.DefaultClient&password=redis-un-githubbed-password
 
 
 How to install
---------------
+==============
 
 ::
 
@@ -130,7 +123,7 @@ How to install
 
 
 How to use
-----------
+==========
 
 There are only classes, Env and Path
 
@@ -165,7 +158,7 @@ There are only classes, Env and Path
 
 
 Supported Types
----------------
+===============
 
 - str
 - bool
@@ -199,14 +192,15 @@ Supported Types
     - Simple cache: simple://
 - email_url
     - SMTP: smtp://
-    - SMTPS: smtps://
+    - SMTP+SSL: smtp+ssl://
+    - SMTP+TLS: smtp+tls://
     - Console mail: consolemail://
     - File mail: filemail://
     - LocMem mail: memorymail://
     - Dummy mail: dummymail://
 
 Tests
------
+=====
 
 ::
 
@@ -215,37 +209,42 @@ Tests
     $ python setup.py test
 
 
+License
+=======
+
+Django-environ is licensed under the MIT License - see the LICENSE.rst file for details
+
 Changelog
----------
+=========
 
-=== 0.3.1 (2014-09-03)
-  * Add LDAP url support for database (django-ldapdb)
-  * Fix psql/pgsql url
+**0.4.0 (2015-09-19)**
+  - Fix non-ascii values (broken in Python 2.x)
+  - New email schemes - smtp+ssl and smtp+tls (smtps would be deprecated)
+  - redis_cache replaced by django_redis
 
-=== 0.3 (2014-06-03) ===
+**0.3.1 (2014-09-03)**
+  - Add LDAP url support for database (django-ldapdb)
+  - Fix psql/pgsql url
 
-  * Add cache url support
-  * Add email url support
-  * Add search url support
-  * Rewriting README.rst
+**0.3 (2014-06-03)**
+  - Add cache url support
+  - Add email url support
+  - Add search url support
+  - Rewriting README.rst
 
-=== 0.2.1 (2013-04-19) ===
+**0.2.1 (2013-04-19)**
+  - environ/environ.py: Env.__call__ now uses Env.get_value instance method
 
-  * environ/environ.py: Env.__call__ now uses Env.get_value instance method
-
-=== 0.2 (2013-04-16) ===
-
-  * environ/environ.py, environ/test.py, environ/test_env.txt: add advanced
+**0.2 (2013-04-16)**
+  - environ/environ.py, environ/test.py, environ/test_env.txt: add advanced
     float parsing (comma and dot symbols to separate thousands and decimals)
+  - README.rst, docs/index.rst: fix TYPO in documentation
 
-  * README.rst, docs/index.rst: fix TYPO in documentation
-
-=== 0.1 (2013-04-02) ===
-
-  * initial release
+**0.1 (2013-04-02)**
+  - initial release
 
 Credits
--------
+=======
 
 - `12factor`_
 - `12factor-django`_
@@ -288,3 +287,27 @@ Credits
 
 .. _Distribute: http://pypi.python.org/pypi/distribute
 .. _`modern-package-template`: http://pypi.python.org/pypi/modern-package-template
+
+.. |pypi| image:: https://img.shields.io/pypi/v/django-environ.svg?style=flat-square&label=version
+    :target: https://pypi.python.org/pypi/fake-factory
+    :alt: Latest version released on PyPi
+
+.. |coverage| image:: https://img.shields.io/coveralls/joke2k/django-environ/master.svg?style=flat-square
+    :target: https://coveralls.io/r/joke2k/django-environ?branch=master
+    :alt: Test coverage
+
+.. |unix_build| image:: https://img.shields.io/travis/joke2k/django-environ/master.svg?style=flat-square&label=unix%20build
+    :target: http://travis-ci.org/joke2k/django-environ
+    :alt: Build status of the master branch on Mac/Linux
+
+.. |windows_build|  image:: https://img.shields.io/appveyor/ci/joke2k/django-environ.svg?style=flat-square&label=windows%20build
+    :target: https://ci.appveyor.com/project/joke2k/django-environ
+    :alt: Build status of the master branch on Windows
+
+.. |downloads| image:: https://img.shields.io/pypi/dm/django-environ.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/django-environ
+    :alt: Monthly downloads
+
+.. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
+    :target: https://raw.githubusercontent.com/joke2k/django-environ/master/LICENSE.txt
+    :alt: Package license

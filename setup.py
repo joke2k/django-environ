@@ -1,16 +1,16 @@
 from __future__ import unicode_literals
 from setuptools import setup, find_packages
+import io
+import os
 
-from environ import environ
+here = os.path.abspath(os.path.dirname(__file__))
+README = io.open(os.path.join(here, 'README.rst'), encoding="utf8").read()
 
-
-here = environ.Path(__file__, is_file=True)
-README = open(here('README.rst')).read()
-
-version = ".".join(map(str, environ.__version__))
-author = environ.__author__
-description = environ.__doc__
-install_requires = [] # 'django'
+version = '0.4.0'
+author = 'joke2k'
+description = "Django-environ allows you to utilize 12factor inspired environment " \
+              "variables to configure your Django application."
+install_requires = ['django', 'six']
 
 setup(name='django-environ',
       version=version,
@@ -34,10 +34,9 @@ setup(name='django-environ',
       url='http://github.com/joke2k/django-environ',
       license='MIT License',
       packages=find_packages(),
+      platforms=["any"],
       include_package_data=True,
-      #py_modules=['environ'],
       test_suite='environ.test.load_suite',
       zip_safe=False,
       install_requires=install_requires,
-)
-
+      )
