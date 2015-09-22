@@ -289,7 +289,7 @@ Credits
 .. _`modern-package-template`: http://pypi.python.org/pypi/modern-package-template
 
 .. |pypi| image:: https://img.shields.io/pypi/v/django-environ.svg?style=flat-square&label=version
-    :target: https://pypi.python.org/pypi/fake-factory
+    :target: https://pypi.python.org/pypi/django-environ
     :alt: Latest version released on PyPi
 
 .. |coverage| image:: https://img.shields.io/coveralls/joke2k/django-environ/master.svg?style=flat-square
