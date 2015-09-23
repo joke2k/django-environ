@@ -37,6 +37,7 @@ class BaseTests(unittest.TestCase):
                     BOOL_FALSE_VAR2='False',
                     PROXIED_VAR='$STR_VAR',
                     INT_LIST='42,33',
+                    INT_TUPLE='(42,33)',
                     STR_LIST_WITH_SPACES=' foo,  bar',
                     EMPTY_LIST='',
                     DICT_VAR='foo=bar,test=on',
@@ -109,6 +110,11 @@ class EnvTests(BaseTests):
         self.assertTypeAndValue(list, [42, 33], self.env('INT_LIST', cast=[int]))
         self.assertTypeAndValue(list, [42, 33], self.env.list('INT_LIST', int))
 
+    def test_int_tuple(self):
+        self.assertTypeAndValue(tuple, (42, 33), self.env('INT_LIST', cast=(int,)))
+        self.assertTypeAndValue(tuple, (42, 33), self.env.tuple('INT_LIST', int))
+        self.assertTypeAndValue(tuple, ('42', '33'), self.env.tuple('INT_LIST'))
+
     def test_str_list_with_spaces(self):
         self.assertTypeAndValue(list, [' foo', '  bar'],
                                 self.env('STR_LIST_WITH_SPACES', cast=[str]))
@@ -134,6 +140,7 @@ class EnvTests(BaseTests):
         url = self.env.url('URL_VAR')
         self.assertEqual(url.__class__, self.env.URL_CLASS)
         self.assertEqual(url.geturl(), self.URL)
+        self.assertEqual(None, self.env.url('OTHER_URL', default=None))
 
     def test_db_url_value(self):
         pg_config = self.env.db()
@@ -561,6 +568,10 @@ class PathTests(unittest.TestCase):
 
         self.assertTrue(Path('/home') == Path('/home'))
         self.assertTrue(Path('/home') != Path('/home/dev'))
+
+        self.assertEqual(Path('/home/foo/').rfind('/'), str(Path('/home/foo')).rfind('/'))
+        self.assertEqual(Path('/home/foo/').find('/home'), str(Path('/home/foo/')).find('/home'))
+        self.assertEqual(Path('/home/foo/')[1], str(Path('/home/foo/'))[1])
 
         self.assertEqual(~Path('/home'), Path('/'))
         self.assertEqual(Path('/') + 'home', Path('/home'))

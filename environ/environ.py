@@ -154,6 +154,12 @@ class Env(object):
         """
         return self.get_value(var, cast=list if not cast else [cast], default=default)
 
+    def tuple(self, var, cast=None, default=NOTSET):
+        """
+        :rtype: tuple
+        """
+        return self.get_value(var, cast=tuple if not cast else (cast,), default=default)
+
     def dict(self, var, cast=dict, default=NOTSET):
         """
         :rtype: dict
@@ -214,7 +220,9 @@ class Env(object):
         :returns: Value from environment or default (if set)
         """
 
-        logger.debug("get '{0}' casted as '{1}' with default '{2}'".format(var, cast, default))
+        logger.debug("get '{0}' casted as '{1}' with default '{2}'".format(
+            var, cast, default
+        ))
 
         if var in self.scheme:
             var_info = self.scheme[var]
@@ -251,7 +259,7 @@ class Env(object):
             value = value.lstrip('$')
             value = self.get_value(value, cast=cast, default=default)
 
-        if value != default or parse_default:
+        if value != default or (parse_default and value):
             value = self.parse_value(value, cast)
 
         return value
@@ -276,18 +284,27 @@ class Env(object):
                 value = value.lower() in cls.BOOLEAN_TRUE_STRINGS
         elif isinstance(cast, list):
             value = list(map(cast[0], [x for x in value.split(',') if x]))
+        elif isinstance(cast, tuple):
+            val = value.strip('(').strip(')').split(',')
+            value = tuple(map(cast[0], [x for x in val if x]))
         elif isinstance(cast, dict):
             key_cast = cast.get('key', str)
             value_cast = cast.get('value', str)
             value_cast_by_key = cast.get('cast', dict())
             value = dict(map(
-                lambda kv: (key_cast(kv[0]), cls.parse_value(kv[1], value_cast_by_key.get(kv[0], value_cast))),
+                lambda kv: (
+                    key_cast(kv[0]),
+                    cls.parse_value(kv[1], value_cast_by_key.get(kv[0], value_cast))
+                ),
                 [val.split('=') for val in value.split(';') if val]
             ))
         elif cast is dict:
             value = dict([val.split('=') for val in value.split(',') if val])
         elif cast is list:
             value = [x for x in value.split(',') if x]
+        elif cast is tuple:
+            val = value.strip('(').strip(')').split(',')
+            value = tuple([x for x in val if x])
         elif cast is float:
             # clean string
             float_str = re.sub(r'[^\d,\.]', '', value)
@@ -379,7 +396,7 @@ class Env(object):
         """Pulled from DJ-Cache-URL, parse an arbitrary Cache URL.
 
         :param url:
-        :param overrides:
+        :param backend:
         :return:
         """
         url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
@@ -663,7 +680,8 @@ class Path(object):
             return self.path('../' * other)
         elif isinstance(other, string_types):
             return Path(self.__root__.rstrip(other))
-        raise TypeError("unsupported operand type(s) for -: '{0}' and '{1}'".format(self, type(other)))
+        raise TypeError(
+            "unsupported operand type(s) for -: '{0}' and '{1}'".format(self, type(other)))
 
     def __invert__(self):
         return self.path('..')
@@ -683,11 +701,21 @@ class Path(object):
     def __unicode__(self):
         return self.__str__()
 
+    def __getitem__(self, *args, **kwargs):
+        return self.__str__().__getitem__(*args, **kwargs)
+
+    def rfind(self, *args, **kwargs):
+        return self.__str__().rfind(*args, **kwargs)
+
+    def find(self, *args, **kwargs):
+        return self.__str__().find(*args, **kwargs)
+
     @staticmethod
     def _absolute_join(base, *paths, **kwargs):
         absolute_path = os.path.abspath(os.path.join(base, *paths))
         if kwargs.get('required', False) and not os.path.exists(absolute_path):
-            raise ImproperlyConfigured("Create required path: {0}".format(absolute_path))
+            raise ImproperlyConfigured(
+                "Create required path: {0}".format(absolute_path))
         return absolute_path
 
 
