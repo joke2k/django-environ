@@ -220,7 +220,9 @@ class Env(object):
         :returns: Value from environment or default (if set)
         """
 
-        logger.debug("get '{0}' casted as '{1}' with default '{2}'".format(var, cast, default))
+        logger.debug("get '{0}' casted as '{1}' with default '{2}'".format(
+            var, cast, default
+        ))
 
         if var in self.scheme:
             var_info = self.scheme[var]
@@ -290,7 +292,10 @@ class Env(object):
             value_cast = cast.get('value', str)
             value_cast_by_key = cast.get('cast', dict())
             value = dict(map(
-                lambda kv: (key_cast(kv[0]), cls.parse_value(kv[1], value_cast_by_key.get(kv[0], value_cast))),
+                lambda kv: (
+                    key_cast(kv[0]),
+                    cls.parse_value(kv[1], value_cast_by_key.get(kv[0], value_cast))
+                ),
                 [val.split('=') for val in value.split(';') if val]
             ))
         elif cast is dict:
@@ -675,7 +680,8 @@ class Path(object):
             return self.path('../' * other)
         elif isinstance(other, string_types):
             return Path(self.__root__.rstrip(other))
-        raise TypeError("unsupported operand type(s) for -: '{0}' and '{1}'".format(self, type(other)))
+        raise TypeError(
+            "unsupported operand type(s) for -: '{0}' and '{1}'".format(self, type(other)))
 
     def __invert__(self):
         return self.path('..')
@@ -695,11 +701,21 @@ class Path(object):
     def __unicode__(self):
         return self.__str__()
 
+    def __getitem__(self, *args, **kwargs):
+        return self.__str__().__getitem__(*args, **kwargs)
+
+    def rfind(self, *args, **kwargs):
+        return self.__str__().rfind(*args, **kwargs)
+
+    def find(self, *args, **kwargs):
+        return self.__str__().find(*args, **kwargs)
+
     @staticmethod
     def _absolute_join(base, *paths, **kwargs):
         absolute_path = os.path.abspath(os.path.join(base, *paths))
         if kwargs.get('required', False) and not os.path.exists(absolute_path):
-            raise ImproperlyConfigured("Create required path: {0}".format(absolute_path))
+            raise ImproperlyConfigured(
+                "Create required path: {0}".format(absolute_path))
         return absolute_path
 
 
