@@ -154,6 +154,12 @@ class Env(object):
         """
         return self.get_value(var, cast=list if not cast else [cast], default=default)
 
+    def tuple(self, var, cast=None, default=NOTSET):
+        """
+        :rtype: tuple
+        """
+        return self.get_value(var, cast=tuple if not cast else (cast,), default=default)
+
     def dict(self, var, cast=dict, default=NOTSET):
         """
         :rtype: dict
@@ -276,6 +282,9 @@ class Env(object):
                 value = value.lower() in cls.BOOLEAN_TRUE_STRINGS
         elif isinstance(cast, list):
             value = list(map(cast[0], [x for x in value.split(',') if x]))
+        elif isinstance(cast, tuple):
+            val = value.strip('(').strip(')').split(',')
+            value = tuple(map(cast[0], [x for x in val if x]))
         elif isinstance(cast, dict):
             key_cast = cast.get('key', str)
             value_cast = cast.get('value', str)
@@ -288,6 +297,9 @@ class Env(object):
             value = dict([val.split('=') for val in value.split(',') if val])
         elif cast is list:
             value = [x for x in value.split(',') if x]
+        elif cast is tuple:
+            val = value.strip('(').strip(')').split(',')
+            value = tuple([x for x in val if x])
         elif cast is float:
             # clean string
             float_str = re.sub(r'[^\d,\.]', '', value)
@@ -379,7 +391,7 @@ class Env(object):
         """Pulled from DJ-Cache-URL, parse an arbitrary Cache URL.
 
         :param url:
-        :param overrides:
+        :param backend:
         :return:
         """
         url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url

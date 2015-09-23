@@ -166,6 +166,7 @@ Supported Types
 - float
 - json
 - list (FOO=a,b,c)
+- tuple (FOO=(a,b,c))
 - dict (BAR=key=val,foo=bar)
 - url
 - path (environ.Path)
@@ -221,6 +222,7 @@ Changelog
   - Fix non-ascii values (broken in Python 2.x)
   - New email schemes - smtp+ssl and smtp+tls (smtps would be deprecated)
   - redis_cache replaced by django_redis
+  - Add tuple support. Thanks to @anonymouzz
 
 **0.3.1 (2014-09-03)**
   - Add LDAP url support for database (django-ldapdb)
