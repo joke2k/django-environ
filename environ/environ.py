@@ -251,7 +251,7 @@ class Env(object):
             value = value.lstrip('$')
             value = self.get_value(value, cast=cast, default=default)
 
-        if value != default or parse_default:
+        if value != default or (parse_default and value):
             value = self.parse_value(value, cast)
 
         return value

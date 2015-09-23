@@ -134,6 +134,7 @@ class EnvTests(BaseTests):
         url = self.env.url('URL_VAR')
         self.assertEqual(url.__class__, self.env.URL_CLASS)
         self.assertEqual(url.geturl(), self.URL)
+        self.assertEqual(None, self.env.url('OTHER_URL', default=None))
 
     def test_db_url_value(self):
         pg_config = self.env.db()
