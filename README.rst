@@ -125,7 +125,7 @@ How to install
 How to use
 ==========
 
-There are only classes, Env and Path
+There are only two classes, `environ.Env` and `environ.Path`
 
 ::
 
@@ -190,6 +190,7 @@ Supported Types
     - ElasticSearch: elasticsearch://
     - Solr: solr://
     - Whoosh: whoosh://
+    - Xapian: xapian://
     - Simple cache: simple://
 - email_url
     - SMTP: smtp://
@@ -213,36 +214,34 @@ Tests
 License
 =======
 
-Django-environ is licensed under the MIT License - see the LICENSE.rst file for details
+Django-environ is licensed under the MIT License - see the `LICENSE`_ file for details
 
 Changelog
 =========
 
-**0.4.0 (2015-09-19)**
+**`0.4.0 - 23-September-2015 <http://github.com/joke2k/django-environ/compare/v0.3...v0.4>`__ **
   - Fix non-ascii values (broken in Python 2.x)
   - New email schemes - smtp+ssl and smtp+tls (smtps would be deprecated)
   - redis_cache replaced by django_redis
   - Add tuple support. Thanks to @anonymouzz
-
-**0.3.1 (2014-09-03)**
   - Add LDAP url support for database (django-ldapdb)
   - Fix psql/pgsql url
 
-**0.3 (2014-06-03)**
+**`0.3 - 03-June-2014 <http://github.com/joke2k/django-environ/compare/v0.2.1...v0.3>`__ **
   - Add cache url support
   - Add email url support
   - Add search url support
   - Rewriting README.rst
 
-**0.2.1 (2013-04-19)**
+**0.2.1 19-April-2013**
   - environ/environ.py: Env.__call__ now uses Env.get_value instance method
 
-**0.2 (2013-04-16)**
+**0.2 16-April-2013**
   - environ/environ.py, environ/test.py, environ/test_env.txt: add advanced
     float parsing (comma and dot symbols to separate thousands and decimals)
   - README.rst, docs/index.rst: fix TYPO in documentation
 
-**0.1 (2013-04-02)**
+**0.1 02-April-2013**
   - initial release
 
 Credits
@@ -313,3 +312,5 @@ Credits
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
     :target: https://raw.githubusercontent.com/joke2k/django-environ/master/LICENSE.txt
     :alt: Package license
+
+.. _LICENSE: https://github.com/joke2k/django-environ/blob/master/LICENSE.txt
