@@ -37,6 +37,7 @@ class BaseTests(unittest.TestCase):
                     BOOL_FALSE_VAR2='False',
                     PROXIED_VAR='$STR_VAR',
                     INT_LIST='42,33',
+                    INT_TUPLE='(42,33)',
                     STR_LIST_WITH_SPACES=' foo,  bar',
                     EMPTY_LIST='',
                     DICT_VAR='foo=bar,test=on',
@@ -108,6 +109,11 @@ class EnvTests(BaseTests):
     def test_int_list(self):
         self.assertTypeAndValue(list, [42, 33], self.env('INT_LIST', cast=[int]))
         self.assertTypeAndValue(list, [42, 33], self.env.list('INT_LIST', int))
+
+    def test_int_tuple(self):
+        self.assertTypeAndValue(tuple, (42, 33), self.env('INT_LIST', cast=(int,)))
+        self.assertTypeAndValue(tuple, (42, 33), self.env.tuple('INT_LIST', int))
+        self.assertTypeAndValue(tuple, ('42', '33'), self.env.tuple('INT_LIST'))
 
     def test_str_list_with_spaces(self):
         self.assertTypeAndValue(list, [' foo', '  bar'],
