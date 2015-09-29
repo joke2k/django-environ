@@ -5,6 +5,8 @@ python:
  - "2.7"
  - "3.3"
  - "3.4"
+ - "3.5"
+ - "nightly"
 env:
   matrix:
    - DJANGO=Django==1.4
@@ -13,8 +15,8 @@ env:
    - DJANGO=Django==1.7
    - DJANGO=Django==1.8
 install:
- - pip install $DJANGO --use-mirrors
- - pip install . --use-mirrors
+ - pip install $DJANGO
+ - pip install .
  - pip install coverage
 branches:
  only:
