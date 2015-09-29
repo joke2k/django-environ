@@ -37,6 +37,10 @@ matrix:
       env: DJANGO=Django==1.4
     - python: "3.4"
       env: DJANGO=Django==1.5
+    - python: "3.5"
+      env: DJANGO=Django==1.4
+    - python: "3.5"
+      env: DJANGO=Django==1.5
 after_success:
   - coverage report
   - pip install --quiet python-coveralls
