@@ -24,6 +24,7 @@ try:
 except ImportError:
     # Python <= 2.6
     import urlparse
+import urllib
 
 
 if sys.version < '3':
@@ -41,7 +42,8 @@ __version__ = (0, 3, 1)
 _cast_int = lambda v: int(v) if isinstance(v, basestring) and v.isdigit() else v
 # return str if possibile
 _cast_str = lambda v: str(v) if isinstance(v, basestring) else v
-
+# return str if possible, and possibly urlencoded
+_cast_urlstr = lambda v: urllib.unquote_plus(str(v)) if isinstance(v, basestring) else v
 
 class NoValue(object):
     def __repr__(self):
@@ -357,8 +359,8 @@ class Env(object):
         # Update with environment configuration.
         config.update({
             'NAME': path,
-            'USER': _cast_str(url.username),
-            'PASSWORD': _cast_str(url.password),
+            'USER': _cast_urlstr(url.username),
+            'PASSWORD': _cast_urlstr(url.password),
             'HOST': _cast_str(url.hostname),
             'PORT': _cast_int(url.port),
         })
@@ -442,8 +444,8 @@ class Env(object):
         # Update with environment configuration
         config.update({
             'EMAIL_FILE_PATH': path,
-            'EMAIL_HOST_USER': _cast_str(url.username),
-            'EMAIL_HOST_PASSWORD': _cast_str(url.password),
+            'EMAIL_HOST_USER': _cast_urlstr(url.username),
+            'EMAIL_HOST_PASSWORD': _cast_urlstr(url.password),
             'EMAIL_HOST': _cast_str(url.hostname),
             'EMAIL_PORT': _cast_int(url.port),
         })
