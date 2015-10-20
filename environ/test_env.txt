@@ -25,3 +25,5 @@ STR_VAR=bar
 INT_LIST=42,33
 CYRILLIC_VAR=фуубар
 INT_TUPLE=(42,33)
+DATABASE_ORACLE_TNS_URL=oracle://user:password@sid
+DATABASE_ORACLE_URL=oracle://user:password@host:1521/sid

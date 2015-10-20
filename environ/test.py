@@ -16,6 +16,8 @@ class BaseTests(unittest.TestCase):
     MYSQL = 'mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/heroku_97681?reconnect=true'
     MYSQLGIS = 'mysqlgis://user:password@127.0.0.1/some_database'
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
+    ORACLE_TNS = 'oracle://user:password@sid/'
+    ORACLE = 'oracle://user:password@host:1521/sid'
     MEMCACHE = 'memcache://127.0.0.1:11211'
     REDIS = 'rediscache://127.0.0.1:6379:1?client_class=django_redis.client.DefaultClient&password=secret'
     EMAIL = 'smtps://user@domain.com:password@smtp.example.com:587'
@@ -45,6 +47,8 @@ class BaseTests(unittest.TestCase):
                     DATABASE_MYSQL_URL=cls.MYSQL,
                     DATABASE_MYSQL_GIS_URL=cls.MYSQLGIS,
                     DATABASE_SQLITE_URL=cls.SQLITE,
+                    DATABASE_ORACLE_URL=cls.ORACLE,
+                    DATABASE_ORACLE_TNS_URL=cls.ORACLE_TNS,
                     CACHE_URL=cls.MEMCACHE,
                     CACHE_REDIS=cls.REDIS,
                     EMAIL_URL=cls.EMAIL,
@@ -166,6 +170,23 @@ class EnvTests(BaseTests):
         self.assertEqual(mysql_gis_config['USER'], 'user')
         self.assertEqual(mysql_gis_config['PASSWORD'], 'password')
         self.assertEqual(mysql_gis_config['PORT'], None)
+
+        oracle_config = self.env.db('DATABASE_ORACLE_TNS_URL')
+        self.assertEqual(oracle_config['ENGINE'], 'django.db.backends.oracle')
+        self.assertEqual(oracle_config['NAME'], 'sid')
+        self.assertEqual(oracle_config['HOST'], '')
+        self.assertEqual(oracle_config['USER'], 'user')
+        self.assertEqual(oracle_config['PASSWORD'], 'password')
+        with self.assertRaises(KeyError):
+            oracle_config['PORT']
+
+        oracle_config = self.env.db('DATABASE_ORACLE_URL')
+        self.assertEqual(oracle_config['ENGINE'], 'django.db.backends.oracle')
+        self.assertEqual(oracle_config['NAME'], 'sid')
+        self.assertEqual(oracle_config['HOST'], 'host')
+        self.assertEqual(oracle_config['USER'], 'user')
+        self.assertEqual(oracle_config['PASSWORD'], 'password')
+        self.assertEqual(oracle_config['PORT'], 1521)
 
         sqlite_config = self.env.db('DATABASE_SQLITE_URL')
         self.assertEqual(sqlite_config['ENGINE'], 'django.db.backends.sqlite3')
