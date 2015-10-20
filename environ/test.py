@@ -177,8 +177,7 @@ class EnvTests(BaseTests):
         self.assertEqual(oracle_config['HOST'], '')
         self.assertEqual(oracle_config['USER'], 'user')
         self.assertEqual(oracle_config['PASSWORD'], 'password')
-        with self.assertRaises(KeyError):
-            oracle_config['PORT']
+        self.assertFalse('PORT' in oracle_config)
 
         oracle_config = self.env.db('DATABASE_ORACLE_URL')
         self.assertEqual(oracle_config['ENGINE'], 'django.db.backends.oracle')
