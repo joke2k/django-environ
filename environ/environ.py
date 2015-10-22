@@ -19,7 +19,7 @@ from six.moves import urllib_parse as urlparse
 from six import string_types
 
 
-logger = logging.getLogger(__file__)
+logger = logging.getLogger(__name__)
 
 
 VERSION = '0.4.0'
