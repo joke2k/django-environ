@@ -157,7 +157,7 @@ class EnvTests(BaseTests):
         self.assertEqual(mysql_config['HOST'], 'us-cdbr-east.cleardb.com')
         self.assertEqual(mysql_config['USER'], 'bea6eb0')
         self.assertEqual(mysql_config['PASSWORD'], '69772142')
-        self.assertEqual(mysql_config['PORT'], None)
+        self.assertEqual(mysql_config['PORT'], '')
 
         mysql_gis_config = self.env.db('DATABASE_MYSQL_GIS_URL')
         self.assertEqual(mysql_gis_config['ENGINE'], 'django.contrib.gis.db.backends.mysql')
@@ -165,7 +165,7 @@ class EnvTests(BaseTests):
         self.assertEqual(mysql_gis_config['HOST'], '127.0.0.1')
         self.assertEqual(mysql_gis_config['USER'], 'user')
         self.assertEqual(mysql_gis_config['PASSWORD'], 'password')
-        self.assertEqual(mysql_gis_config['PORT'], None)
+        self.assertEqual(mysql_gis_config['PORT'], '')
 
         sqlite_config = self.env.db('DATABASE_SQLITE_URL')
         self.assertEqual(sqlite_config['ENGINE'], 'django.db.backends.sqlite3')
@@ -276,7 +276,18 @@ class DatabaseTestSuite(unittest.TestCase):
         self.assertEqual(url['HOST'], 'us-cdbr-east.cleardb.com')
         self.assertEqual(url['USER'], 'bea6eb025ca0d8')
         self.assertEqual(url['PASSWORD'], '69772142')
-        self.assertEqual(url['PORT'], None)
+        self.assertEqual(url['PORT'], '')
+
+    def test_mysql_no_password(self):
+        url = 'mysql://travis@localhost/test_db'
+        url = Env.db_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'django.db.backends.mysql')
+        self.assertEqual(url['NAME'], 'test_db')
+        self.assertEqual(url['HOST'], 'localhost')
+        self.assertEqual(url['USER'], 'travis')
+        self.assertEqual(url['PASSWORD'], '')
+        self.assertEqual(url['PORT'], '')
 
     def test_empty_sqlite_url(self):
         url = 'sqlite://'
@@ -309,7 +320,7 @@ class DatabaseTestSuite(unittest.TestCase):
 
         self.assertEqual(url['ENGINE'], 'ldapdb.backends.ldap')
         self.assertEqual(url['HOST'], 'ldap.nodomain.org')
-        self.assertEqual(url['PORT'], None)
+        self.assertEqual(url['PORT'], '')
         self.assertEqual(url['NAME'], 'ldap://ldap.nodomain.org')
         self.assertEqual(url['USER'], 'cn=admin,dc=nodomain,dc=org')
         self.assertEqual(url['PASSWORD'], 'some_secret_password')
