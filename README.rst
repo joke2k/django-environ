@@ -167,7 +167,8 @@ Supported Types
 - json
 - list (FOO=a,b,c)
 - tuple (FOO=(a,b,c))
-- dict (BAR=key=val,foo=bar)
+- dict (BAR=key=val,foo=bar) #environ.Env(BAR=(dict, {}))
+- dict (BAR=key=val;foo=1.1;baz=True) #environ.Env(BAR=(dict(value=unicode, cast=dict(foo=float,baz=bool)), {}))
 - url
 - path (environ.Path)
 - db_url

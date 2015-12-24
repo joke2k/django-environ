@@ -135,6 +135,9 @@ class EnvTests(BaseTests):
         self.assertEqual({'a': 1, 'b': [1.1, 2.2], 'c': 3},
                          self.env.parse_value('a=1;b=1.1,2.2;c=3', dict(value=int, cast=dict(b=[float]))))
 
+        self.assertEqual({'a': "uname", 'c': "http://www.google.com", 'b': True},
+                         self.env.parse_value('a=uname;c=http://www.google.com;b=True', dict(value=str, cast=dict(b=bool))))
+
     def test_url_value(self):
         url = self.env.url('URL_VAR')
         self.assertEqual(url.__class__, self.env.URL_CLASS)
