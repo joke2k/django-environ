@@ -178,6 +178,7 @@ Supported Types
     -  MySQL for GeoDjango: mysqlgis://
     -  SQLITE: sqlite://
     -  SQLITE with SPATIALITE for GeoDjango: spatialite://
+    -  Oracle: oracle://
     -  LDAP: ldap://
 - cache_url
     -  Database: dbcache://

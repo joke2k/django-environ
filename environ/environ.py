@@ -64,6 +64,7 @@ class Env(object):
         'mysql': 'django.db.backends.mysql',
         'mysql2': 'django.db.backends.mysql',
         'mysqlgis': 'django.contrib.gis.db.backends.mysql',
+        'oracle': 'django.db.backends.oracle',
         'spatialite': 'django.contrib.gis.db.backends.spatialite',
         'sqlite': 'django.db.backends.sqlite3',
         'ldap': 'ldapdb.backends.ldap',
@@ -323,7 +324,7 @@ class Env(object):
     @classmethod
     def db_url_config(cls, url, engine=None):
         """Pulled from DJ-Database-URL, parse an arbitrary Database URL.
-        Support currently exists for PostgreSQL, PostGIS, MySQL and SQLite.
+        Support currently exists for PostgreSQL, PostGIS, MySQL, Oracle and SQLite.
 
         SQLite connects to file based databases. The same URL format is used, omitting the hostname,
         and using the "file" portion as the filename of the database.
@@ -371,6 +372,13 @@ class Env(object):
             'HOST': url.hostname,
             'PORT': _cast_int(url.port),
         })
+
+        if url.scheme == 'oracle' and path == '':
+            config['NAME'] = config['HOST']
+            config['HOST'] = ''
+
+        if url.scheme == 'oracle' and config['PORT'] is None:
+            del(config['PORT']) # Django oracle/base.py strips port and fails on None
 
         if url.query:
             config_options = {}
