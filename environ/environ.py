@@ -81,7 +81,7 @@ class Env(object):
         'rediscache': 'django_redis.cache.RedisCache',
         'redis': 'django_redis.cache.RedisCache',
     }
-    _CACHE_BASE_OPTIONS = ['TIMEOUT', 'KEY_PREFIX', 'VERSION', 'KEY_FUNCTION']
+    _CACHE_BASE_OPTIONS = ['TIMEOUT', 'KEY_PREFIX', 'VERSION', 'KEY_FUNCTION', 'BINARY']
 
     DEFAULT_EMAIL_ENV = 'EMAIL_URL'
     EMAIL_SCHEMES = {
