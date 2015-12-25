@@ -31,6 +31,14 @@ __version__ = tuple(VERSION.split('.'))
 def _cast_int(v):
     return int(v) if hasattr(v, 'isdigit') and v.isdigit() else v
 
+# back compatibility with redis_cache package
+REDIS_DRIVER = 'django_redis.cache.RedisCache'
+try:
+    import redis_cache
+    REDIS_DRIVER = 'redis_cache.RedisCache'
+except ImportError:
+    pass
+
 
 class NoValue(object):
 
@@ -79,8 +87,8 @@ class Env(object):
         'locmemcache': 'django.core.cache.backends.locmem.LocMemCache',
         'memcache': 'django.core.cache.backends.memcached.MemcachedCache',
         'pymemcache': 'django.core.cache.backends.memcached.PyLibMCCache',
-        'rediscache': 'django_redis.cache.RedisCache',
-        'redis': 'django_redis.cache.RedisCache',
+        'rediscache': REDIS_DRIVER,
+        'redis': REDIS_DRIVER,
     }
     _CACHE_BASE_OPTIONS = ['TIMEOUT', 'KEY_PREFIX', 'VERSION', 'KEY_FUNCTION', 'BINARY']
 
