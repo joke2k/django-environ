@@ -261,6 +261,9 @@ class Env(object):
             value = value.lstrip('$')
             value = self.get_value(value, cast=cast, default=default)
 
+        if cast is None and default is not None and not isinstance(default, NoValue):
+            cast = type(default)
+
         if value != default or (parse_default and value):
             value = self.parse_value(value, cast)
 
@@ -377,7 +380,7 @@ class Env(object):
             config['NAME'] = config['HOST']
             config['HOST'] = ''
 
-        if url.scheme == 'oracle' and config['PORT'] is None:
+        if url.scheme == 'oracle' and not config['PORT']:
             del(config['PORT']) # Django oracle/base.py strips port and fails on None
 
         if url.query:

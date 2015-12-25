@@ -224,6 +224,13 @@ class EnvTests(BaseTests):
         root = self.env.path('PATH_VAR')
         self.assertTypeAndValue(Path, Path(self.PATH), root)
 
+    def test_smart_cast(self):
+        self.assertEqual(self.env.get_value('STR_VAR', default='string'), 'bar')
+        self.assertEqual(self.env.get_value('BOOL_TRUE_VAR', default=True), True)
+        self.assertEqual(self.env.get_value('BOOL_FALSE_VAR', default=True), False)
+        self.assertEqual(self.env.get_value('INT_VAR', default=1), 42)
+        self.assertEqual(self.env.get_value('FLOAT_VAR', default=1.2), 33.3)
+
 
 class FileEnvTests(EnvTests):
 
