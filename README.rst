@@ -203,6 +203,20 @@ Supported Types
     - LocMem mail: memorymail://
     - Dummy mail: dummymail://
 
+Tips
+====
+
+Email settings
+--------------
+In order to set email configuration for django you can use this code:
+::
+
+    EMAIL_CONFIG = env.email_url(
+        'EMAIL_URL', default='smtp://user@:password@localhost:25')
+
+    vars().update(EMAIL_CONFIG)
+
+
 Tests
 =====
 

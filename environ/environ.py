@@ -388,7 +388,7 @@ class Env(object):
             config['NAME'] = config['HOST']
             config['HOST'] = ''
 
-        if url.scheme == 'oracle' and config['PORT'] is None:
+        if url.scheme == 'oracle' and not config['PORT']:
             del(config['PORT']) # Django oracle/base.py strips port and fails on None
 
         if url.query:
