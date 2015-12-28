@@ -32,10 +32,13 @@ def _cast_int(v):
     return int(v) if hasattr(v, 'isdigit') and v.isdigit() else v
 
 # back compatibility with redis_cache package
-REDIS_DRIVER = 'django_redis.cache.RedisCache'
+DJANGO_REDIS_DRIVER = 'django_redis.cache.RedisCache'
+DJANGO_REDIS_CACHE_DRIVER = 'redis_cache.RedisCache'
+
+REDIS_DRIVER = DJANGO_REDIS_DRIVER
 try:
     import redis_cache
-    REDIS_DRIVER = 'redis_cache.RedisCache'
+    REDIS_DRIVER = DJANGO_REDIS_CACHE_DRIVER
 except ImportError:
     pass
 
@@ -427,15 +430,23 @@ class Env(object):
             'LOCATION': location,
         }
 
+        # Add the drive to LOCATION
         if url.scheme == 'filecache':
             config.update({
                 'LOCATION': url.netloc + url.path,
             })
 
-        if url.path and url.scheme in ['memcache', 'pymemcache', 'rediscache']:
+        if url.path and url.scheme in ['memcache', 'pymemcache']:
             config.update({
                 'LOCATION': 'unix:' + url.path,
             })
+        elif url.scheme.startswith('redis'):
+            if url.hostname:
+                scheme = url.scheme.replace('cache', '')
+            else:
+                scheme = 'unix'
+
+            config['LOCATION'] = scheme + '://' + url.netloc + url.path
 
         if url.query:
             config_options = {}
