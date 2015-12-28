@@ -14,6 +14,7 @@ env:
    - DJANGO=Django==1.6
    - DJANGO=Django==1.7
    - DJANGO=Django==1.8
+   - DJANGO=Django==1.9
 install:
  - pip install $DJANGO
  - pip install .
@@ -29,6 +30,8 @@ matrix:
       env: DJANGO=Django==1.7
     - python: "2.6"
       env: DJANGO=Django==1.8
+    - python: "2.6"
+      env: DJANGO=Django==1.9
     - python: "3.3"
       env: DJANGO=Django==1.4
     - python: "3.3"
