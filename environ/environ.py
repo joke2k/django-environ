@@ -39,7 +39,7 @@ REDIS_DRIVER = DJANGO_REDIS_DRIVER
 try:
     import redis_cache
     REDIS_DRIVER = DJANGO_REDIS_CACHE_DRIVER
-except ImportError:
+except:
     pass
 
 
