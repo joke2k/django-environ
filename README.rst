@@ -24,7 +24,7 @@ and inspired by:
 
 This is your `settings.py` file before you have installed **django-environ**
 
-::
+.. code-block:: python
 
     import os
     SITE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
@@ -71,7 +71,9 @@ This is your `settings.py` file before you have installed **django-environ**
         }
     }
 
-After::
+After:
+
+.. code-block:: python
 
     import environ
     root = environ.Path(__file__) - 3 # three folder back (/a/b/c/ - 3 = /)
@@ -102,8 +104,11 @@ After::
         'redis': env.cache('REDIS_URL')
     }
 
-You can also pass `read_env()` an explicit path to the .env file.
-Create a `.env` file::
+You can also pass ``read_env()`` an explicit path to the ``.env`` file.
+
+Create a ``.env`` file:
+
+.. code-block:: bash
 
     DEBUG=on
     # DJANGO_SETTINGS_MODULE=myapp.settings.dev
@@ -125,9 +130,9 @@ How to install
 How to use
 ==========
 
-There are only two classes, `environ.Env` and `environ.Path`
+There are only two classes, ``environ.Env`` and ``environ.Path``
 
-::
+.. code-block:: python
 
     >>> import environ
     >>> env = environ.Env(
@@ -208,8 +213,10 @@ Tips
 
 Email settings
 --------------
+
 In order to set email configuration for django you can use this code:
-::
+
+.. code-block:: python
 
     EMAIL_CONFIG = env.email_url(
         'EMAIL_URL', default='smtp://user@:password@localhost:25')
