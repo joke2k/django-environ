@@ -23,6 +23,10 @@ branches:
  only:
   - master
   - develop
+  - /^feature\/.+/
+  - /^release\/.+/
+  - /^hotfix\/.+/
+  - /^v[\d\.]+/
 script: coverage run --source=environ setup.py test
 matrix:
   exclude:
