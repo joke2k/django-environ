@@ -108,6 +108,11 @@ class EnvTests(BaseTests):
 
     def test_proxied_value(self):
         self.assertTypeAndValue(str, 'bar', self.env('PROXIED_VAR'))
+        
+    def test_disabling_proxies(self):
+        self.assertTypeAndValue(str, '$STR_VAR', self.env('PROXIED_VAR', resolve_proxies=False))
+        self.assertTypeAndValue(str, '$STR_VAR', self.str('PROXIED_VAR', resolve_proxies=False))
+        self.assertTypeAndValue(str, '$STR_VAR', self.unicode('PROXIED_VAR', resolve_proxies=False))
 
     def test_int_list(self):
         self.assertTypeAndValue(list, [42, 33], self.env('INT_LIST', cast=[int]))

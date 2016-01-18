@@ -208,6 +208,28 @@ Supported Types
     - LocMem mail: memorymail://
     - Dummy mail: dummymail://
 
+Proxied Values
+==============
+
+An environ value or default can reference another environ value by referring to it with a $ sign.  For example:
+
+.. code-block:: python
+
+    PROXIED_VAL = 'hello'
+    TEST_VAL ='$PROXIED_VAL'
+    environ('TEST_VAL') == 'hello
+    environ('UNKNOWN_VAL', default='$PROXIED_VAL') == 'hello'
+
+Proxy values are resolved by default.  To turn off resolving proxy values
+pass ``resolve_proxies=False`` to ``environ``, ``environ.str``, or ``environ.unicode``.
+
+Ex:  ``environ('DJANGO_SECRET_KEY', '$1233FJSIFWR44', resolve_proxies=False)``
+
+If you get an infinite recursion when using environ most likely you have an unresolved and perhaps
+unintentional proxy value in an environ string.
+For example ``environ('DJANGO_SECRET_KEY', '$1233FJSIFWR44')`` will cause an infinite
+recursion unless you add ``resolve_proxies=False``.
+
 Tips
 ====
 

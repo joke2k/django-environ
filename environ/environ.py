@@ -120,22 +120,24 @@ class Env(object):
     def __init__(self, **scheme):
         self.scheme = scheme
 
-    def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
-        return self.get_value(var, cast=cast, default=default, parse_default=parse_default)
+    def __call__(self, var, cast=None, default=NOTSET, parse_default=False, resolve_proxies=True):
+        return self.get_value(var, cast=cast, default=default, parse_default=parse_default,
+                              resolve_proxies=resolve_proxies)
 
     # Shortcuts
 
-    def str(self, var, default=NOTSET):
+    def str(self, var, default=NOTSET, resolve_proxies=True):
         """
         :rtype: str
         """
-        return self.get_value(var, default=default)
+        return self.get_value(var, default=default, resolve_proxies=resolve_proxies)
+    
 
-    def unicode(self, var, default=NOTSET):
+    def unicode(self, var, default=NOTSET, resolve_proxies=True):
         """Helper for python2
         :rtype: unicode
         """
-        return self.get_value(var, cast=str, default=default)
+        return self.get_value(var, cast=str, default=default, resolve_proxies=resolve_proxies)
 
     def bool(self, var, default=NOTSET):
         """
@@ -222,13 +224,14 @@ class Env(object):
         """
         return Path(self.get_value(var, default=default), **kwargs)
 
-    def get_value(self, var, cast=None, default=NOTSET, parse_default=False):
+    def get_value(self, var, cast=None, default=NOTSET, parse_default=False, resolve_proxies=True):
         """Return value for given environment variable.
 
         :param var: Name of variable.
         :param cast: Type to cast return value as.
         :param default: If var not present in environ, return this instead.
         :param parse_default: force to parse default..
+        :param resolve_proxies: resolve proxied values, ie values like $MYVAR
 
         :returns: Value from environment or default (if set)
         """
@@ -268,7 +271,7 @@ class Env(object):
             value = default
 
         # Resolve any proxied values
-        if hasattr(value, 'startswith') and value.startswith('$'):
+        if resolve_proxies and hasattr(value, 'startswith') and value.startswith('$'):
             value = value.lstrip('$')
             value = self.get_value(value, cast=cast, default=default)
 
