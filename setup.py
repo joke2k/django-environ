@@ -10,7 +10,7 @@ version = '0.4.0'
 author = 'joke2k'
 description = "Django-environ allows you to utilize 12factor inspired environment " \
               "variables to configure your Django application."
-install_requires = ['django', 'six']
+install_requires = ['django']
 
 setup(name='django-environ',
       version=version,

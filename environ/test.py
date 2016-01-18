@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 import json
 import os
 import sys
@@ -78,8 +78,8 @@ class EnvTests(BaseTests):
         self.assertRaises(ImproperlyConfigured, self.env, 'not_present')
 
     def test_str(self):
-        self.assertTypeAndValue(str, 'bar', self.env('STR_VAR'))
-        self.assertTypeAndValue(str, 'bar', self.env.str('STR_VAR'))
+        self.assertEqual('bar', self.env('STR_VAR'))
+        self.assertEqual('bar', self.env.str('STR_VAR'))
 
     def test_int(self):
         self.assertTypeAndValue(int, 42, self.env('INT_VAR', cast=int))
@@ -107,7 +107,7 @@ class EnvTests(BaseTests):
         self.assertTypeAndValue(bool, False, self.env.bool('BOOL_FALSE_VAR'))
 
     def test_proxied_value(self):
-        self.assertTypeAndValue(str, 'bar', self.env('PROXIED_VAR'))
+        self.assertEqual('bar', self.env('PROXIED_VAR'))
 
     def test_int_list(self):
         self.assertTypeAndValue(list, [42, 33], self.env('INT_LIST', cast=[int]))
@@ -255,8 +255,8 @@ class SchemaEnvTests(BaseTests):
         self.assertTypeAndValue(int, 42, env('INT_VAR'))
         self.assertTypeAndValue(float, 33.3, env('NOT_PRESENT_VAR'))
 
-        self.assertTypeAndValue(str, 'bar', env('STR_VAR'))
-        self.assertTypeAndValue(str, 'foo', env('NOT_PRESENT2', default='foo'))
+        self.assertEqual('bar', env('STR_VAR'))
+        self.assertEqual('foo', env('NOT_PRESENT2', default='foo'))
 
         self.assertTypeAndValue(list, [42, 33], env('INT_LIST'))
         self.assertTypeAndValue(list, [2], env('DEFAULT_LIST'))

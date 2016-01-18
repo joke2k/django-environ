@@ -10,13 +10,18 @@ import sys
 import warnings
 
 try:
+    # Default on Python 3
+    from urllib import parse as urlparse
+    basestring = str
+except ImportError:
+    # Python 2
+    import urlparse
+
+try:
     from django.core.exceptions import ImproperlyConfigured
 except ImportError:
     class ImproperlyConfigured(Exception):
         pass
-
-from six.moves import urllib_parse as urlparse
-from six import string_types
 
 
 logger = logging.getLogger(__name__)
@@ -601,7 +606,7 @@ class Env(object):
                 return
 
         try:
-            with open(env_file) if isinstance(env_file, string_types) else env_file as f:
+            with open(env_file) if isinstance(env_file, basestring) else env_file as f:
                 content = f.read()
         except IOError:
             warnings.warn("not reading %s - it doesn't exist." % env_file)
@@ -706,7 +711,7 @@ class Path(object):
     def __sub__(self, other):
         if isinstance(other, int):
             return self.path('../' * other)
-        elif isinstance(other, string_types):
+        elif isinstance(other, basestring):
             return Path(self.__root__.rstrip(other))
         raise TypeError(
             "unsupported operand type(s) for -: '{0}' and '{1}'".format(self, type(other)))
