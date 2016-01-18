@@ -32,10 +32,14 @@ matrix:
       env: DJANGO=Django==1.8
     - python: "2.6"
       env: DJANGO=Django==1.9
+    - python: "3.2"
+      env: DJANGO=Django==1.9
     - python: "3.3"
       env: DJANGO=Django==1.4
     - python: "3.3"
       env: DJANGO=Django==1.5
+    - python: "3.3"
+      env: DJANGO=Django==1.9
     - python: "3.4"
       env: DJANGO=Django==1.4
     - python: "3.4"
