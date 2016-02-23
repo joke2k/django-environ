@@ -388,8 +388,12 @@ class Env(object):
             config['NAME'] = config['HOST']
             config['HOST'] = ''
 
-        if url.scheme == 'oracle' and not config['PORT']:
-            del(config['PORT']) # Django oracle/base.py strips port and fails on None
+        if url.scheme == 'oracle':
+            # Django oracle/base.py strips port and fails on non-string value
+            if not config['PORT']:
+                del(config['PORT'])
+            else:
+                config['PORT'] = str(config['PORT'])
 
         if url.query:
             config_options = {}
