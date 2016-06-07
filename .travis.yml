@@ -2,7 +2,6 @@ language: python
 sudo: false
 python:
  - "2.7"
- - "3.3"
  - "3.4"
  - "3.5"
  - "nightly"
@@ -23,6 +22,10 @@ branches:
   - /^hotfix\/.+/
   - /^v[\d\.]+/
 script: coverage run --source=environ setup.py test
+matrix:
+  include:
+    - python: "3.3"
+      env: DJANGO=Django==1.8
 after_success:
   - coverage report
   - pip install --quiet python-coveralls
