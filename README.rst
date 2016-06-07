@@ -242,7 +242,7 @@ Django-environ is licensed under the MIT License - see the `LICENSE`_ file for d
 Changelog
 =========
 
-`0.4.0 - 23-September-2015 <http://github.com/joke2k/django-environ/compare/v0.3...v0.4>`__
+`0.4.0 - 23-September-2015 <https://github.com/joke2k/django-environ/compare/v0.3...v0.4>`__
 -------------------------------------------------------------------------------------------
   - Fix non-ascii values (broken in Python 2.x)
   - New email schemes - smtp+ssl and smtp+tls (smtps would be deprecated)
@@ -251,7 +251,7 @@ Changelog
   - Add LDAP url support for database (django-ldapdb)
   - Fix psql/pgsql url
 
-`0.3 - 03-June-2014 <http://github.com/joke2k/django-environ/compare/v0.2.1...v0.3>`__
+`0.3 - 03-June-2014 <https://github.com/joke2k/django-environ/compare/v0.2.1...v0.3>`__
 --------------------------------------------------------------------------------------
   - Add cache url support
   - Add email url support
