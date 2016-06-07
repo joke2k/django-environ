@@ -7,8 +7,8 @@ python:
  - "nightly"
 env:
   matrix:
-   - DJANGO=Django==1.8
-   - DJANGO=Django==1.9
+   - DJANGO="Django>=1.8,<1.9"
+   - DJANGO="Django>=1.9,<1.10"
 install:
  - pip install $DJANGO
  - pip install .
@@ -25,7 +25,7 @@ script: coverage run --source=environ setup.py test
 matrix:
   include:
     - python: "3.3"
-      env: DJANGO=Django==1.8
+      env: DJANGO="Django>=1.8,<1.9"
 after_success:
   - coverage report
   - pip install --quiet python-coveralls
