@@ -5,6 +5,7 @@ python:
  - "3.4"
  - "3.5"
  - "nightly"
+ - "pypy"
 env:
   matrix:
    - DJANGO="Django>=1.8,<1.9"
