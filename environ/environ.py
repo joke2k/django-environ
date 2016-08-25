@@ -596,9 +596,9 @@ class Env(object):
         if env_file is None:
             frame = sys._getframe()
             env_file = os.path.join(os.path.dirname(frame.f_back.f_code.co_filename), '.env')
-            if not os.path.exists(env_file):
-                warnings.warn("not reading %s - it doesn't exist." % env_file)
-                return
+        if not os.path.exists(env_file):
+            warnings.warn("not reading %s - it doesn't exist." % env_file)
+            return
 
         try:
             with open(env_file) if isinstance(env_file, string_types) else env_file as f:
