@@ -194,7 +194,7 @@ class EnvTests(BaseTests):
         self.assertEqual(oracle_config['HOST'], 'host')
         self.assertEqual(oracle_config['USER'], 'user')
         self.assertEqual(oracle_config['PASSWORD'], 'password')
-        self.assertEqual(oracle_config['PORT'], 1521)
+        self.assertEqual(oracle_config['PORT'], '1521')
 
         sqlite_config = self.env.db('DATABASE_SQLITE_URL')
         self.assertEqual(sqlite_config['ENGINE'], 'django.db.backends.sqlite3')
