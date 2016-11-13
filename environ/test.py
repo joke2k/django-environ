@@ -148,6 +148,13 @@ class EnvTests(BaseTests):
         self.assertEqual(url.geturl(), self.URL)
         self.assertEqual(None, self.env.url('OTHER_URL', default=None))
 
+    def test_url_encoded_parts(self):
+        from six.moves import urllib
+        password_with_unquoted_characters = "#password"
+        encoded_url = "mysql://user:%s@127.0.0.1:3306/dbname" % urllib.parse.quote(password_with_unquoted_characters)
+        parsed_url = self.env.db_url_config(encoded_url)
+        self.assertEqual(parsed_url['PASSWORD'], password_with_unquoted_characters)
+
     def test_db_url_value(self):
         pg_config = self.env.db()
         self.assertEqual(pg_config['ENGINE'], 'django.db.backends.postgresql_psycopg2')
