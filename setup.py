@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from __future__ import unicode_literals
 from setuptools import setup, find_packages
 import io
@@ -23,6 +25,8 @@ setup(name='django-environ',
           'Programming Language :: Python',
           'Programming Language :: Python :: 2',
           'Programming Language :: Python :: 3',
+          'Programming Language :: Python :: Implementation :: CPython',
+          'Programming Language :: Python :: Implementation :: PyPy',
           'Topic :: Software Development :: Libraries :: Python Modules',
           'Topic :: Utilities',
           'License :: OSI Approved :: MIT License',
@@ -31,7 +35,7 @@ setup(name='django-environ',
       keywords='django environment variables 12factor',
       author=author,
       author_email='joke2k@gmail.com',
-      url='http://github.com/joke2k/django-environ',
+      url='https://github.com/joke2k/django-environ',
       license='MIT License',
       packages=find_packages(),
       platforms=["any"],
