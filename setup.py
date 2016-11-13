@@ -8,7 +8,7 @@ import os
 here = os.path.abspath(os.path.dirname(__file__))
 README = io.open(os.path.join(here, 'README.rst'), encoding="utf8").read()
 
-version = '0.4.0'
+version = '0.4.1'
 author = 'joke2k'
 description = "Django-environ allows you to utilize 12factor inspired environment " \
               "variables to configure your Django application."
