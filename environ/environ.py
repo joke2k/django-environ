@@ -599,14 +599,18 @@ class Env(object):
             frame = sys._getframe()
             env_file = os.path.join(os.path.dirname(frame.f_back.f_code.co_filename), '.env')
             if not os.path.exists(env_file):
-                warnings.warn("not reading %s - it doesn't exist." % env_file)
+                warnings.warn(
+                    "%s doesn't exist - if you're not configuring your "
+                    "environment separately, create one." % env_file)
                 return
 
         try:
             with open(env_file) if isinstance(env_file, string_types) else env_file as f:
                 content = f.read()
         except IOError:
-            warnings.warn("not reading %s - it doesn't exist." % env_file)
+            warnings.warn(
+                "Error reading %s - if you're not configuring your "
+                "environment separately, check this." % env_file)
             return
 
         logger.debug('Read environment variables from: {0}'.format(env_file))
