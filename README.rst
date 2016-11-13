@@ -254,6 +254,15 @@ Django-environ is licensed under the MIT License - see the `LICENSE`_ file for d
 Changelog
 =========
 
+`0.4.1 - 13-November-2016 <https://github.com/joke2k/django-environ/compare/v0.4...v0.4.1>`__
+-------------------------------------------------------------------------------------------
+  - Fix for unsafe characters into URLs
+  - Clarifying warning on missing or unreadable file. Thanks to @nickcatal
+  - Add support for Django 1.10.
+  - Fix support for Oracle urls
+  - Fix support for django-redis
+
+
 `0.4.0 - 23-September-2015 <https://github.com/joke2k/django-environ/compare/v0.3...v0.4>`__
 -------------------------------------------------------------------------------------------
   - Fix non-ascii values (broken in Python 2.x)
