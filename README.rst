@@ -211,6 +211,16 @@ Supported Types
 Tips
 ====
 
+Using unsafe characters in URLs
+-------------------------------
+
+In order to use unsafe characters you have to encode with `urllib.parse.encode` before you set into `.env` file.
+.. code-block::
+    DATABASE_URL=mysql://user:%23password@127.0.0.1:3306/dbname
+
+
+See `https://perishablepress.com/stop-using-unsafe-characters-in-urls/` for reference.
+
 Email settings
 --------------
 
