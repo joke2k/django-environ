@@ -241,6 +241,40 @@ class FileEnvTests(EnvTests):
         file_path = Path(__file__, is_file=True)('test_env.txt')
         self.env.read_env(file_path, PATH_VAR=Path(__file__, is_file=True).__root__)
 
+    def test_read_env_path_like(self):
+
+        # No pathlib on Python < 3.4
+        try:
+            import pathlib
+        except ImportError:
+            return
+
+        path_like = (pathlib.Path(__file__).parent / 'test_env_pathlib.txt')
+        self.assertFalse(path_like.exists())
+        env_key = 'JALSDKFJ'
+        env_val = '98198165464984984'
+        env_str = env_key + '=' + env_val
+
+        def cleanup():
+            try:
+                path_like.unlink()
+            except:
+                pass
+
+        self.addCleanup(cleanup)
+
+        # open() doesn't take path-like on Python < 3.6
+        try:
+            with open(path_like, 'w') as f:
+                f.write(env_str + '\n')
+        except TypeError:
+            return
+
+        self.assertTrue(path_like.exists(), msg=path_like)
+        self.env.read_env(path_like)
+        self.assertIn(env_key, self.env.ENVIRON)
+        self.assertEqual(self.env.ENVIRON[env_key], env_val)
+
 class SubClassTests(EnvTests):
 
     def setUp(self):

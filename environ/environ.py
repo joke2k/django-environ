@@ -18,6 +18,13 @@ except ImportError:
 from six.moves import urllib
 from six import string_types
 
+
+try:
+    from os import PathLike
+    Openable = (string_types, PathLike)
+except ImportError:
+    Openable = (string_types,)
+
 logger = logging.getLogger(__name__)
 
 
@@ -609,7 +616,7 @@ class Env(object):
                 return
 
         try:
-            with open(env_file) if isinstance(env_file, string_types) else env_file as f:
+            with open(env_file) if isinstance(env_file, Openable) else env_file as f:
                 content = f.read()
         except IOError:
             warnings.warn(
