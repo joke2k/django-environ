@@ -11,11 +11,12 @@ env:
    - DJANGO="Django>=1.8,<1.9"
    - DJANGO="Django>=1.9,<1.10"
    - DJANGO="Django>=1.10,<1.11"
+   - DJANGO="Django>=1.11,<2.0"
    - DJANGO="https://github.com/django/django/archive/master.tar.gz"
 install:
- - pip install $DJANGO
- - pip install .
- - pip install coverage
+ # The default pip doesn't properly support pre-release version specifiers.
+ - pip install -U pip
+ - pip install . coverage $DJANGO
 branches:
  only:
   - master

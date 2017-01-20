@@ -254,6 +254,11 @@ Django-environ is licensed under the MIT License - see the `LICENSE`_ file for d
 Changelog
 =========
 
+Unreleased
+----------
+
+  - Confirm support for Django 1.11.
+
 `0.4.1 - 13-November-2016 <https://github.com/joke2k/django-environ/compare/v0.4...v0.4.1>`__
 -------------------------------------------------------------------------------------------
   - Fix for unsafe characters into URLs
