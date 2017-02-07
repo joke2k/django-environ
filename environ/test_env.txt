@@ -3,7 +3,7 @@ BOOL_FALSE_VAR2=False
 DATABASE_MYSQL_URL=mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/heroku_97681?reconnect=true
 DATABASE_MYSQL_GIS_URL=mysqlgis://user:password@127.0.0.1/some_database
 CACHE_URL=memcache://127.0.0.1:11211
-CACHE_REDIS=rediscache://127.0.0.1:6379:1?client_class=django_redis.client.DefaultClient&password=secret
+CACHE_REDIS=rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=secret
 EMAIL_URL=smtps://user@domain.com:password@smtp.example.com:587
 URL_VAR=http://www.google.com/
 PATH_VAR=/home/dev

@@ -19,7 +19,7 @@ class BaseTests(unittest.TestCase):
     ORACLE_TNS = 'oracle://user:password@sid/'
     ORACLE = 'oracle://user:password@host:1521/sid'
     MEMCACHE = 'memcache://127.0.0.1:11211'
-    REDIS = 'rediscache://127.0.0.1:6379:1?client_class=django_redis.client.DefaultClient&password=secret'
+    REDIS = 'rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=secret'
     EMAIL = 'smtps://user@domain.com:password@smtp.example.com:587'
     JSON = dict(one='bar', two=2, three=33.44)
     DICT = dict(foo='bar', test='on')
@@ -208,7 +208,7 @@ class EnvTests(BaseTests):
 
         redis_config = self.env.cache_url('CACHE_REDIS')
         self.assertEqual(redis_config['BACKEND'], 'django_redis.cache.RedisCache')
-        self.assertEqual(redis_config['LOCATION'], 'redis://127.0.0.1:6379:1')
+        self.assertEqual(redis_config['LOCATION'], 'redis://127.0.0.1:6379/1')
         self.assertEqual(redis_config['OPTIONS'], {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'PASSWORD': 'secret',
@@ -439,11 +439,11 @@ class CacheTestSuite(unittest.TestCase):
         self.assertEqual(url['LOCATION'], '')
 
     def test_redis_parsing(self):
-        url = 'rediscache://127.0.0.1:6379:1?client_class=django_redis.client.DefaultClient&password=secret'
+        url = 'rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=secret'
         url = Env.cache_url_config(url)
 
         self.assertEqual(url['BACKEND'], REDIS_DRIVER)
-        self.assertEqual(url['LOCATION'], 'redis://127.0.0.1:6379:1')
+        self.assertEqual(url['LOCATION'], 'redis://127.0.0.1:6379/1')
         self.assertEqual(url['OPTIONS'], {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
             'PASSWORD': 'secret',
