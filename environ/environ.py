@@ -78,6 +78,7 @@ class Env(object):
         'mysql2': 'django.db.backends.mysql',
         'mysqlgis': 'django.contrib.gis.db.backends.mysql',
         'oracle': 'django.db.backends.oracle',
+        'redshift': 'django_redshift_backend',
         'spatialite': 'django.contrib.gis.db.backends.spatialite',
         'sqlite': 'django.db.backends.sqlite3',
         'ldap': 'ldapdb.backends.ldap',
