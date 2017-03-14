@@ -620,9 +620,9 @@ class Env(object):
         logger.debug('Read environment variables from: {0}'.format(env_file))
 
         for line in content.splitlines():
-            m1 = re.match(r'\A([A-Za-z_0-9]+)=(.*)\Z', line)
+            m1 = re.match(r'\A([A-Za-z_0-9]+.*?)=(.*)\Z', line)
             if m1:
-                key, val = m1.group(1), m1.group(2)
+                key, val = m1.group(1).strip(), m1.group(2).strip()
                 m2 = re.match(r"\A'(.*)'\Z", val)
                 if m2:
                     val = m2.group(1)
