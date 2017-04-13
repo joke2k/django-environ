@@ -18,6 +18,7 @@ class BaseTests(unittest.TestCase):
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
     ORACLE_TNS = 'oracle://user:password@sid/'
     ORACLE = 'oracle://user:password@host:1521/sid'
+    REDSHIFT = 'redshift://user:password@examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev'
     MEMCACHE = 'memcache://127.0.0.1:11211'
     REDIS = 'rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=secret'
     EMAIL = 'smtps://user@domain.com:password@smtp.example.com:587'
@@ -49,6 +50,7 @@ class BaseTests(unittest.TestCase):
                     DATABASE_SQLITE_URL=cls.SQLITE,
                     DATABASE_ORACLE_URL=cls.ORACLE,
                     DATABASE_ORACLE_TNS_URL=cls.ORACLE_TNS,
+                    DATABASE_REDSHIFT_URL=cls.REDSHIFT,
                     CACHE_URL=cls.MEMCACHE,
                     CACHE_REDIS=cls.REDIS,
                     EMAIL_URL=cls.EMAIL,
@@ -195,6 +197,14 @@ class EnvTests(BaseTests):
         self.assertEqual(oracle_config['USER'], 'user')
         self.assertEqual(oracle_config['PASSWORD'], 'password')
         self.assertEqual(oracle_config['PORT'], '1521')
+
+        redshift_config = self.env.db('DATABASE_REDSHIFT_URL')
+        self.assertEqual(redshift_config['ENGINE'], 'django_redshift_backend')
+        self.assertEqual(redshift_config['NAME'], 'dev')
+        self.assertEqual(redshift_config['HOST'], 'examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com')
+        self.assertEqual(redshift_config['USER'], 'user')
+        self.assertEqual(redshift_config['PASSWORD'], 'password')
+        self.assertEqual(redshift_config['PORT'], 5439)
 
         sqlite_config = self.env.db('DATABASE_SQLITE_URL')
         self.assertEqual(sqlite_config['ENGINE'], 'django.db.backends.sqlite3')

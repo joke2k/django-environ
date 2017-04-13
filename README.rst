@@ -184,6 +184,7 @@ Supported Types
     -  SQLITE: sqlite://
     -  SQLITE with SPATIALITE for GeoDjango: spatialite://
     -  Oracle: oracle://
+    -  Redshift: redshift://
     -  LDAP: ldap://
 - cache_url
     -  Database: dbcache://
