@@ -63,7 +63,7 @@ class Env(object):
             ...
     """
 
-    ENVIRON = os.environ
+    ENVIRON = {}
     NOTSET = NoValue()
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = urllib.parse.ParseResult
@@ -620,6 +620,7 @@ class Env(object):
 
         logger.debug('Read environment variables from: {0}'.format(env_file))
 
+        cls.ENVIRON = os.environ.copy()
         for line in content.splitlines():
             m1 = re.match(r'\A([A-Za-z_0-9]+)=(.*)\Z', line)
             if m1:
