@@ -40,7 +40,7 @@ This is your `settings.py` file before you have installed **django-environ**
             'PASSWORD': 'githubbedpassword',
             'HOST': '127.0.0.1',
             'PORT': '8458',
-        }
+        },
         'extra': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': os.path.join(SITE_ROOT, 'database.sqlite')
@@ -262,13 +262,13 @@ Tests
 License
 =======
 
-Django-environ is licensed under the MIT License - see the `LICENSE`_ file for details
+Django-environ is licensed under the MIT License - see the `LICENSE_FILE`_ file for details
 
 Changelog
 =========
 
 `0.4.2 - 13-April-2017 <https://github.com/joke2k/django-environ/compare/v0.4.1...v0.4.2>`__
-------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
 
   - Confirm support for Django 1.11.
   - Support for Redshift database URL
@@ -276,7 +276,7 @@ Changelog
   - Update support for django-redis urls (#109)
 
 `0.4.1 - 13-November-2016 <https://github.com/joke2k/django-environ/compare/v0.4...v0.4.1>`__
--------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------
   - Fix for unsafe characters into URLs
   - Clarifying warning on missing or unreadable file. Thanks to @nickcatal
   - Add support for Django 1.10.
@@ -285,7 +285,7 @@ Changelog
 
 
 `0.4.0 - 23-September-2015 <https://github.com/joke2k/django-environ/compare/v0.3...v0.4>`__
--------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------
   - Fix non-ascii values (broken in Python 2.x)
   - New email schemes - smtp+ssl and smtp+tls (smtps would be deprecated)
   - redis_cache replaced by django_redis
@@ -294,7 +294,7 @@ Changelog
   - Fix psql/pgsql url
 
 `0.3 - 03-June-2014 <https://github.com/joke2k/django-environ/compare/v0.2.1...v0.3>`__
---------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------
   - Add cache url support
   - Add email url support
   - Add search url support
@@ -381,4 +381,4 @@ Credits
     :target: https://raw.githubusercontent.com/joke2k/django-environ/master/LICENSE.txt
     :alt: Package license
 
-.. _LICENSE: https://github.com/joke2k/django-environ/blob/master/LICENSE.txt
+.. _LICENSE_FILE: https://github.com/joke2k/django-environ/blob/master/LICENSE.txt
