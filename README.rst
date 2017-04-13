@@ -4,7 +4,7 @@ Django-environ
 
 Django-environ allows you to utilize 12factor inspired environment variables to configure your Django application.
 
-|pypi| |unix_build| |windows_build| |coverage| |downloads| |license|
+|pypi| |unix_build| |windows_build| |coverage| |license|
 
 
 This module is a merge of:
@@ -162,6 +162,9 @@ There are only two classes, ``environ.Env`` and ``environ.Path``
     '/home/myproject/static'
 
 
+See `cookiecutter-django`_ for a concrete example on using with a django project.
+
+
 Supported Types
 ===============
 
@@ -237,6 +240,15 @@ In order to set email configuration for django you can use this code:
     vars().update(EMAIL_CONFIG)
 
 
+SQLite urls
+-----------
+
+SQLite connects to file based databases. The same URL format is used, omitting the hostname,
+and using the "file" portion as the filename of the database.
+This has the effect of four slashes being present for an absolute
+file path: sqlite:////full/path/to/your/database/file.sqlite.
+
+
 Tests
 =====
 
@@ -255,10 +267,13 @@ Django-environ is licensed under the MIT License - see the `LICENSE`_ file for d
 Changelog
 =========
 
-Unreleased
-----------
+`0.4.2 - 13-April-2017 <https://github.com/joke2k/django-environ/compare/v0.4.1...v0.4.2>`__
+------------------------------------------------------------------------------------------
 
   - Confirm support for Django 1.11.
+  - Support for Redshift database URL
+  - Fix uwsgi settings reload problem (#55)
+  - Update support for django-redis urls (#109)
 
 `0.4.1 - 13-November-2016 <https://github.com/joke2k/django-environ/compare/v0.4...v0.4.1>`__
 -------------------------------------------------------------------------------------------
@@ -344,6 +359,8 @@ Credits
 .. _Distribute: http://pypi.python.org/pypi/distribute
 .. _`modern-package-template`: http://pypi.python.org/pypi/modern-package-template
 
+.. _cookiecutter-django: https://github.com/pydanny/cookiecutter-django
+
 .. |pypi| image:: https://img.shields.io/pypi/v/django-environ.svg?style=flat-square&label=version
     :target: https://pypi.python.org/pypi/django-environ
     :alt: Latest version released on PyPi
@@ -359,10 +376,6 @@ Credits
 .. |windows_build|  image:: https://img.shields.io/appveyor/ci/joke2k/django-environ.svg?style=flat-square&label=windows%20build
     :target: https://ci.appveyor.com/project/joke2k/django-environ
     :alt: Build status of the master branch on Windows
-
-.. |downloads| image:: https://img.shields.io/pypi/dm/django-environ.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/django-environ
-    :alt: Monthly downloads
 
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
     :target: https://raw.githubusercontent.com/joke2k/django-environ/master/LICENSE.txt
