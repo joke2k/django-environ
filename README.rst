@@ -149,6 +149,7 @@ There are only two classes, ``environ.Env`` and ``environ.Path``
     True
 
     >>> open('.myenv', 'a').write('\nINT_VAR=1010')
+    >>> env.read_env('.myenv')
     >>> env.int('INT_VAR'), env.str('INT_VAR')
     1010, '1010'
 
