@@ -36,3 +36,6 @@ nosetests.xml
 .idea
 .projectile
 .ropeproject
+
+# pyenv/pyenv-virtualenv
+.python-version

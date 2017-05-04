@@ -471,6 +471,17 @@ class CacheTestSuite(unittest.TestCase):
         self.assertEqual(REDIS_DRIVER, url['BACKEND'])
         self.assertEqual(url['LOCATION'], 'redis://:redispass@127.0.0.1:6379/0')
 
+    def test_redis_multi_location_parsing(self):
+        url = 'rediscache://host1:6379,host2:6379,host3:9999/1'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], REDIS_DRIVER)
+        self.assertEqual(url['LOCATION'], [
+            'redis://host1:6379/1',
+            'redis://host2:6379/1',
+            'redis://host3:9999/1',
+        ])
+
     def test_redis_socket_url(self):
         url = 'redis://:redispass@/path/to/socket.sock?db=0'
         url = Env.cache_url_config(url)
@@ -479,7 +490,7 @@ class CacheTestSuite(unittest.TestCase):
         self.assertEqual(url['OPTIONS'], {
             'DB': 0
         })
-
+    
     def test_options_parsing(self):
         url = 'filecache:///var/tmp/django_cache?timeout=60&max_entries=1000&cull_frequency=0'
         url = Env.cache_url_config(url)
