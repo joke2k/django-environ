@@ -28,3 +28,4 @@ INT_TUPLE=(42,33)
 DATABASE_ORACLE_TNS_URL=oracle://user:password@sid
 DATABASE_ORACLE_URL=oracle://user:password@host:1521/sid
 DATABASE_REDSHIFT_URL=redshift://user:password@examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev
+export EXPORTED_VAR="exported var"

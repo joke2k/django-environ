@@ -25,6 +25,7 @@ class BaseTests(unittest.TestCase):
     JSON = dict(one='bar', two=2, three=33.44)
     DICT = dict(foo='bar', test='on')
     PATH = '/home/dev'
+    EXPORTED = 'exported var'
 
     @classmethod
     def generateData(cls):
@@ -56,7 +57,8 @@ class BaseTests(unittest.TestCase):
                     EMAIL_URL=cls.EMAIL,
                     URL_VAR=cls.URL,
                     JSON_VAR=json.dumps(cls.JSON),
-                    PATH_VAR=cls.PATH)
+                    PATH_VAR=cls.PATH,
+                    EXPORTED_VAR=cls.EXPORTED)
 
     def setUp(self):
         self._old_environ = os.environ
@@ -240,6 +242,9 @@ class EnvTests(BaseTests):
     def test_path(self):
         root = self.env.path('PATH_VAR')
         self.assertTypeAndValue(Path, Path(self.PATH), root)
+
+    def test_exported(self):
+        self.assertEqual(self.EXPORTED, self.env('EXPORTED_VAR'))
 
 
 class FileEnvTests(EnvTests):
