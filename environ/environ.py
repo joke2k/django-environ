@@ -122,6 +122,9 @@ class Env(object):
 
     def __init__(self, **scheme):
         self.scheme = scheme
+        # Make sure environment is read correctly
+        if self.ENVIRON == {}:
+            self.ENVIRON = os.environ
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
         return self.get_value(var, cast=cast, default=default, parse_default=parse_default)
@@ -600,6 +603,8 @@ class Env(object):
 
         https://gist.github.com/bennylope/2999704
         """
+        if cls.ENVIRON == {}:
+            cls.ENVIRON = os.environ
         if env_file is None:
             frame = sys._getframe()
             env_file = os.path.join(os.path.dirname(frame.f_back.f_code.co_filename), '.env')
