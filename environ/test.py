@@ -378,6 +378,20 @@ class DatabaseTestSuite(unittest.TestCase):
 
 class CacheTestSuite(unittest.TestCase):
 
+    def test_base_options_parsing(self):
+        url = 'memcache://127.0.0.1:11211/?timeout=0&key_prefix=cache_&key_function=foo.get_key&version=1'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['KEY_PREFIX'], 'cache_')
+        self.assertEqual(url['KEY_FUNCTION'], 'foo.get_key')
+        self.assertEqual(url['TIMEOUT'], 0)
+        self.assertEqual(url['VERSION'], 1)
+
+        url = 'redis://127.0.0.1:6379/?timeout=None'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['TIMEOUT'], None)
+
     def test_memcache_parsing(self):
         url = 'memcache://127.0.0.1:11211'
         url = Env.cache_url_config(url)
