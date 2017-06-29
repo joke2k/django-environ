@@ -358,6 +358,12 @@ class DatabaseTestSuite(unittest.TestCase):
         url = Env.db_url_config(url)
         self.assertEqual(url['CONN_MAX_AGE'], 600)
 
+        url = 'postgres://user:pass@host:1234/dbname?conn_max_age=None&autocommit=True&atomic_requests=False'
+        url = Env.db_url_config(url)
+        self.assertEqual(url['CONN_MAX_AGE'], None)
+        self.assertEqual(url['AUTOCOMMIT'], True)
+        self.assertEqual(url['ATOMIC_REQUESTS'], False)
+
         url = 'mysql://user:pass@host:1234/dbname?init_command=SET storage_engine=INNODB'
         url = Env.db_url_config(url)
         self.assertEqual(url['OPTIONS'], {
