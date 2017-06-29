@@ -13,6 +13,7 @@ author = 'joke2k'
 description = "Django-environ allows you to utilize 12factor inspired environment " \
               "variables to configure your Django application."
 install_requires = ['django', 'six']
+tests_require = ['django-redis-cache']
 
 setup(name='django-environ',
       version=version,
@@ -51,4 +52,5 @@ setup(name='django-environ',
       test_suite='environ.test.load_suite',
       zip_safe=False,
       install_requires=install_requires,
+      tests_require=tests_require,
       )
