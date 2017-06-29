@@ -661,7 +661,7 @@ class Env(object):
 
         # set defaults
         for key, value in overrides.items():
-            cls.ENVIRON.setdefault(key, value)
+            cls.ENVIRON[key] = value
 
 
 class Path(object):
