@@ -77,7 +77,8 @@ class EnvTests(BaseTests):
         self.assertEqual(3, self.env('not_present', default=3))
 
     def test_not_present_without_default(self):
-        self.assertRaises(ImproperlyConfigured, self.env, 'not_present')
+        with self.assertRaises(ImproperlyConfigured):
+            self.env('not_present')
 
     def test_str(self):
         self.assertTypeAndValue(str, 'bar', self.env('STR_VAR'))
@@ -262,6 +263,7 @@ class SubClassTests(EnvTests):
 
     def test_singleton_environ(self):
         self.assertTrue(self.CONFIG is self.env.ENVIRON)
+
 
 class SchemaEnvTests(BaseTests):
 
@@ -634,8 +636,10 @@ class PathTests(unittest.TestCase):
 
     def test_required_path(self):
 
-        self.assertRaises(ImproperlyConfigured, Path, '/not/existing/path/', required=True)
-        self.assertRaises(ImproperlyConfigured, Path(__file__), 'not_existing_path', required=True)
+        with self.assertRaises(ImproperlyConfigured):
+            Path('/not/existing/path/', required=True)
+        with self.assertRaises(ImproperlyConfigured):
+            Path(__file__)('not_existing_path', required=True)
 
     def test_comparison(self):
 
@@ -655,7 +659,8 @@ class PathTests(unittest.TestCase):
         self.assertEqual(Path('/home/dev/public') - 2, Path('/home'))
         self.assertEqual(Path('/home/dev/public') - 'public', Path('/home/dev'))
 
-        self.assertRaises(TypeError, lambda _: Path('/home/dev/') - 'not int')
+        with self.assertRaises(TypeError):
+            Path('/home/dev/') - 'not int'
 
 
 def load_suite():
@@ -668,6 +673,7 @@ def load_suite():
     for case in cases:
         test_suite.addTest(unittest.makeSuite(case))
     return test_suite
+
 
 if __name__ == "__main__":
 
