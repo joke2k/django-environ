@@ -282,8 +282,26 @@ class FileEnvTests(EnvTests):
         super(FileEnvTests, self).setUp()
         Env.ENVIRON = {}
         self.env = Env()
-        file_path = Path(__file__, is_file=True)('test_env.txt')
-        self.env.read_env(file_path, PATH_VAR=Path(__file__, is_file=True).__root__)
+        self.file_path = Path(__file__, is_file=True)('test_env.txt')
+        self.env.read_env(self.file_path)
+
+    def test_read_env_overrides(self):
+        # overrides given as kwargs to read_env() override any existing
+        # variables including those just read from the file
+        self.env.read_env(
+            self.file_path,
+            STR_VAR='foo',
+            INT_VAR='82',
+        )
+        self.assertTypeAndValue(str, 'foo', self.env('STR_VAR'))
+        self.assertTypeAndValue(str, 'foo', self.env.str('STR_VAR'))
+
+        self.assertTypeAndValue(str, '82', self.env('INT_VAR'))
+        self.assertTypeAndValue(int, 82, self.env.int('INT_VAR'))
+
+        with self.assertRaises(ImproperlyConfigured):
+            self.env('str_var')
+
 
 class SubClassTests(EnvTests):
 
