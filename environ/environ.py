@@ -659,7 +659,7 @@ class Env(object):
                     val = re.sub(r'\\(.)', r'\1', m3.group(1))
                 cls.ENVIRON.setdefault(key, str(val))
 
-        # set defaults
+        # set overrides
         for key, value in overrides.items():
             cls.ENVIRON[key] = value
 
