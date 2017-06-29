@@ -415,7 +415,7 @@ class Env(object):
             config_options = {}
             for k, v in urllib.parse.parse_qs(url.query).items():
                 if k.upper() in cls._DB_BASE_OPTIONS:
-                    config.update({k.upper(): _cast_int(v[0])})
+                    config.update({k.upper(): _cast(v[0])})
                 else:
                     config_options.update({k: _cast_int(v[0])})
             config['OPTIONS'] = config_options
