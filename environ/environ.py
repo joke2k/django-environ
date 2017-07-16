@@ -126,6 +126,9 @@ class Env(object):
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
         return self.get_value(var, cast=cast, default=default, parse_default=parse_default)
 
+    def __contains__(self, var):
+        return var in self.ENVIRON
+
     # Shortcuts
 
     def str(self, var, default=NOTSET):

@@ -79,6 +79,11 @@ class EnvTests(BaseTests):
     def test_not_present_without_default(self):
         self.assertRaises(ImproperlyConfigured, self.env, 'not_present')
 
+    def test_contains(self):
+        self.assertTrue('STR_VAR' in self.env)
+        self.assertTrue('EMPTY_LIST' in self.env)
+        self.assertFalse('I_AM_NOT_A_VAR' in self.env)
+
     def test_str(self):
         self.assertTypeAndValue(str, 'bar', self.env('STR_VAR'))
         self.assertTypeAndValue(str, 'bar', self.env.str('STR_VAR'))
