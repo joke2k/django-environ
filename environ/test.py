@@ -77,8 +77,7 @@ class EnvTests(BaseTests):
         self.assertEqual(3, self.env('not_present', default=3))
 
     def test_not_present_without_default(self):
-        with self.assertRaises(ImproperlyConfigured):
-            self.env('not_present')
+        self.assertRaises(ImproperlyConfigured, self.env, 'not_present')
 
     def test_contains(self):
         self.assertTrue('STR_VAR' in self.env)
@@ -641,10 +640,8 @@ class PathTests(unittest.TestCase):
 
     def test_required_path(self):
 
-        with self.assertRaises(ImproperlyConfigured):
-            Path('/not/existing/path/', required=True)
-        with self.assertRaises(ImproperlyConfigured):
-            Path(__file__)('not_existing_path', required=True)
+        self.assertRaises(ImproperlyConfigured, Path, '/not/existing/path/', required=True)
+        self.assertRaises(ImproperlyConfigured, Path(__file__), 'not_existing_path', required=True)
 
     def test_comparison(self):
 
@@ -664,8 +661,7 @@ class PathTests(unittest.TestCase):
         self.assertEqual(Path('/home/dev/public') - 2, Path('/home'))
         self.assertEqual(Path('/home/dev/public') - 'public', Path('/home/dev'))
 
-        with self.assertRaises(TypeError):
-            Path('/home/dev/') - 'not int'
+        self.assertRaises(TypeError, lambda _: Path('/home/dev/') - 'not int')
 
 
 def load_suite():
