@@ -268,6 +268,7 @@ class SubClassTests(EnvTests):
     def test_singleton_environ(self):
         self.assertTrue(self.CONFIG is self.env.ENVIRON)
 
+
 class SchemaEnvTests(BaseTests):
 
     def test_schema(self):
@@ -673,6 +674,7 @@ def load_suite():
     for case in cases:
         test_suite.addTest(unittest.makeSuite(case))
     return test_suite
+
 
 if __name__ == "__main__":
 
