@@ -277,10 +277,22 @@ Django-environ is licensed under the MIT License - see the `LICENSE_FILE`_ file 
 Changelog
 =========
 
-`pending`
----------
+
+`0.4.4 - 21-August-2017 <https://github.com/joke2k/django-environ/compare/v0.4.3...v0.4.4>`__
+---------------------------------------------------------------------------------------------
 
   - Support for django-redis multiple locations (master/slave, shards)
+  - Support for Elasticsearch2
+  - Support for Mysql-connector
+  - Support for pyodbc
+  - Add __contains__ feature to Environ class
+  - Fix Path subtracting
+
+
+`0.4.3 - 21-August-2017 <https://github.com/joke2k/django-environ/compare/v0.4.2...v0.4.3>`__
+---------------------------------------------------------------------------------------------
+
+  - Rollback the default Environ to os.environ
 
 `0.4.2 - 13-April-2017 <https://github.com/joke2k/django-environ/compare/v0.4.1...v0.4.2>`__
 --------------------------------------------------------------------------------------------
