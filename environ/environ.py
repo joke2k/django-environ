@@ -21,7 +21,7 @@ from six import string_types
 logger = logging.getLogger(__name__)
 
 
-VERSION = '0.4.3'
+VERSION = '0.4.4'
 __author__ = 'joke2k'
 __version__ = tuple(VERSION.split('.'))
 
