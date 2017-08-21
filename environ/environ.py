@@ -630,6 +630,10 @@ class Env(object):
             m1 = re.match(r'\A([A-Za-z_0-9]+)=(.*)\Z', line)
             if m1:
                 key, val = m1.group(1), m1.group(2)
+                # Resolve any proxied values
+                if val.startswith('$'):
+                    val = val.lstrip('$')
+                    val = os.environ.get(val, '')
                 m2 = re.match(r"\A'(.*)'\Z", val)
                 if m2:
                     val = m2.group(1)
