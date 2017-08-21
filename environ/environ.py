@@ -114,6 +114,7 @@ class Env(object):
     DEFAULT_SEARCH_ENV = 'SEARCH_URL'
     SEARCH_SCHEMES = {
         "elasticsearch": "haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine",
+        "elasticsearch2": "haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine",
         "solr": "haystack.backends.solr_backend.SolrEngine",
         "whoosh": "haystack.backends.whoosh_backend.WhooshEngine",
         "xapian": "haystack.backends.xapian_backend.XapianEngine",
@@ -545,7 +546,7 @@ class Env(object):
 
         if url.scheme == 'simple':
             return config
-        elif url.scheme in ['solr', 'elasticsearch']:
+        elif url.scheme in ['solr', 'elasticsearch', 'elasticsearch2']:
             if 'KWARGS' in params.keys():
                 config['KWARGS'] = params['KWARGS'][0]
 
@@ -559,7 +560,7 @@ class Env(object):
                 config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
             return config
 
-        if url.scheme == 'elasticsearch':
+        if url.scheme in ['elasticsearch', 'elasticsearch2']:
 
             split = path.rsplit("/", 1)
 
