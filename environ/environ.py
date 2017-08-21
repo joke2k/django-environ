@@ -721,9 +721,14 @@ class Path(object):
         if isinstance(other, int):
             return self.path('../' * other)
         elif isinstance(other, string_types):
-            return Path(self.__root__.rstrip(other))
+            if self.__root__.endswith(other):
+                return Path(self.__root__.rstrip(other))
         raise TypeError(
-            "unsupported operand type(s) for -: '{0}' and '{1}'".format(self, type(other)))
+            "unsupported operand type(s) for -: '{self}' and '{other}' "
+            "unless value of {self} ends with value of {other}".format(
+                self=type(self), other=type(other)
+            )
+        )
 
     def __invert__(self):
         return self.path('..')
