@@ -227,6 +227,15 @@ In order to use unsafe characters you have to encode with ``urllib.parse.encode`
 
 See https://perishablepress.com/stop-using-unsafe-characters-in-urls/ for reference.
 
+Multiple redis cache locations
+------------------------------
+
+For redis cache, `multiple master/slave or shard locations <http://niwinz.github.io/django-redis/latest/#_pluggable_clients>`_ can be configured as follows:
+
+.. code-block::
+
+    CACHE_URL='rediscache://master:6379,slave1:6379,slave2:6379/1'
+
 Email settings
 --------------
 
@@ -266,6 +275,11 @@ Django-environ is licensed under the MIT License - see the `LICENSE_FILE`_ file 
 
 Changelog
 =========
+
+`pending`
+---------
+
+  - Support for django-redis multiple locations (master/slave, shards)
 
 `0.4.2 - 13-April-2017 <https://github.com/joke2k/django-environ/compare/v0.4.1...v0.4.2>`__
 --------------------------------------------------------------------------------------------

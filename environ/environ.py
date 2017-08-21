@@ -456,8 +456,8 @@ class Env(object):
                 scheme = url.scheme.replace('cache', '')
             else:
                 scheme = 'unix'
-
-            config['LOCATION'] = scheme + '://' + url.netloc + url.path
+            locations = [scheme + '://' + loc + url.path for loc in url.netloc.split(',')]
+            config['LOCATION'] = locations[0] if len(locations) == 1 else locations
 
         if url.query:
             config_options = {}
