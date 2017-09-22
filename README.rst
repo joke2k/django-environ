@@ -259,6 +259,27 @@ This has the effect of four slashes being present for an absolute
 file path: sqlite:////full/path/to/your/database/file.sqlite.
 
 
+Interpolate environment variables
+---------------------------------
+
+Values that being with a ``$`` will be interpolated. Pass ``interpolate=False`` to ``environ.Env()`` to disable this feature.
+
+.. code-block:: bash
+
+    PROXIED_VAR=$STR_VAR
+    STR_VAR=bar
+
+.. code-block:: python
+
+    env = environ.Env()
+    env.str('PROXIED_VAR')
+    >>> 'bar'
+
+    env = environ.Env(interpolate=False)
+    env.str('PROXIED_VAR')
+    >>> '$STR_VAR'
+
+
 Tests
 =====
 
