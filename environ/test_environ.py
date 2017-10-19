@@ -673,28 +673,3 @@ class PathTests(unittest.TestCase):
         self.assertEqual(Path('/home/dev/public') - 'public', Path('/home/dev'))
 
         self.assertRaises(TypeError, lambda _: Path('/home/dev/') - 'not int')
-
-
-def load_suite():
-
-    test_suite = unittest.TestSuite()
-    cases = [
-        EnvTests, FileEnvTests, SubClassTests, SchemaEnvTests, PathTests,
-        DatabaseTestSuite, CacheTestSuite, EmailTests, SearchTestSuite
-    ]
-    for case in cases:
-        test_suite.addTest(unittest.makeSuite(case))
-    return test_suite
-
-
-if __name__ == "__main__":
-
-    try:
-        if sys.argv[1] == '-o':
-            for key, value in BaseTests.generateData().items():
-                print("{0}={1}".format(key, value))
-            sys.exit()
-    except IndexError:
-        pass
-
-    unittest.TextTestRunner().run(load_suite())
