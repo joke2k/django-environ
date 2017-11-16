@@ -258,6 +258,15 @@ and using the "file" portion as the filename of the database.
 This has the effect of four slashes being present for an absolute
 file path: sqlite:////full/path/to/your/database/file.sqlite.
 
+Multiple env files
+------------------
+It is possible to have multiple env files and select one using environment variables.
+
+.. code-block:: python
+    env = environ.Env()
+    env.read_env(env.str('ENV_PATH', '.env'))
+
+Now ``ENV_PATH=other-env ./manage.py runserver`` uses ``other-env`` while ``./manage.py runserver`` uses ``.env``.
 
 Tests
 =====
