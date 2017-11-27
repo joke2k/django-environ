@@ -19,6 +19,7 @@ class BaseTests(unittest.TestCase):
     ORACLE_TNS = 'oracle://user:password@sid/'
     ORACLE = 'oracle://user:password@host:1521/sid'
     REDSHIFT = 'redshift://user:password@examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev'
+    MSSQL = 'mssql://sampleuser:samplepassword@samplehost.com:1433/sampledatabase?driver=ODBC Driver 13 for SQL Server'
     MEMCACHE = 'memcache://127.0.0.1:11211'
     REDIS = 'rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=secret'
     EMAIL = 'smtps://user@domain.com:password@smtp.example.com:587'
@@ -51,6 +52,7 @@ class BaseTests(unittest.TestCase):
                     DATABASE_ORACLE_URL=cls.ORACLE,
                     DATABASE_ORACLE_TNS_URL=cls.ORACLE_TNS,
                     DATABASE_REDSHIFT_URL=cls.REDSHIFT,
+                    DATABASE_MSSQL_URL=cls.MSSQL,
                     CACHE_URL=cls.MEMCACHE,
                     CACHE_REDIS=cls.REDIS,
                     EMAIL_URL=cls.EMAIL,
@@ -214,6 +216,17 @@ class EnvTests(BaseTests):
         sqlite_config = self.env.db('DATABASE_SQLITE_URL')
         self.assertEqual(sqlite_config['ENGINE'], 'django.db.backends.sqlite3')
         self.assertEqual(sqlite_config['NAME'], '/full/path/to/your/database/file.sqlite')
+
+        mssql_config = self.env.db('DATABASE_MSSQL_URL')
+        self.assertEqual(mssql_config['ENGINE'], 'sql_server.pyodbc')
+        self.assertEqual(mssql_config['NAME'], 'sampledatabase')
+        self.assertEqual(mssql_config['HOST'], 'samplehost.com')
+        self.assertEqual(mssql_config['USER'], 'sampleuser')
+        self.assertEqual(mssql_config['PASSWORD'], 'samplepassword')
+        self.assertEqual(mssql_config['PORT'], 1433)
+        self.assertEqual(mssql_config['OPTIONS'], {
+            'driver': 'ODBC Driver 13 for SQL Server'
+        })
 
     def test_cache_url_value(self):
 
@@ -496,7 +509,7 @@ class CacheTestSuite(unittest.TestCase):
         self.assertEqual(url['OPTIONS'], {
             'DB': 0
         })
-    
+
     def test_options_parsing(self):
         url = 'filecache:///var/tmp/django_cache?timeout=60&max_entries=1000&cull_frequency=0'
         url = Env.cache_url_config(url)

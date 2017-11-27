@@ -189,6 +189,7 @@ Supported Types
     -  Oracle: oracle://
     -  PyODBC: pyodbc://
     -  Redshift: redshift://
+    -  MSSQL: mssql://
     -  LDAP: ldap://
 - cache_url
     -  Database: dbcache://
