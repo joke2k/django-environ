@@ -301,6 +301,14 @@ class DatabaseTestSuite(unittest.TestCase):
         self.assertEqual(url['PASSWORD'], 'wegauwhgeuioweg')
         self.assertEqual(url['PORT'], 5431)
 
+    def test_postgres_parsing_unix_domain_socket(self):
+        url = 'postgres:////var/run/postgresql/db'
+        url = Env.db_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'django.db.backends.postgresql_psycopg2')
+        self.assertEqual(url['NAME'], 'db')
+        self.assertEqual(url['HOST'], '/var/run/postgresql')
+
     def test_postgis_parsing(self):
         url = 'postgis://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
         url = Env.db_url_config(url)
@@ -496,7 +504,7 @@ class CacheTestSuite(unittest.TestCase):
         self.assertEqual(url['OPTIONS'], {
             'DB': 0
         })
-    
+
     def test_options_parsing(self):
         url = 'filecache:///var/tmp/django_cache?timeout=60&max_entries=1000&cull_frequency=0'
         url = Env.cache_url_config(url)
