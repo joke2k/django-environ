@@ -249,7 +249,6 @@ In order to set email configuration for django you can use this code:
 
     vars().update(EMAIL_CONFIG)
 
-
 SQLite urls
 -----------
 
@@ -257,6 +256,19 @@ SQLite connects to file based databases. The same URL format is used, omitting t
 and using the "file" portion as the filename of the database.
 This has the effect of four slashes being present for an absolute
 file path: sqlite:////full/path/to/your/database/file.sqlite.
+
+Nested lists
+------------
+
+Some settings such as Django's ``ADMINS`` make use of nested lists. You can use something like this to handle similar cases.
+
+.. code-block::
+
+    DJANGO_ADMINS=John:john@admin.com,Jane:jane@admin.com
+    
+.. code-block:: python
+
+    ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')] 
 
 
 Tests
