@@ -381,6 +381,17 @@ class DatabaseTestSuite(unittest.TestCase):
         self.assertEqual(url['USER'], 'cn=admin,dc=nodomain,dc=org')
         self.assertEqual(url['PASSWORD'], 'some_secret_password')
 
+    def test_database_accept_engine(self):
+        url = 'postgres://user:pass@localhost:5432/DatabaseName'
+        url = Env.db_url_config(url, engine='my.engine')
+
+        self.assertEqual(url['ENGINE'], 'my.engine')
+        self.assertEqual(url['NAME'], 'DatabaseName')
+        self.assertEqual(url['HOST'], 'localhost')
+        self.assertEqual(url['USER'], 'user')
+        self.assertEqual(url['PASSWORD'], 'pass')
+        self.assertEqual(url['PORT'], 5432)
+
 
 class CacheTestSuite(unittest.TestCase):
 

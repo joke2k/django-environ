@@ -415,7 +415,7 @@ class Env(object):
 
         if engine:
             config['ENGINE'] = engine
-        if url.scheme in Env.DB_SCHEMES:
+        elif url.scheme in Env.DB_SCHEMES:
             config['ENGINE'] = Env.DB_SCHEMES[url.scheme]
 
         if not config.get('ENGINE', False):
