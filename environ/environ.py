@@ -375,10 +375,14 @@ class Env(object):
         path = url.path[1:]
         path = urllib.parse.unquote_plus(path.split('?', 2)[0])
 
-        # if we are using sqlite and we have no path, then assume we
-        # want an in-memory database (this is the behaviour of sqlalchemy)
-        if url.scheme == 'sqlite' and path == '':
-            path = ':memory:'
+        if url.scheme == 'sqlite':
+            if path == '':
+                # if we are using sqlite and we have no path, then assume we
+                # want an in-memory database (this is the behaviour of  sqlalchemy)
+                path = ':memory:'
+            if url.netloc:
+                warnings.warn(
+                    'SQLite URL contains host component %r, it will be ignored' % url.netloc, stacklevel=3)
         if url.scheme == 'ldap':
             path = '{scheme}://{hostname}'.format(scheme=url.scheme, hostname=url.hostname)
             if url.port:
