@@ -2,9 +2,11 @@
 Django-environ
 ==============
 
+
+ 
 Django-environ allows you to utilize 12factor inspired environment variables to configure your Django application.
 
-|pypi| |unix_build| |windows_build| |coverage| |license|
+|pypi| |unix_build| |windows_build| |coverage| |license| |ocbackers| |ocsponsors| 
 
 
 This module is a merge of:
@@ -358,6 +360,22 @@ Credits
 - `Distribute`_
 - `modern-package-template`_
 
+Contributors
+-----------------
+Thank you to all the people who have already contributed. 
+|occontributorimage|
+
+Backers
+-----------------
+Thank you to all our backers! 
+|ocbackerimage|
+
+Sponsors
+-----------------
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. `become_sponsor`_
+
+|ocsponsor0| |ocsponsor1| |ocsponsor2|
+
 .. _rconradharris: https://github.com/rconradharris
 .. _envparse: https://github.com/rconradharris/envparse
 
@@ -409,3 +427,29 @@ Credits
     :alt: Package license
 
 .. _LICENSE_FILE: https://github.com/joke2k/django-environ/blob/master/LICENSE.txt
+
+.. |ocbackers| image:: https://opencollective.com/django-environ/backers/badge.svg
+    :target: https://opencollective.com/django-environ
+    :alt: Backers on Open Collective
+.. |ocsponsors| image:: https://opencollective.com/django-environ/sponsors/badge.svg
+    :target: https://opencollective.com/django-environ
+    :alt: Sponsors on Open Collective
+    
+.. |ocbackerimage| image:: https://opencollective.com/django-environ/backers.svg?width=890
+    :target: https://opencollective.com/django-environ
+    :alt: Backers on Open Collective
+.. |occontributorimage| image:: https://opencollective.com/django-environ/contributors.svg?width=890&button=false
+    :target: https://opencollective.com/django-environ
+    :alt: Repo Contributors
+
+.. _become_sponsor: https://opencollective.com/django-environ#sponsor
+
+.. |ocsponsor0| image:: https://opencollective.com/django-environ/sponsor/0/avatar.svg
+    :target: https://opencollective.com/django-environ/sponsor/0/website
+    :alt: Sponsor
+.. |ocsponsor1| image:: https://opencollective.com/django-environ/sponsor/1/avatar.svg
+    :target: https://opencollective.com/django-environ/sponsor/1/website
+    :alt: Sponsor
+.. |ocsponsor2| image:: https://opencollective.com/django-environ/sponsor/2/avatar.svg
+    :target: https://opencollective.com/django-environ/sponsor/2/website
+    :alt: Sponsor
