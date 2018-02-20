@@ -18,6 +18,7 @@ class BaseTests(unittest.TestCase):
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
     ORACLE_TNS = 'oracle://user:password@sid/'
     ORACLE = 'oracle://user:password@host:1521/sid'
+    CUSTOM_BACKEND = 'custom.backend://user:password@example.com:5430/database'
     REDSHIFT = 'redshift://user:password@examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev'
     MEMCACHE = 'memcache://127.0.0.1:11211'
     REDIS = 'rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=secret'
@@ -51,6 +52,7 @@ class BaseTests(unittest.TestCase):
                     DATABASE_ORACLE_URL=cls.ORACLE,
                     DATABASE_ORACLE_TNS_URL=cls.ORACLE_TNS,
                     DATABASE_REDSHIFT_URL=cls.REDSHIFT,
+                    DATABASE_CUSTOM_BACKEND_URL=cls.CUSTOM_BACKEND,
                     CACHE_URL=cls.MEMCACHE,
                     CACHE_REDIS=cls.REDIS,
                     EMAIL_URL=cls.EMAIL,
