@@ -215,6 +215,14 @@ class EnvTests(BaseTests):
         self.assertEqual(sqlite_config['ENGINE'], 'django.db.backends.sqlite3')
         self.assertEqual(sqlite_config['NAME'], '/full/path/to/your/database/file.sqlite')
 
+        custom_backend_config = self.env.db('DATABASE_CUSTOM_BACKEND_URL')
+        self.assertEqual(custom_backend_config['ENGINE'], 'custom.backend')
+        self.assertEqual(custom_backend_config['NAME'], 'database')
+        self.assertEqual(custom_backend_config['HOST'], 'example.com')
+        self.assertEqual(custom_backend_config['USER'], 'user')
+        self.assertEqual(custom_backend_config['PASSWORD'], 'password')
+        self.assertEqual(custom_backend_config['PORT'], 5430)
+
     def test_cache_url_value(self):
 
         cache_config = self.env.cache_url()
