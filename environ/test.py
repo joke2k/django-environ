@@ -665,6 +665,7 @@ class PathTests(unittest.TestCase):
         self.assertEqual(Path('/home/foo/').rfind('/'), str(Path('/home/foo')).rfind('/'))
         self.assertEqual(Path('/home/foo/').find('/home'), str(Path('/home/foo/')).find('/home'))
         self.assertEqual(Path('/home/foo/')[1], str(Path('/home/foo/'))[1])
+        self.assertEqual(Path('/home/foo/').__fspath__(), str(Path('/home/foo/')))
 
         self.assertEqual(~Path('/home'), Path('/'))
         self.assertEqual(Path('/') + 'home', Path('/home'))
