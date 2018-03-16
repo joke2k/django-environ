@@ -48,9 +48,9 @@ This is your `settings.py` file before you have installed **django-environ**
     }
 
     MEDIA_ROOT = os.path.join(SITE_ROOT, 'assets')
-    MEDIA_URL = 'media/'
+    MEDIA_URL = '/media/'
     STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
-    STATIC_URL = 'static/'
+    STATIC_URL = '/static/'
 
     SECRET_KEY = '...im incredibly still here...'
 
@@ -93,9 +93,9 @@ After:
     public_root = root.path('public/')
 
     MEDIA_ROOT = public_root('media')
-    MEDIA_URL = 'media/'
+    MEDIA_URL = '/media/'
     STATIC_ROOT = public_root('static')
-    STATIC_URL = 'static/'
+    STATIC_URL = '/static/'
 
     SECRET_KEY = env('SECRET_KEY') # Raises ImproperlyConfigured exception if SECRET_KEY not in os.environ
 
