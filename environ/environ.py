@@ -355,7 +355,8 @@ class Env(object):
         {'ENGINE': 'django.db.backends.sqlite3', 'HOST': '', 'NAME': '/full/path/to/your/file.sqlite', 'PASSWORD': '', 'PORT': '', 'USER': ''}
         >>> Env.db_url_config('postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn')
         {'ENGINE': 'django.db.backends.postgresql_psycopg2', 'HOST': 'ec2-107-21-253-135.compute-1.amazonaws.com', 'NAME': 'd8r82722r2kuvn', 'PASSWORD': 'wegauwhgeuioweg', 'PORT': 5431, 'USER': 'uf07k1i6d8ia0v'}
-
+        >>> Env.db_url_config('psql:///db')
+        {'ENGINE': 'django.db.backends.postgresql_psycopg2', 'HOST': '', 'NAME': 'db', 'PASSWORD': '', 'PORT': '', 'USER': ''}
         """
         if not isinstance(url, cls.URL_CLASS):
             if url == 'sqlite://:memory:':
