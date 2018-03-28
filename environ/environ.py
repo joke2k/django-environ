@@ -10,8 +10,11 @@ import sys
 import warnings
 
 try:
+    from django import VERSION as DJANGO_VERSION
     from django.core.exceptions import ImproperlyConfigured
 except ImportError:
+    DJANGO_VERSION = None
+
     class ImproperlyConfigured(Exception):
         pass
 
@@ -69,10 +72,6 @@ class Env(object):
     URL_CLASS = urllib.parse.ParseResult
     DEFAULT_DATABASE_ENV = 'DATABASE_URL'
     DB_SCHEMES = {
-        'postgres': 'django.db.backends.postgresql_psycopg2',
-        'postgresql': 'django.db.backends.postgresql_psycopg2',
-        'psql': 'django.db.backends.postgresql_psycopg2',
-        'pgsql': 'django.db.backends.postgresql_psycopg2',
         'postgis': 'django.contrib.gis.db.backends.postgis',
         'mysql': 'django.db.backends.mysql',
         'mysql2': 'django.db.backends.mysql',
@@ -85,6 +84,17 @@ class Env(object):
         'sqlite': 'django.db.backends.sqlite3',
         'ldap': 'ldapdb.backends.ldap',
     }
+    if DJANGO_VERSION is not None and DJANGO_VERSION < (2, 0):
+        DB_SCHEMES['postgres'] = 'django.db.backends.postgresql_psycopg2'
+        DB_SCHEMES['postgresql'] = 'django.db.backends.postgresql_psycopg2'
+        DB_SCHEMES['psql'] = 'django.db.backends.postgresql_psycopg2'
+        DB_SCHEMES['pgsql'] = 'django.db.backends.postgresql_psycopg2'
+    else:
+        # https://docs.djangoproject.com/en/2.0/releases/2.0/#id1
+        DB_SCHEMES['postgres'] = 'django.db.backends.postgresql'
+        DB_SCHEMES['postgresql'] = 'django.db.backends.postgresql'
+        DB_SCHEMES['psql'] = 'django.db.backends.postgresql'
+        DB_SCHEMES['pgsql'] = 'django.db.backends.postgresql'
     _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT']
 
     DEFAULT_CACHE_ENV = 'CACHE_URL'
@@ -354,7 +364,7 @@ class Env(object):
         >>> Env.db_url_config('sqlite:////full/path/to/your/file.sqlite')
         {'ENGINE': 'django.db.backends.sqlite3', 'HOST': '', 'NAME': '/full/path/to/your/file.sqlite', 'PASSWORD': '', 'PORT': '', 'USER': ''}
         >>> Env.db_url_config('postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn')
-        {'ENGINE': 'django.db.backends.postgresql_psycopg2', 'HOST': 'ec2-107-21-253-135.compute-1.amazonaws.com', 'NAME': 'd8r82722r2kuvn', 'PASSWORD': 'wegauwhgeuioweg', 'PORT': 5431, 'USER': 'uf07k1i6d8ia0v'}
+        {'ENGINE': 'django.db.backends.postgresql', 'HOST': 'ec2-107-21-253-135.compute-1.amazonaws.com', 'NAME': 'd8r82722r2kuvn', 'PASSWORD': 'wegauwhgeuioweg', 'PORT': 5431, 'USER': 'uf07k1i6d8ia0v'}
 
         """
         if not isinstance(url, cls.URL_CLASS):
