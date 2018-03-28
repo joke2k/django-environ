@@ -34,7 +34,7 @@ matrix:
     - python: "3.3"
       env: DJANGO="Django>=1.8,<1.9"
   exclude:
-    # Django master dropped support for Python 2.
+    # Django 2 dropped support for Python 2.
     - python: "2.7"
       env: DJANGO="Django>=2.0,<2.1"
     - python: "pypy"
@@ -42,6 +42,9 @@ matrix:
     - python: "2.7"
       env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
     - python: "pypy"
+      env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
+    # Django master dropped support for Python 3.4.
+    - python: "3.4"
       env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
   allow_failures:
     - env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
