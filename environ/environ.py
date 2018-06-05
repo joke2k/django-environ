@@ -5,6 +5,7 @@ variables to configure your Django application.
 import json
 import logging
 import os
+import pkgutil
 import re
 import sys
 import warnings
@@ -38,11 +39,8 @@ DJANGO_REDIS_DRIVER = 'django_redis.cache.RedisCache'
 DJANGO_REDIS_CACHE_DRIVER = 'redis_cache.RedisCache'
 
 REDIS_DRIVER = DJANGO_REDIS_DRIVER
-try:
-    import redis_cache
+if pkgutil.find_loader('redis_cache'):
     REDIS_DRIVER = DJANGO_REDIS_CACHE_DRIVER
-except:
-    pass
 
 
 class NoValue(object):

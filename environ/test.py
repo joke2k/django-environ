@@ -224,7 +224,7 @@ class EnvTests(BaseTests):
         self.assertEqual(cache_config['LOCATION'], '127.0.0.1:11211')
 
         redis_config = self.env.cache_url('CACHE_REDIS')
-        self.assertEqual(redis_config['BACKEND'], 'django_redis.cache.RedisCache')
+        self.assertEqual(redis_config['BACKEND'], 'redis_cache.RedisCache')
         self.assertEqual(redis_config['LOCATION'], 'redis://127.0.0.1:6379/1')
         self.assertEqual(redis_config['OPTIONS'], {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
@@ -473,7 +473,7 @@ class CacheTestSuite(unittest.TestCase):
     def test_redis_socket_parsing(self):
         url = 'rediscache:///path/to/socket:1'
         url = Env.cache_url_config(url)
-        self.assertEqual(url['BACKEND'], 'django_redis.cache.RedisCache')
+        self.assertEqual(url['BACKEND'], 'redis_cache.RedisCache')
         self.assertEqual(url['LOCATION'], 'unix:///path/to/socket:1')
 
     def test_redis_with_password_parsing(self):
