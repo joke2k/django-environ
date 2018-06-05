@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import unittest
+import warnings
 
 from django.core.exceptions import ImproperlyConfigured
 
@@ -358,6 +359,15 @@ class DatabaseTestSuite(unittest.TestCase):
 
         self.assertEqual(url['ENGINE'], 'django.db.backends.sqlite3')
         self.assertEqual(url['NAME'], ':memory:')
+        
+    def test_memory_sqlite_url_warns_about_netloc(self):
+        url = 'sqlite://missing-slash-path'
+        with warnings.catch_warnings(record=True) as w:
+            url = Env.db_url_config(url)
+            self.assertEqual(url['ENGINE'], 'django.db.backends.sqlite3')
+            self.assertEqual(url['NAME'], ':memory:')
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, UserWarning))
 
     def test_database_options_parsing(self):
         url = 'postgres://user:pass@host:1234/dbname?conn_max_age=600'
