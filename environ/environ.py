@@ -77,6 +77,7 @@ class Env(object):
         'mysql2': 'django.db.backends.mysql',
         'mysql-connector': 'mysql.connector.django',
         'mysqlgis': 'django.contrib.gis.db.backends.mysql',
+        'mssql': 'sql_server.pyodbc',
         'oracle': 'django.db.backends.oracle',
         'pyodbc': 'sql_server.pyodbc',
         'redshift': 'django_redshift_backend',
@@ -155,6 +156,12 @@ class Env(object):
         :rtype: unicode
         """
         return self.get_value(var, cast=str, default=default)
+
+    def bytes(self, var, default=NOTSET, encoding='utf8'):
+        """
+        :rtype: bytes
+        """
+        return self.get_value(var, cast=str).encode(encoding)
 
     def bool(self, var, default=NOTSET):
         """
@@ -385,10 +392,14 @@ class Env(object):
         path = url.path[1:]
         path = urllib.parse.unquote_plus(path.split('?', 2)[0])
 
-        # if we are using sqlite and we have no path, then assume we
-        # want an in-memory database (this is the behaviour of sqlalchemy)
-        if url.scheme == 'sqlite' and path == '':
-            path = ':memory:'
+        if url.scheme == 'sqlite':
+            if path == '':
+                # if we are using sqlite and we have no path, then assume we
+                # want an in-memory database (this is the behaviour of  sqlalchemy)
+                path = ':memory:'
+            if url.netloc:
+                warnings.warn(
+                    'SQLite URL contains host component %r, it will be ignored' % url.netloc, stacklevel=3)
         if url.scheme == 'ldap':
             path = '{scheme}://{hostname}'.format(scheme=url.scheme, hostname=url.hostname)
             if url.port:
@@ -425,8 +436,11 @@ class Env(object):
 
         if engine:
             config['ENGINE'] = engine
-        if url.scheme in Env.DB_SCHEMES:
-            config['ENGINE'] = Env.DB_SCHEMES[url.scheme]
+        else:
+            config['ENGINE'] = url.scheme
+
+        if config['ENGINE'] in Env.DB_SCHEMES:
+            config['ENGINE'] = Env.DB_SCHEMES[config['ENGINE']]
 
         if not config.get('ENGINE', False):
             warnings.warn("Engine not recognized from url: {0}".format(config))
@@ -637,7 +651,7 @@ class Env(object):
         logger.debug('Read environment variables from: {0}'.format(env_file))
 
         for line in content.splitlines():
-            m1 = re.match(r'\A([A-Za-z_0-9]+)=(.*)\Z', line)
+            m1 = re.match(r'\A(?:export )?([A-Za-z_0-9]+)=(.*)\Z', line)
             if m1:
                 key, val = m1.group(1), m1.group(2)
                 m2 = re.match(r"\A'(.*)'\Z", val)
@@ -763,6 +777,9 @@ class Path(object):
 
     def __getitem__(self, *args, **kwargs):
         return self.__str__().__getitem__(*args, **kwargs)
+    
+    def __fspath__(self):
+        return self.__str__()
 
     def rfind(self, *args, **kwargs):
         return self.__str__().rfind(*args, **kwargs)

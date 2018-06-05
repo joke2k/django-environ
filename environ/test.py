@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import unittest
+import warnings
 
 from django import VERSION as DJANGO_VERSION
 from django.core.exceptions import ImproperlyConfigured
@@ -19,6 +20,7 @@ class BaseTests(unittest.TestCase):
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
     ORACLE_TNS = 'oracle://user:password@sid/'
     ORACLE = 'oracle://user:password@host:1521/sid'
+    CUSTOM_BACKEND = 'custom.backend://user:password@example.com:5430/database'
     REDSHIFT = 'redshift://user:password@examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev'
     MEMCACHE = 'memcache://127.0.0.1:11211'
     REDIS = 'rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=secret'
@@ -26,6 +28,7 @@ class BaseTests(unittest.TestCase):
     JSON = dict(one='bar', two=2, three=33.44)
     DICT = dict(foo='bar', test='on')
     PATH = '/home/dev'
+    EXPORTED = 'exported var'
 
     @classmethod
     def generateData(cls):
@@ -52,12 +55,14 @@ class BaseTests(unittest.TestCase):
                     DATABASE_ORACLE_URL=cls.ORACLE,
                     DATABASE_ORACLE_TNS_URL=cls.ORACLE_TNS,
                     DATABASE_REDSHIFT_URL=cls.REDSHIFT,
+                    DATABASE_CUSTOM_BACKEND_URL=cls.CUSTOM_BACKEND,
                     CACHE_URL=cls.MEMCACHE,
                     CACHE_REDIS=cls.REDIS,
                     EMAIL_URL=cls.EMAIL,
                     URL_VAR=cls.URL,
                     JSON_VAR=json.dumps(cls.JSON),
-                    PATH_VAR=cls.PATH)
+                    PATH_VAR=cls.PATH,
+                    EXPORTED_VAR=cls.EXPORTED)
 
     def setUp(self):
         self._old_environ = os.environ
@@ -88,6 +93,9 @@ class EnvTests(BaseTests):
     def test_str(self):
         self.assertTypeAndValue(str, 'bar', self.env('STR_VAR'))
         self.assertTypeAndValue(str, 'bar', self.env.str('STR_VAR'))
+
+    def test_bytes(self):
+        self.assertTypeAndValue(bytes, b'bar', self.env.bytes('STR_VAR'))
 
     def test_int(self):
         self.assertTypeAndValue(int, 42, self.env('INT_VAR', cast=int))
@@ -219,6 +227,14 @@ class EnvTests(BaseTests):
         self.assertEqual(sqlite_config['ENGINE'], 'django.db.backends.sqlite3')
         self.assertEqual(sqlite_config['NAME'], '/full/path/to/your/database/file.sqlite')
 
+        custom_backend_config = self.env.db('DATABASE_CUSTOM_BACKEND_URL')
+        self.assertEqual(custom_backend_config['ENGINE'], 'custom.backend')
+        self.assertEqual(custom_backend_config['NAME'], 'database')
+        self.assertEqual(custom_backend_config['HOST'], 'example.com')
+        self.assertEqual(custom_backend_config['USER'], 'user')
+        self.assertEqual(custom_backend_config['PASSWORD'], 'password')
+        self.assertEqual(custom_backend_config['PORT'], 5430)
+
     def test_cache_url_value(self):
 
         cache_config = self.env.cache_url()
@@ -249,6 +265,9 @@ class EnvTests(BaseTests):
     def test_path(self):
         root = self.env.path('PATH_VAR')
         self.assertTypeAndValue(Path, Path(self.PATH), root)
+
+    def test_exported(self):
+        self.assertEqual(self.EXPORTED, self.env('EXPORTED_VAR'))
 
 
 class FileEnvTests(EnvTests):
@@ -365,6 +384,15 @@ class DatabaseTestSuite(unittest.TestCase):
 
         self.assertEqual(url['ENGINE'], 'django.db.backends.sqlite3')
         self.assertEqual(url['NAME'], ':memory:')
+        
+    def test_memory_sqlite_url_warns_about_netloc(self):
+        url = 'sqlite://missing-slash-path'
+        with warnings.catch_warnings(record=True) as w:
+            url = Env.db_url_config(url)
+            self.assertEqual(url['ENGINE'], 'django.db.backends.sqlite3')
+            self.assertEqual(url['NAME'], ':memory:')
+            self.assertEqual(len(w), 1)
+            self.assertTrue(issubclass(w[0].category, UserWarning))
 
     def test_database_options_parsing(self):
         url = 'postgres://user:pass@host:1234/dbname?conn_max_age=600'
@@ -672,6 +700,7 @@ class PathTests(unittest.TestCase):
         self.assertEqual(Path('/home/foo/').rfind('/'), str(Path('/home/foo')).rfind('/'))
         self.assertEqual(Path('/home/foo/').find('/home'), str(Path('/home/foo/')).find('/home'))
         self.assertEqual(Path('/home/foo/')[1], str(Path('/home/foo/'))[1])
+        self.assertEqual(Path('/home/foo/').__fspath__(), str(Path('/home/foo/')))
 
         self.assertEqual(~Path('/home'), Path('/'))
         self.assertEqual(Path('/') + 'home', Path('/home'))
