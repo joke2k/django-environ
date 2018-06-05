@@ -18,6 +18,7 @@ class BaseTests(unittest.TestCase):
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
     ORACLE_TNS = 'oracle://user:password@sid/'
     ORACLE = 'oracle://user:password@host:1521/sid'
+    CUSTOM_BACKEND = 'custom.backend://user:password@example.com:5430/database'
     REDSHIFT = 'redshift://user:password@examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev'
     MEMCACHE = 'memcache://127.0.0.1:11211'
     REDIS = 'rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=secret'
@@ -52,6 +53,7 @@ class BaseTests(unittest.TestCase):
                     DATABASE_ORACLE_URL=cls.ORACLE,
                     DATABASE_ORACLE_TNS_URL=cls.ORACLE_TNS,
                     DATABASE_REDSHIFT_URL=cls.REDSHIFT,
+                    DATABASE_CUSTOM_BACKEND_URL=cls.CUSTOM_BACKEND,
                     CACHE_URL=cls.MEMCACHE,
                     CACHE_REDIS=cls.REDIS,
                     EMAIL_URL=cls.EMAIL,
@@ -219,6 +221,14 @@ class EnvTests(BaseTests):
         sqlite_config = self.env.db('DATABASE_SQLITE_URL')
         self.assertEqual(sqlite_config['ENGINE'], 'django.db.backends.sqlite3')
         self.assertEqual(sqlite_config['NAME'], '/full/path/to/your/database/file.sqlite')
+
+        custom_backend_config = self.env.db('DATABASE_CUSTOM_BACKEND_URL')
+        self.assertEqual(custom_backend_config['ENGINE'], 'custom.backend')
+        self.assertEqual(custom_backend_config['NAME'], 'database')
+        self.assertEqual(custom_backend_config['HOST'], 'example.com')
+        self.assertEqual(custom_backend_config['USER'], 'user')
+        self.assertEqual(custom_backend_config['PASSWORD'], 'password')
+        self.assertEqual(custom_backend_config['PORT'], 5430)
 
     def test_cache_url_value(self):
 

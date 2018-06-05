@@ -422,8 +422,11 @@ class Env(object):
 
         if engine:
             config['ENGINE'] = engine
-        if url.scheme in Env.DB_SCHEMES:
-            config['ENGINE'] = Env.DB_SCHEMES[url.scheme]
+        else:
+            config['ENGINE'] = url.scheme
+
+        if config['ENGINE'] in Env.DB_SCHEMES:
+            config['ENGINE'] = Env.DB_SCHEMES[config['ENGINE']]
 
         if not config.get('ENGINE', False):
             warnings.warn("Engine not recognized from url: {0}".format(config))
