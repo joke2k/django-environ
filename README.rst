@@ -4,7 +4,7 @@ Django-environ
 
 Django-environ allows you to utilize 12factor inspired environment variables to configure your Django application.
 
-|pypi| |unix_build| |windows_build| |coverage| |downloads| |license|
+|pypi| |unix_build| |windows_build| |coverage| |license|
 
 
 This module is a merge of:
@@ -40,7 +40,7 @@ This is your `settings.py` file before you have installed **django-environ**
             'PASSWORD': 'githubbedpassword',
             'HOST': '127.0.0.1',
             'PORT': '8458',
-        }
+        },
         'extra': {
             'ENGINE': 'django.db.backends.sqlite3',
             'NAME': os.path.join(SITE_ROOT, 'database.sqlite')
@@ -48,9 +48,9 @@ This is your `settings.py` file before you have installed **django-environ**
     }
 
     MEDIA_ROOT = os.path.join(SITE_ROOT, 'assets')
-    MEDIA_URL = 'media/'
+    MEDIA_URL = '/media/'
     STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
-    STATIC_URL = 'static/'
+    STATIC_URL = '/static/'
 
     SECRET_KEY = '...im incredibly still here...'
 
@@ -63,7 +63,7 @@ This is your `settings.py` file before you have installed **django-environ**
         },
         'redis': {
             'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': '127.0.0.1:6379:1',
+            'LOCATION': '127.0.0.1:6379/1',
             'OPTIONS': {
                 'CLIENT_CLASS': 'django_redis.client.DefaultClient',
                 'PASSWORD': 'redis-githubbed-password',
@@ -93,9 +93,9 @@ After:
     public_root = root.path('public/')
 
     MEDIA_ROOT = public_root('media')
-    MEDIA_URL = 'media/'
+    MEDIA_URL = '/media/'
     STATIC_ROOT = public_root('static')
-    STATIC_URL = 'static/'
+    STATIC_URL = '/static/'
 
     SECRET_KEY = env('SECRET_KEY') # Raises ImproperlyConfigured exception if SECRET_KEY not in os.environ
 
@@ -116,7 +116,7 @@ Create a ``.env`` file:
     DATABASE_URL=psql://urser:un-githubbedpassword@127.0.0.1:8458/database
     # SQLITE_URL=sqlite:///my-local-sqlite.db
     CACHE_URL=memcache://127.0.0.1:11211,127.0.0.1:11212,127.0.0.1:11213
-    REDIS_URL=rediscache://127.0.0.1:6379:1?client_class=django_redis.client.DefaultClient&password=redis-un-githubbed-password
+    REDIS_URL=rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=redis-un-githubbed-password
 
 
 How to install
@@ -162,6 +162,9 @@ There are only two classes, ``environ.Env`` and ``environ.Path``
     '/home/myproject/static'
 
 
+See `cookiecutter-django`_ for a concrete example on using with a django project.
+
+
 Supported Types
 ===============
 
@@ -184,6 +187,9 @@ Supported Types
     -  SQLITE: sqlite://
     -  SQLITE with SPATIALITE for GeoDjango: spatialite://
     -  Oracle: oracle://
+    -  MSSQL: mssql://
+    -  PyODBC: pyodbc://
+    -  Redshift: redshift://
     -  LDAP: ldap://
 - cache_url
     -  Database: dbcache://
@@ -211,6 +217,27 @@ Supported Types
 Tips
 ====
 
+Using unsafe characters in URLs
+-------------------------------
+
+In order to use unsafe characters you have to encode with ``urllib.parse.encode`` before you set into ``.env`` file.
+
+.. code-block::
+
+    DATABASE_URL=mysql://user:%23password@127.0.0.1:3306/dbname
+
+
+See https://perishablepress.com/stop-using-unsafe-characters-in-urls/ for reference.
+
+Multiple redis cache locations
+------------------------------
+
+For redis cache, `multiple master/slave or shard locations <http://niwinz.github.io/django-redis/latest/#_pluggable_clients>`_ can be configured as follows:
+
+.. code-block::
+
+    CACHE_URL='rediscache://master:6379,slave1:6379,slave2:6379/1'
+
 Email settings
 --------------
 
@@ -223,6 +250,55 @@ In order to set email configuration for django you can use this code:
 
     vars().update(EMAIL_CONFIG)
 
+SQLite urls
+-----------
+
+SQLite connects to file based databases. The same URL format is used, omitting the hostname,
+and using the "file" portion as the filename of the database.
+This has the effect of four slashes being present for an absolute
+file path: sqlite:////full/path/to/your/database/file.sqlite.
+
+Nested lists
+------------
+
+Some settings such as Django's ``ADMINS`` make use of nested lists. You can use something like this to handle similar cases.
+
+.. code-block:: python
+
+    # DJANGO_ADMINS=John:john@admin.com,Jane:jane@admin.com
+    ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')] 
+
+    # or use more specific function
+
+    from email.utils import getaddresses
+
+    # DJANGO_ADMINS=Full Name <email-with-name@example.com>,anotheremailwithoutname@example.com
+    ADMINS = getaddresses([env('DJANGO_ADMINS')])
+
+Multiline value
+---------------
+
+You can set a multiline variable value:
+
+.. code-block:: python
+
+    # MULTILINE_TEXT=Hello\\nWorld
+    >>> print env.str('MULTILINE_TEXT', multiline=True)
+    Hello
+    World
+
+
+Proxy value
+-----------
+
+You can set a value prefixed by ``$`` to use as a proxy to another variable value:
+
+.. code-block:: python
+
+    # BAR=FOO
+    # PROXY=$BAR
+    >>> print env.str('PROXY')
+    FOO
 
 Tests
 =====
@@ -237,13 +313,47 @@ Tests
 License
 =======
 
-Django-environ is licensed under the MIT License - see the `LICENSE`_ file for details
+Django-environ is licensed under the MIT License - see the `LICENSE_FILE`_ file for details
 
 Changelog
 =========
 
-`0.4.0 - 23-September-2015 <http://github.com/joke2k/django-environ/compare/v0.3...v0.4>`__
--------------------------------------------------------------------------------------------
+
+`0.4.4 - 21-August-2017 <https://github.com/joke2k/django-environ/compare/v0.4.3...v0.4.4>`__
+---------------------------------------------------------------------------------------------
+
+  - Support for django-redis multiple locations (master/slave, shards)
+  - Support for Elasticsearch2
+  - Support for Mysql-connector
+  - Support for pyodbc
+  - Add __contains__ feature to Environ class
+  - Fix Path subtracting
+
+
+`0.4.3 - 21-August-2017 <https://github.com/joke2k/django-environ/compare/v0.4.2...v0.4.3>`__
+---------------------------------------------------------------------------------------------
+
+  - Rollback the default Environ to os.environ
+
+`0.4.2 - 13-April-2017 <https://github.com/joke2k/django-environ/compare/v0.4.1...v0.4.2>`__
+--------------------------------------------------------------------------------------------
+
+  - Confirm support for Django 1.11.
+  - Support for Redshift database URL
+  - Fix uwsgi settings reload problem (#55)
+  - Update support for django-redis urls (#109)
+
+`0.4.1 - 13-November-2016 <https://github.com/joke2k/django-environ/compare/v0.4...v0.4.1>`__
+---------------------------------------------------------------------------------------------
+  - Fix for unsafe characters into URLs
+  - Clarifying warning on missing or unreadable file. Thanks to @nickcatal
+  - Add support for Django 1.10.
+  - Fix support for Oracle urls
+  - Fix support for django-redis
+
+
+`0.4.0 - 23-September-2015 <https://github.com/joke2k/django-environ/compare/v0.3...v0.4>`__
+--------------------------------------------------------------------------------------------
   - Fix non-ascii values (broken in Python 2.x)
   - New email schemes - smtp+ssl and smtp+tls (smtps would be deprecated)
   - redis_cache replaced by django_redis
@@ -251,8 +361,8 @@ Changelog
   - Add LDAP url support for database (django-ldapdb)
   - Fix psql/pgsql url
 
-`0.3 - 03-June-2014 <http://github.com/joke2k/django-environ/compare/v0.2.1...v0.3>`__
---------------------------------------------------------------------------------------
+`0.3 - 03-June-2014 <https://github.com/joke2k/django-environ/compare/v0.2.1...v0.3>`__
+---------------------------------------------------------------------------------------
   - Add cache url support
   - Add email url support
   - Add search url support
@@ -317,6 +427,8 @@ Credits
 .. _Distribute: http://pypi.python.org/pypi/distribute
 .. _`modern-package-template`: http://pypi.python.org/pypi/modern-package-template
 
+.. _cookiecutter-django: https://github.com/pydanny/cookiecutter-django
+
 .. |pypi| image:: https://img.shields.io/pypi/v/django-environ.svg?style=flat-square&label=version
     :target: https://pypi.python.org/pypi/django-environ
     :alt: Latest version released on PyPi
@@ -333,12 +445,8 @@ Credits
     :target: https://ci.appveyor.com/project/joke2k/django-environ
     :alt: Build status of the master branch on Windows
 
-.. |downloads| image:: https://img.shields.io/pypi/dm/django-environ.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/django-environ
-    :alt: Monthly downloads
-
 .. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
     :target: https://raw.githubusercontent.com/joke2k/django-environ/master/LICENSE.txt
     :alt: Package license
 
-.. _LICENSE: https://github.com/joke2k/django-environ/blob/master/LICENSE.txt
+.. _LICENSE_FILE: https://github.com/joke2k/django-environ/blob/master/LICENSE.txt

@@ -18,16 +18,18 @@ except ImportError:
     import urlparse
 
 try:
+    from django import VERSION as DJANGO_VERSION
     from django.core.exceptions import ImproperlyConfigured
 except ImportError:
+    DJANGO_VERSION = None
+
     class ImproperlyConfigured(Exception):
         pass
-
 
 logger = logging.getLogger(__name__)
 
 
-VERSION = '0.4.0'
+VERSION = '0.4.4'
 __author__ = 'joke2k'
 __version__ = tuple(VERSION.split('.'))
 
@@ -35,6 +37,9 @@ __version__ = tuple(VERSION.split('.'))
 # return int if possible
 def _cast_int(v):
     return int(v) if hasattr(v, 'isdigit') and v.isdigit() else v
+
+def _cast_urlstr(v):
+    return urllib.parse.unquote_plus(v) if isinstance(v, str) else v
 
 # back compatibility with redis_cache package
 DJANGO_REDIS_DRIVER = 'django_redis.cache.RedisCache'
@@ -69,22 +74,33 @@ class Env(object):
     ENVIRON = os.environ
     NOTSET = NoValue()
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
-    URL_CLASS = urlparse.ParseResult
+    URL_CLASS = urllib.parse.ParseResult
     DEFAULT_DATABASE_ENV = 'DATABASE_URL'
     DB_SCHEMES = {
-        'postgres': 'django.db.backends.postgresql_psycopg2',
-        'postgresql': 'django.db.backends.postgresql_psycopg2',
-        'psql': 'django.db.backends.postgresql_psycopg2',
-        'pgsql': 'django.db.backends.postgresql_psycopg2',
         'postgis': 'django.contrib.gis.db.backends.postgis',
         'mysql': 'django.db.backends.mysql',
         'mysql2': 'django.db.backends.mysql',
+        'mysql-connector': 'mysql.connector.django',
         'mysqlgis': 'django.contrib.gis.db.backends.mysql',
+        'mssql': 'sql_server.pyodbc',
         'oracle': 'django.db.backends.oracle',
+        'pyodbc': 'sql_server.pyodbc',
+        'redshift': 'django_redshift_backend',
         'spatialite': 'django.contrib.gis.db.backends.spatialite',
         'sqlite': 'django.db.backends.sqlite3',
         'ldap': 'ldapdb.backends.ldap',
     }
+    if DJANGO_VERSION is not None and DJANGO_VERSION < (2, 0):
+        DB_SCHEMES['postgres'] = 'django.db.backends.postgresql_psycopg2'
+        DB_SCHEMES['postgresql'] = 'django.db.backends.postgresql_psycopg2'
+        DB_SCHEMES['psql'] = 'django.db.backends.postgresql_psycopg2'
+        DB_SCHEMES['pgsql'] = 'django.db.backends.postgresql_psycopg2'
+    else:
+        # https://docs.djangoproject.com/en/2.0/releases/2.0/#id1
+        DB_SCHEMES['postgres'] = 'django.db.backends.postgresql'
+        DB_SCHEMES['postgresql'] = 'django.db.backends.postgresql'
+        DB_SCHEMES['psql'] = 'django.db.backends.postgresql'
+        DB_SCHEMES['pgsql'] = 'django.db.backends.postgresql'
     _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT']
 
     DEFAULT_CACHE_ENV = 'CACHE_URL'
@@ -116,6 +132,7 @@ class Env(object):
     DEFAULT_SEARCH_ENV = 'SEARCH_URL'
     SEARCH_SCHEMES = {
         "elasticsearch": "haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine",
+        "elasticsearch2": "haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine",
         "solr": "haystack.backends.solr_backend.SolrEngine",
         "whoosh": "haystack.backends.whoosh_backend.WhooshEngine",
         "xapian": "haystack.backends.xapian_backend.XapianEngine",
@@ -128,19 +145,31 @@ class Env(object):
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
         return self.get_value(var, cast=cast, default=default, parse_default=parse_default)
 
+    def __contains__(self, var):
+        return var in self.ENVIRON
+
     # Shortcuts
 
-    def str(self, var, default=NOTSET):
+    def str(self, var, default=NOTSET, multiline=False):
         """
         :rtype: str
         """
-        return self.get_value(var, default=default)
+        value = self.get_value(var, default=default)
+        if multiline:
+            return value.replace('\\n', '\n')
+        return value
 
     def unicode(self, var, default=NOTSET):
         """Helper for python2
         :rtype: unicode
         """
         return self.get_value(var, cast=str, default=default)
+
+    def bytes(self, var, default=NOTSET, encoding='utf8'):
+        """
+        :rtype: bytes
+        """
+        return self.get_value(var, cast=str).encode(encoding)
 
     def bool(self, var, default=NOTSET):
         """
@@ -188,7 +217,7 @@ class Env(object):
         """
         :rtype: urlparse.ParseResult
         """
-        return self.get_value(var, cast=urlparse.urlparse, default=default, parse_default=True)
+        return self.get_value(var, cast=urllib.parse.urlparse, default=default, parse_default=True)
 
     def db_url(self, var=DEFAULT_DATABASE_ENV, default=NOTSET, engine=None):
         """Returns a config dictionary, defaulting to DATABASE_URL.
@@ -350,7 +379,7 @@ class Env(object):
         >>> Env.db_url_config('sqlite:////full/path/to/your/file.sqlite')
         {'ENGINE': 'django.db.backends.sqlite3', 'HOST': '', 'NAME': '/full/path/to/your/file.sqlite', 'PASSWORD': '', 'PORT': '', 'USER': ''}
         >>> Env.db_url_config('postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn')
-        {'ENGINE': 'django.db.backends.postgresql_psycopg2', 'HOST': 'ec2-107-21-253-135.compute-1.amazonaws.com', 'NAME': 'd8r82722r2kuvn', 'PASSWORD': 'wegauwhgeuioweg', 'PORT': 5431, 'USER': 'uf07k1i6d8ia0v'}
+        {'ENGINE': 'django.db.backends.postgresql', 'HOST': 'ec2-107-21-253-135.compute-1.amazonaws.com', 'NAME': 'd8r82722r2kuvn', 'PASSWORD': 'wegauwhgeuioweg', 'PORT': 5431, 'USER': 'uf07k1i6d8ia0v'}
 
         """
         if not isinstance(url, cls.URL_CLASS):
@@ -363,18 +392,22 @@ class Env(object):
                     'NAME': ':memory:'
                 }
                 # note: no other settings are required for sqlite
-            url = urlparse.urlparse(url)
+            url = urllib.parse.urlparse(url)
 
         config = {}
 
         # Remove query strings.
         path = url.path[1:]
-        path = path.split('?', 2)[0]
+        path = urllib.parse.unquote_plus(path.split('?', 2)[0])
 
-        # if we are using sqlite and we have no path, then assume we
-        # want an in-memory database (this is the behaviour of sqlalchemy)
-        if url.scheme == 'sqlite' and path == '':
-            path = ':memory:'
+        if url.scheme == 'sqlite':
+            if path == '':
+                # if we are using sqlite and we have no path, then assume we
+                # want an in-memory database (this is the behaviour of  sqlalchemy)
+                path = ':memory:'
+            if url.netloc:
+                warnings.warn(
+                    'SQLite URL contains host component %r, it will be ignored' % url.netloc, stacklevel=3)
         if url.scheme == 'ldap':
             path = '{scheme}://{hostname}'.format(scheme=url.scheme, hostname=url.hostname)
             if url.port:
@@ -383,8 +416,8 @@ class Env(object):
         # Update with environment configuration.
         config.update({
             'NAME': path or '',
-            'USER': url.username or '',
-            'PASSWORD': url.password or '',
+            'USER': _cast_urlstr(url.username) or '',
+            'PASSWORD': _cast_urlstr(url.password) or '',
             'HOST': url.hostname or '',
             'PORT': _cast_int(url.port) or '',
         })
@@ -393,12 +426,16 @@ class Env(object):
             config['NAME'] = config['HOST']
             config['HOST'] = ''
 
-        if url.scheme == 'oracle' and not config['PORT']:
-            del(config['PORT']) # Django oracle/base.py strips port and fails on None
+        if url.scheme == 'oracle':
+            # Django oracle/base.py strips port and fails on non-string value
+            if not config['PORT']:
+                del(config['PORT'])
+            else:
+                config['PORT'] = str(config['PORT'])
 
         if url.query:
             config_options = {}
-            for k, v in urlparse.parse_qs(url.query).items():
+            for k, v in urllib.parse.parse_qs(url.query).items():
                 if k.upper() in cls._DB_BASE_OPTIONS:
                     config.update({k.upper(): _cast_int(v[0])})
                 else:
@@ -407,8 +444,11 @@ class Env(object):
 
         if engine:
             config['ENGINE'] = engine
-        if url.scheme in Env.DB_SCHEMES:
-            config['ENGINE'] = Env.DB_SCHEMES[url.scheme]
+        else:
+            config['ENGINE'] = url.scheme
+
+        if config['ENGINE'] in Env.DB_SCHEMES:
+            config['ENGINE'] = Env.DB_SCHEMES[config['ENGINE']]
 
         if not config.get('ENGINE', False):
             warnings.warn("Engine not recognized from url: {0}".format(config))
@@ -424,7 +464,7 @@ class Env(object):
         :param backend:
         :return:
         """
-        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        url = urllib.parse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
         location = url.netloc.split(',')
         if len(location) == 1:
@@ -450,12 +490,12 @@ class Env(object):
                 scheme = url.scheme.replace('cache', '')
             else:
                 scheme = 'unix'
-
-            config['LOCATION'] = scheme + '://' + url.netloc + url.path
+            locations = [scheme + '://' + loc + url.path for loc in url.netloc.split(',')]
+            config['LOCATION'] = locations[0] if len(locations) == 1 else locations
 
         if url.query:
             config_options = {}
-            for k, v in urlparse.parse_qs(url.query).items():
+            for k, v in urllib.parse.parse_qs(url.query).items():
                 opt = {k.upper(): _cast_int(v[0])}
                 if k.upper() in cls._CACHE_BASE_OPTIONS:
                     config.update(opt)
@@ -474,17 +514,17 @@ class Env(object):
 
         config = {}
 
-        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        url = urllib.parse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
         # Remove query strings
         path = url.path[1:]
-        path = path.split('?', 2)[0]
+        path = urllib.parse.unquote_plus(path.split('?', 2)[0])
 
         # Update with environment configuration
         config.update({
             'EMAIL_FILE_PATH': path,
-            'EMAIL_HOST_USER': url.username,
-            'EMAIL_HOST_PASSWORD': url.password,
+            'EMAIL_HOST_USER': _cast_urlstr(url.username),
+            'EMAIL_HOST_PASSWORD': _cast_urlstr(url.password),
             'EMAIL_HOST': url.hostname,
             'EMAIL_PORT': _cast_int(url.port),
         })
@@ -503,7 +543,7 @@ class Env(object):
 
         if url.query:
             config_options = {}
-            for k, v in urlparse.parse_qs(url.query).items():
+            for k, v in urllib.parse.parse_qs(url.query).items():
                 opt = {k.upper(): _cast_int(v[0])}
                 if k.upper() in cls._EMAIL_BASE_OPTIONS:
                     config.update(opt)
@@ -517,11 +557,11 @@ class Env(object):
     def search_url_config(cls, url, engine=None):
         config = {}
 
-        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        url = urllib.parse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
         # Remove query strings.
         path = url.path[1:]
-        path = path.split('?', 2)[0]
+        path = urllib.parse.unquote_plus(path.split('?', 2)[0])
 
         if url.scheme not in cls.SEARCH_SCHEMES:
             raise ImproperlyConfigured('Invalid search schema %s' % url.scheme)
@@ -530,7 +570,7 @@ class Env(object):
         # check commons params
         params = {}
         if url.query:
-            params = urlparse.parse_qs(url.query)
+            params = urllib.parse.parse_qs(url.query)
             if 'EXCLUDED_INDEXES' in params.keys():
                 config['EXCLUDED_INDEXES'] = params['EXCLUDED_INDEXES'][0].split(',')
             if 'INCLUDE_SPELLING' in params.keys():
@@ -540,7 +580,7 @@ class Env(object):
 
         if url.scheme == 'simple':
             return config
-        elif url.scheme in ['solr', 'elasticsearch']:
+        elif url.scheme in ['solr', 'elasticsearch', 'elasticsearch2']:
             if 'KWARGS' in params.keys():
                 config['KWARGS'] = params['KWARGS'][0]
 
@@ -549,12 +589,12 @@ class Env(object):
             path = path[:-1]
 
         if url.scheme == 'solr':
-            config['URL'] = urlparse.urlunparse(('http',) + url[1:2] + (path,) + ('', '', ''))
+            config['URL'] = urllib.parse.urlunparse(('http',) + url[1:2] + (path,) + ('', '', ''))
             if 'TIMEOUT' in params.keys():
                 config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
             return config
 
-        if url.scheme == 'elasticsearch':
+        if url.scheme in ['elasticsearch', 'elasticsearch2']:
 
             split = path.rsplit("/", 1)
 
@@ -565,7 +605,7 @@ class Env(object):
                 path = ""
                 index = split[0]
 
-            config['URL'] = urlparse.urlunparse(('http',) + url[1:2] + (path,) + ('', '', ''))
+            config['URL'] = urllib.parse.urlunparse(('http',) + url[1:2] + (path,) + ('', '', ''))
             if 'TIMEOUT' in params.keys():
                 config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
             config['INDEX_NAME'] = index
@@ -602,20 +642,24 @@ class Env(object):
             frame = sys._getframe()
             env_file = os.path.join(os.path.dirname(frame.f_back.f_code.co_filename), '.env')
             if not os.path.exists(env_file):
-                warnings.warn("not reading %s - it doesn't exist." % env_file)
+                warnings.warn(
+                    "%s doesn't exist - if you're not configuring your "
+                    "environment separately, create one." % env_file)
                 return
 
         try:
             with open(env_file) if isinstance(env_file, basestring) else env_file as f:
                 content = f.read()
         except IOError:
-            warnings.warn("not reading %s - it doesn't exist." % env_file)
+            warnings.warn(
+                "Error reading %s - if you're not configuring your "
+                "environment separately, check this." % env_file)
             return
 
         logger.debug('Read environment variables from: {0}'.format(env_file))
 
         for line in content.splitlines():
-            m1 = re.match(r'\A([A-Za-z_0-9]+)=(.*)\Z', line)
+            m1 = re.match(r'\A(?:export )?([A-Za-z_0-9]+)=(.*)\Z', line)
             if m1:
                 key, val = m1.group(1), m1.group(2)
                 m2 = re.match(r"\A'(.*)'\Z", val)
@@ -712,9 +756,14 @@ class Path(object):
         if isinstance(other, int):
             return self.path('../' * other)
         elif isinstance(other, basestring):
-            return Path(self.__root__.rstrip(other))
+            if self.__root__.endswith(other):
+                return Path(self.__root__.rstrip(other))
         raise TypeError(
-            "unsupported operand type(s) for -: '{0}' and '{1}'".format(self, type(other)))
+            "unsupported operand type(s) for -: '{self}' and '{other}' "
+            "unless value of {self} ends with value of {other}".format(
+                self=type(self), other=type(other)
+            )
+        )
 
     def __invert__(self):
         return self.path('..')
@@ -736,6 +785,9 @@ class Path(object):
 
     def __getitem__(self, *args, **kwargs):
         return self.__str__().__getitem__(*args, **kwargs)
+    
+    def __fspath__(self):
+        return self.__str__()
 
     def rfind(self, *args, **kwargs):
         return self.__str__().rfind(*args, **kwargs)
@@ -753,9 +805,9 @@ class Path(object):
 
 
 def register_scheme(scheme):
-    for method in dir(urlparse):
+    for method in dir(urllib.parse):
         if method.startswith('uses_'):
-            getattr(urlparse, method).append(scheme)
+            getattr(urllib.parse, method).append(scheme)
 
 
 def register_schemes(schemes):
