@@ -275,6 +275,30 @@ Some settings such as Django's ``ADMINS`` make use of nested lists. You can use 
     # DJANGO_ADMINS=Full Name <email-with-name@example.com>,anotheremailwithoutname@example.com
     ADMINS = getaddresses([env('DJANGO_ADMINS')])
 
+Multiline value
+---------------
+
+You can set a multiline variable value:
+
+.. code-block:: python
+
+    # MULTILINE_TEXT=Hello\\nWorld
+    >>> print env.str('MULTILINE_TEXT', multiline=True)
+    Hello
+    World
+
+
+Proxy value
+-----------
+
+You can set a value prefixed by ``$`` to use as a proxy to another variable value:
+
+.. code-block:: python
+
+    # BAR=FOO
+    # PROXY=$BAR
+    >>> print env.str('PROXY')
+    FOO
 
 Tests
 =====
