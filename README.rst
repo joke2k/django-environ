@@ -187,6 +187,7 @@ Supported Types
     -  SQLITE: sqlite://
     -  SQLITE with SPATIALITE for GeoDjango: spatialite://
     -  Oracle: oracle://
+    -  MSSQL: mssql://
     -  PyODBC: pyodbc://
     -  Redshift: redshift://
     -  LDAP: ldap://
