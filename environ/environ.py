@@ -78,6 +78,7 @@ class Env(object):
         'mysql2': 'django.db.backends.mysql',
         'mysql-connector': 'mysql.connector.django',
         'mysqlgis': 'django.contrib.gis.db.backends.mysql',
+        'mssql': 'sql_server.pyodbc',
         'oracle': 'django.db.backends.oracle',
         'pyodbc': 'sql_server.pyodbc',
         'redshift': 'django_redshift_backend',
@@ -145,6 +146,12 @@ class Env(object):
         :rtype: unicode
         """
         return self.get_value(var, cast=str, default=default)
+
+    def bytes(self, var, default=NOTSET, encoding='utf8'):
+        """
+        :rtype: bytes
+        """
+        return self.get_value(var, cast=str).encode(encoding)
 
     def bool(self, var, default=NOTSET):
         """
@@ -630,7 +637,7 @@ class Env(object):
         logger.debug('Read environment variables from: {0}'.format(env_file))
 
         for line in content.splitlines():
-            m1 = re.match(r'\A([A-Za-z_0-9]+)=(.*)\Z', line)
+            m1 = re.match(r'\A(?:export )?([A-Za-z_0-9]+)=(.*)\Z', line)
             if m1:
                 key, val = m1.group(1), m1.group(2)
                 m2 = re.match(r"\A'(.*)'\Z", val)

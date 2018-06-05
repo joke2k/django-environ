@@ -187,6 +187,7 @@ Supported Types
     -  SQLITE: sqlite://
     -  SQLITE with SPATIALITE for GeoDjango: spatialite://
     -  Oracle: oracle://
+    -  MSSQL: mssql://
     -  PyODBC: pyodbc://
     -  Redshift: redshift://
     -  LDAP: ldap://
@@ -249,7 +250,6 @@ In order to set email configuration for django you can use this code:
 
     vars().update(EMAIL_CONFIG)
 
-
 SQLite urls
 -----------
 
@@ -257,6 +257,23 @@ SQLite connects to file based databases. The same URL format is used, omitting t
 and using the "file" portion as the filename of the database.
 This has the effect of four slashes being present for an absolute
 file path: sqlite:////full/path/to/your/database/file.sqlite.
+
+Nested lists
+------------
+
+Some settings such as Django's ``ADMINS`` make use of nested lists. You can use something like this to handle similar cases.
+
+.. code-block:: python
+
+    # DJANGO_ADMINS=John:john@admin.com,Jane:jane@admin.com
+    ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')] 
+
+    # or use more specific function
+
+    from email.utils import getaddresses
+
+    # DJANGO_ADMINS=Full Name <email-with-name@example.com>,anotheremailwithoutname@example.com
+    ADMINS = getaddresses([env('DJANGO_ADMINS')])
 
 
 Tests
