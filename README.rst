@@ -263,13 +263,17 @@ Nested lists
 
 Some settings such as Django's ``ADMINS`` make use of nested lists. You can use something like this to handle similar cases.
 
-.. code-block::
-
-    DJANGO_ADMINS=John:john@admin.com,Jane:jane@admin.com
-    
 .. code-block:: python
 
+    # DJANGO_ADMINS=John:john@admin.com,Jane:jane@admin.com
     ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')] 
+
+    # or use more specific function
+
+    from email.utils import getaddresses
+
+    # DJANGO_ADMINS=Full Name <email-with-name@example.com>,anotheremailwithoutname@example.com
+    ADMINS = getaddresses([env('DJANGO_ADMINS')])
 
 
 Tests
