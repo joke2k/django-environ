@@ -5,6 +5,7 @@ import sys
 import unittest
 import warnings
 
+from django import VERSION as DJANGO_VERSION
 from django.core.exceptions import ImproperlyConfigured
 
 from environ import Env, Path, REDIS_DRIVER
@@ -172,7 +173,10 @@ class EnvTests(BaseTests):
 
     def test_db_url_value(self):
         pg_config = self.env.db()
-        self.assertEqual(pg_config['ENGINE'], 'django.db.backends.postgresql_psycopg2')
+        if DJANGO_VERSION < (2, 0):
+            self.assertEqual(pg_config['ENGINE'], 'django.db.backends.postgresql_psycopg2')
+        else:
+            self.assertEqual(pg_config['ENGINE'], 'django.db.backends.postgresql')
         self.assertEqual(pg_config['NAME'], 'd8r82722')
         self.assertEqual(pg_config['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
         self.assertEqual(pg_config['USER'], 'uf07k1')
@@ -313,7 +317,10 @@ class DatabaseTestSuite(unittest.TestCase):
         url = 'postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
         url = Env.db_url_config(url)
 
-        self.assertEqual(url['ENGINE'], 'django.db.backends.postgresql_psycopg2')
+        if DJANGO_VERSION < (2, 0):
+            self.assertEqual(url['ENGINE'], 'django.db.backends.postgresql_psycopg2')
+        else:
+            self.assertEqual(url['ENGINE'], 'django.db.backends.postgresql')
         self.assertEqual(url['NAME'], 'd8r82722r2kuvn')
         self.assertEqual(url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
         self.assertEqual(url['USER'], 'uf07k1i6d8ia0v')

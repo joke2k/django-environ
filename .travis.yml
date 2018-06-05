@@ -4,6 +4,7 @@ python:
  - "2.7"
  - "3.4"
  - "3.5"
+ - "3.6"
  - "nightly"
  - "pypy"
 env:
@@ -46,6 +47,9 @@ matrix:
     - python: "2.7"
       env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
     - python: "pypy"
+      env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
+    # Django master dropped support for Python 3.4.
+    - python: "3.4"
       env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
   allow_failures:
     - env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
