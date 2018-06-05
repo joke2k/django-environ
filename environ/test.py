@@ -4,9 +4,7 @@ import os
 import sys
 import unittest
 
-from django.core.exceptions import ImproperlyConfigured
-
-from environ import Env, Path, REDIS_DRIVER
+from environ import Env, Path, ImproperlyConfigured, REDIS_DRIVER
 
 
 class BaseTests(unittest.TestCase):
