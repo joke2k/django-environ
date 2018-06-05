@@ -33,6 +33,7 @@ class BaseTests(unittest.TestCase):
     @classmethod
     def generateData(cls):
         return dict(STR_VAR='bar',
+                    MULTILINE_STR_VAR='foo\\nbar',
                     INT_VAR='42',
                     FLOAT_VAR='33.3',
                     FLOAT_COMMA_VAR='33,3',
@@ -93,6 +94,8 @@ class EnvTests(BaseTests):
     def test_str(self):
         self.assertTypeAndValue(str, 'bar', self.env('STR_VAR'))
         self.assertTypeAndValue(str, 'bar', self.env.str('STR_VAR'))
+        self.assertTypeAndValue(str, 'foo\\nbar', self.env.str('MULTILINE_STR_VAR'))
+        self.assertTypeAndValue(str, 'foo\nbar', self.env.str('MULTILINE_STR_VAR', multiline=True))
 
     def test_bytes(self):
         self.assertTypeAndValue(bytes, b'bar', self.env.bytes('STR_VAR'))

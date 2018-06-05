@@ -145,11 +145,14 @@ class Env(object):
 
     # Shortcuts
 
-    def str(self, var, default=NOTSET):
+    def str(self, var, default=NOTSET, multiline=False):
         """
         :rtype: str
         """
-        return self.get_value(var, default=default)
+        value = self.get_value(var, default=default)
+        if multiline:
+            return value.replace('\\n', '\n')
+        return value
 
     def unicode(self, var, default=NOTSET):
         """Helper for python2
