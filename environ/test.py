@@ -90,6 +90,9 @@ class EnvTests(BaseTests):
         self.assertTypeAndValue(str, 'bar', self.env('STR_VAR'))
         self.assertTypeAndValue(str, 'bar', self.env.str('STR_VAR'))
 
+    def test_bytes(self):
+        self.assertTypeAndValue(bytes, b'bar', self.env.bytes('STR_VAR'))
+
     def test_int(self):
         self.assertTypeAndValue(int, 42, self.env('INT_VAR', cast=int))
         self.assertTypeAndValue(int, 42, self.env.int('INT_VAR'))

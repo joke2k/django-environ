@@ -147,6 +147,12 @@ class Env(object):
         """
         return self.get_value(var, cast=str, default=default)
 
+    def bytes(self, var, default=NOTSET, encoding='utf8'):
+        """
+        :rtype: bytes
+        """
+        return self.get_value(var, cast=str).encode(encoding)
+
     def bool(self, var, default=NOTSET):
         """
         :rtype: bool
