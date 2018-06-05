@@ -15,7 +15,7 @@ try:
     basestring = str
 except ImportError:
     # Python 2
-    import urlparse
+    from urlparse import urlparse
 
 try:
     from django import VERSION as DJANGO_VERSION
