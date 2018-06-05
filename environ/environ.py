@@ -767,6 +767,9 @@ class Path(object):
 
     def __getitem__(self, *args, **kwargs):
         return self.__str__().__getitem__(*args, **kwargs)
+    
+    def __fspath__(self):
+        return self.__str__()
 
     def rfind(self, *args, **kwargs):
         return self.__str__().rfind(*args, **kwargs)
