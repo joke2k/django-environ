@@ -126,6 +126,14 @@ How to install
 
     $ pip install django-environ
 
+You also can start django project with included django-environ settings
+by using django project template::
+
+    $ django-admin startproject --template https://github.com/mixkorshun/django-environ-project-template/archive/master.zip -n .env myproject
+
+or using a short link::
+
+    $ django-admin startproject --template https://bit.ly/django-environ-project-template -n .env myproject
 
 How to use
 ==========
