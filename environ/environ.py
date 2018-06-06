@@ -2,14 +2,13 @@
 Django-environ allows you to utilize 12factor inspired environment
 variables to configure your Django application.
 """
-import json
 import logging
 import os
 import re
 import sys
 import warnings
 from .compat import (
-    urlparselib, urlparse, urlunparse, ParseResult, parse_qs,
+    json, urlparselib, urlparse, urlunparse, ParseResult, parse_qs,
     unquote_plus, DJANGO_POSTGRES, REDIS_DRIVER, ImproperlyConfigured, basestring)
 
 logger = logging.getLogger(__name__)

@@ -1,12 +1,11 @@
 from __future__ import print_function
-import json
 import os
 import sys
 import unittest
 import warnings
 
 from .compat import (
-    DJANGO_POSTGRES, ImproperlyConfigured, REDIS_DRIVER, quote
+    json, DJANGO_POSTGRES, ImproperlyConfigured, REDIS_DRIVER, quote
 )
 
 from environ import Env, Path

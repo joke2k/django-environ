@@ -23,33 +23,28 @@ is_py2 = (_ver[0] == 2)
 #: Python 3.x?
 is_py3 = (_ver[0] == 3)
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
-
-# ---------
-# Specifics
-# ---------
 if is_py2:
     import urlparse as urlparselib
-
     from urllib import quote, unquote_plus
-#
+
     basestring = basestring
-#
+
 elif is_py3:
     import urllib.parse as urlparselib
-
     quote = urlparselib.quote
     unquote_plus = urlparselib.unquote_plus
-#
+
     basestring = str
-#
+
 urlparse = urlparselib.urlparse
 urlunparse = urlparselib.urlunparse
 ParseResult = urlparselib.ParseResult
 parse_qs = urlparselib.parse_qs
+
+if pkgutil.find_loader('simplejson'):
+    import simplejson as json
+else:
+    import json
 
 if pkgutil.find_loader('django'):
     from django import VERSION as DJANGO_VERSION
