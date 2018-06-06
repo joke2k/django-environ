@@ -31,8 +31,6 @@ except ImportError:
 # ---------
 # Specifics
 # ---------
-# from six.moves import urllib
-# from six import string_types
 if is_py2:
     import urlparse as urlparselib
 
@@ -52,13 +50,6 @@ urlparse = urlparselib.urlparse
 urlunparse = urlparselib.urlunparse
 ParseResult = urlparselib.ParseResult
 parse_qs = urlparselib.parse_qs
-# urlparselib = urllib
-# quote = urllib.parse.quote
-# unquote_plus = urllib.parse.unquote_plus
-# urlparse = urllib.parse.urlparse
-# urlunparse = urllib.parse.urlunparse
-# ParseResult = urllib.parse.ParseResult
-# parse_qs = urllib.parse.parse_qs
 
 if pkgutil.find_loader('django'):
     from django import VERSION as DJANGO_VERSION
