@@ -8,23 +8,9 @@ import os
 import re
 import sys
 import warnings
-
-try:
-    # Default on Python 3
-    from urllib import parse as urlparse
-    basestring = str
-except ImportError:
-    # Python 2
-    from urlparse import urlparse
-
-try:
-    from django import VERSION as DJANGO_VERSION
-    from django.core.exceptions import ImproperlyConfigured
-except ImportError:
-    DJANGO_VERSION = None
-
-    class ImproperlyConfigured(Exception):
-        pass
+from .compat import (
+    urlparselib, urlparse, urlunparse, ParseResult, parse_qs,
+    unquote_plus, DJANGO_POSTGRES, REDIS_DRIVER, ImproperlyConfigured, basestring)
 
 logger = logging.getLogger(__name__)
 
@@ -38,19 +24,9 @@ __version__ = tuple(VERSION.split('.'))
 def _cast_int(v):
     return int(v) if hasattr(v, 'isdigit') and v.isdigit() else v
 
+
 def _cast_urlstr(v):
-    return urlparse.unquote_plus(v) if isinstance(v, str) else v
-
-# back compatibility with redis_cache package
-DJANGO_REDIS_DRIVER = 'django_redis.cache.RedisCache'
-DJANGO_REDIS_CACHE_DRIVER = 'redis_cache.RedisCache'
-
-REDIS_DRIVER = DJANGO_REDIS_DRIVER
-try:
-    import redis_cache
-    REDIS_DRIVER = DJANGO_REDIS_CACHE_DRIVER
-except:
-    pass
+    return unquote_plus(v) if isinstance(v, str) else v
 
 
 class NoValue(object):
@@ -74,9 +50,13 @@ class Env(object):
     ENVIRON = os.environ
     NOTSET = NoValue()
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
-    URL_CLASS = urlparse.ParseResult
+    URL_CLASS = ParseResult
     DEFAULT_DATABASE_ENV = 'DATABASE_URL'
     DB_SCHEMES = {
+        'postgres': DJANGO_POSTGRES,
+        'postgresql': DJANGO_POSTGRES,
+        'psql': DJANGO_POSTGRES,
+        'pgsql': DJANGO_POSTGRES,
         'postgis': 'django.contrib.gis.db.backends.postgis',
         'mysql': 'django.db.backends.mysql',
         'mysql2': 'django.db.backends.mysql',
@@ -90,17 +70,6 @@ class Env(object):
         'sqlite': 'django.db.backends.sqlite3',
         'ldap': 'ldapdb.backends.ldap',
     }
-    if DJANGO_VERSION is not None and DJANGO_VERSION < (2, 0):
-        DB_SCHEMES['postgres'] = 'django.db.backends.postgresql_psycopg2'
-        DB_SCHEMES['postgresql'] = 'django.db.backends.postgresql_psycopg2'
-        DB_SCHEMES['psql'] = 'django.db.backends.postgresql_psycopg2'
-        DB_SCHEMES['pgsql'] = 'django.db.backends.postgresql_psycopg2'
-    else:
-        # https://docs.djangoproject.com/en/2.0/releases/2.0/#id1
-        DB_SCHEMES['postgres'] = 'django.db.backends.postgresql'
-        DB_SCHEMES['postgresql'] = 'django.db.backends.postgresql'
-        DB_SCHEMES['psql'] = 'django.db.backends.postgresql'
-        DB_SCHEMES['pgsql'] = 'django.db.backends.postgresql'
     _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT']
 
     DEFAULT_CACHE_ENV = 'CACHE_URL'
@@ -217,7 +186,7 @@ class Env(object):
         """
         :rtype: urlparse.ParseResult
         """
-        return self.get_value(var, cast=urlparse.urlparse, default=default, parse_default=True)
+        return self.get_value(var, cast=urlparse, default=default, parse_default=True)
 
     def db_url(self, var=DEFAULT_DATABASE_ENV, default=NOTSET, engine=None):
         """Returns a config dictionary, defaulting to DATABASE_URL.
@@ -392,13 +361,13 @@ class Env(object):
                     'NAME': ':memory:'
                 }
                 # note: no other settings are required for sqlite
-            url = urlparse.urlparse(url)
+            url = urlparse(url)
 
         config = {}
 
         # Remove query strings.
         path = url.path[1:]
-        path = urlparse.unquote_plus(path.split('?', 2)[0])
+        path = unquote_plus(path.split('?', 2)[0])
 
         if url.scheme == 'sqlite':
             if path == '':
@@ -435,7 +404,7 @@ class Env(object):
 
         if url.query:
             config_options = {}
-            for k, v in urlparse.parse_qs(url.query).items():
+            for k, v in parse_qs(url.query).items():
                 if k.upper() in cls._DB_BASE_OPTIONS:
                     config.update({k.upper(): _cast_int(v[0])})
                 else:
@@ -464,7 +433,7 @@ class Env(object):
         :param backend:
         :return:
         """
-        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
         location = url.netloc.split(',')
         if len(location) == 1:
@@ -495,7 +464,7 @@ class Env(object):
 
         if url.query:
             config_options = {}
-            for k, v in urlparse.parse_qs(url.query).items():
+            for k, v in parse_qs(url.query).items():
                 opt = {k.upper(): _cast_int(v[0])}
                 if k.upper() in cls._CACHE_BASE_OPTIONS:
                     config.update(opt)
@@ -514,11 +483,11 @@ class Env(object):
 
         config = {}
 
-        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
         # Remove query strings
         path = url.path[1:]
-        path = urlparse.unquote_plus(path.split('?', 2)[0])
+        path = unquote_plus(path.split('?', 2)[0])
 
         # Update with environment configuration
         config.update({
@@ -543,7 +512,7 @@ class Env(object):
 
         if url.query:
             config_options = {}
-            for k, v in urlparse.parse_qs(url.query).items():
+            for k, v in parse_qs(url.query).items():
                 opt = {k.upper(): _cast_int(v[0])}
                 if k.upper() in cls._EMAIL_BASE_OPTIONS:
                     config.update(opt)
@@ -557,11 +526,11 @@ class Env(object):
     def search_url_config(cls, url, engine=None):
         config = {}
 
-        url = urlparse.urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
         # Remove query strings.
         path = url.path[1:]
-        path = urlparse.unquote_plus(path.split('?', 2)[0])
+        path = unquote_plus(path.split('?', 2)[0])
 
         if url.scheme not in cls.SEARCH_SCHEMES:
             raise ImproperlyConfigured('Invalid search schema %s' % url.scheme)
@@ -570,7 +539,7 @@ class Env(object):
         # check commons params
         params = {}
         if url.query:
-            params = urlparse.parse_qs(url.query)
+            params = parse_qs(url.query)
             if 'EXCLUDED_INDEXES' in params.keys():
                 config['EXCLUDED_INDEXES'] = params['EXCLUDED_INDEXES'][0].split(',')
             if 'INCLUDE_SPELLING' in params.keys():
@@ -589,7 +558,7 @@ class Env(object):
             path = path[:-1]
 
         if url.scheme == 'solr':
-            config['URL'] = urlparse.urlunparse(('http',) + url[1:2] + (path,) + ('', '', ''))
+            config['URL'] = urlunparse(('http',) + url[1:2] + (path,) + ('', '', ''))
             if 'TIMEOUT' in params.keys():
                 config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
             return config
@@ -605,7 +574,7 @@ class Env(object):
                 path = ""
                 index = split[0]
 
-            config['URL'] = urlparse.urlunparse(('http',) + url[1:2] + (path,) + ('', '', ''))
+            config['URL'] = urlunparse(('http',) + url[1:2] + (path,) + ('', '', ''))
             if 'TIMEOUT' in params.keys():
                 config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
             config['INDEX_NAME'] = index
@@ -805,9 +774,9 @@ class Path(object):
 
 
 def register_scheme(scheme):
-    for method in dir(urlparse):
+    for method in dir(urlparselib):
         if method.startswith('uses_'):
-            getattr(urlparse, method).append(scheme)
+            getattr(urlparselib, method).append(scheme)
 
 
 def register_schemes(schemes):
