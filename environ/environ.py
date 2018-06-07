@@ -108,6 +108,7 @@ class Env(object):
         'pymemcache': 'django.core.cache.backends.memcached.PyLibMCCache',
         'rediscache': REDIS_DRIVER,
         'redis': REDIS_DRIVER,
+        'rediss': REDIS_DRIVER,
     }
     _CACHE_BASE_OPTIONS = ['TIMEOUT', 'KEY_PREFIX', 'VERSION', 'KEY_FUNCTION', 'BINARY']
 
