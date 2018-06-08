@@ -492,11 +492,17 @@ class Env(object):
         if url.query:
             config_options = {}
             for k, v in urllib.parse.parse_qs(url.query).items():
-                opt = {k.upper(): _cast_int(v[0])}
                 if k.upper() in cls._CACHE_BASE_OPTIONS:
+                    opt = {k.upper(): _cast_int(v[0])}
                     config.update(opt)
                 else:
-                    config_options.update(opt)
+                    if k.lower() == 'ssl':
+                        if v[0].lower() == 'true':
+                            config_options.update({k.upper(): True})
+                        else:
+                            config_options.update({k.upper(): False})
+                    else:
+                        config_options.update({k: _cast_int(v[0])})
             config['OPTIONS'] = config_options
 
         if backend:
