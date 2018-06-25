@@ -402,6 +402,9 @@ class Env(object):
             'PORT': _cast_int(url.port) or '',
         })
 
+        if url.scheme == 'postgres' and path.startswith('/'):
+            config['HOST'], config['NAME'] = path.rsplit('/', 1)
+
         if url.scheme == 'oracle' and path == '':
             config['NAME'] = config['HOST']
             config['HOST'] = ''
