@@ -12,6 +12,8 @@ Added
 +++++
   - Support for Django 2.0
   - Support for smart casting
+  - Support PostgreSQL unix domain socket paths
+  - Tip: Multiple env files
 
 Changed
 +++++++

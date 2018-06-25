@@ -9,36 +9,6 @@ Django-environ
 
 .. _settings.py:
 
-<<<<<<< HEAD
-Behold, the power of django-environ in your ``settings.py``:
-=======
-    MEDIA_ROOT = os.path.join(SITE_ROOT, 'assets')
-    MEDIA_URL = '/media/'
-    STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
-    STATIC_URL = '/static/'
-
-    SECRET_KEY = '...im incredibly still here...'
-
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-            'LOCATION': [
-                '127.0.0.1:11211', '127.0.0.1:11212', '127.0.0.1:11213',
-            ]
-        },
-        'redis': {
-            'BACKEND': 'django_redis.cache.RedisCache',
-            'LOCATION': '127.0.0.1:6379/1',
-            'OPTIONS': {
-                'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-                'PASSWORD': 'redis-githubbed-password',
-            }
-        }
-    }
-
-After:
->>>>>>> develop
-
 .. code-block:: python
 
     import environ
@@ -63,19 +33,6 @@ After:
         'extra': env.db('SQLITE_URL', default='sqlite:////tmp/my-tmp-sqlite.db')
     }
 
-<<<<<<< HEAD
-    # Parse cache connection url strings like memcache://127.0.0.1:11211
-=======
-    public_root = root.path('public/')
-
-    MEDIA_ROOT = public_root('media')
-    MEDIA_URL = '/media/'
-    STATIC_ROOT = public_root('static')
-    STATIC_URL = '/static/'
-
-    SECRET_KEY = env('SECRET_KEY') # Raises ImproperlyConfigured exception if SECRET_KEY not in os.environ
-
->>>>>>> develop
     CACHES = {
         # read os.environ['CACHE_URL'] and raises ImproperlyConfigured exception if not found
         'default': env.cache(),
@@ -239,10 +196,8 @@ SQLite urls
 SQLite connects to file based databases. The same URL format is used, omitting the hostname,
 and using the "file" portion as the filename of the database.
 This has the effect of four slashes being present for an absolute
-<<<<<<< HEAD
+
 file path: ``sqlite:////full/path/to/your/database/file.sqlite``.
-=======
-file path: sqlite:////full/path/to/your/database/file.sqlite.
 
 Nested lists
 ------------
@@ -304,7 +259,6 @@ Tests
     $ git clone git@github.com:joke2k/django-environ.git
     $ cd django-environ/
     $ python setup.py test
->>>>>>> develop
 
 How to Contribute
 -----------------
