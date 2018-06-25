@@ -8,7 +8,19 @@ and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.
 
 `v0.4.5-dev`_ - ~June-2018
 --------------------------
+Added
++++++
   - Support for Django 2.0
+  - Support for smart casting
+
+Changed
++++++++
+  - Fix parsing option values None, True and False
+  - Order of importance of engine configuration in db_url_config
+
+Removed
++++++++
+  - Remove django and six dependencies
 
 
 `v0.4.4`_ - 21-August-2017
