@@ -48,9 +48,9 @@ This is your `settings.py` file before you have installed **django-environ**
     }
 
     MEDIA_ROOT = os.path.join(SITE_ROOT, 'assets')
-    MEDIA_URL = 'media/'
+    MEDIA_URL = '/media/'
     STATIC_ROOT = os.path.join(SITE_ROOT, 'static')
-    STATIC_URL = 'static/'
+    STATIC_URL = '/static/'
 
     SECRET_KEY = '...im incredibly still here...'
 
@@ -93,9 +93,9 @@ After:
     public_root = root.path('public/')
 
     MEDIA_ROOT = public_root('media')
-    MEDIA_URL = 'media/'
+    MEDIA_URL = '/media/'
     STATIC_ROOT = public_root('static')
-    STATIC_URL = 'static/'
+    STATIC_URL = '/static/'
 
     SECRET_KEY = env('SECRET_KEY') # Raises ImproperlyConfigured exception if SECRET_KEY not in os.environ
 
@@ -187,6 +187,8 @@ Supported Types
     -  SQLITE: sqlite://
     -  SQLITE with SPATIALITE for GeoDjango: spatialite://
     -  Oracle: oracle://
+    -  MSSQL: mssql://
+    -  PyODBC: pyodbc://
     -  Redshift: redshift://
     -  LDAP: ldap://
 - cache_url
@@ -227,6 +229,15 @@ In order to use unsafe characters you have to encode with ``urllib.parse.encode`
 
 See https://perishablepress.com/stop-using-unsafe-characters-in-urls/ for reference.
 
+Multiple redis cache locations
+------------------------------
+
+For redis cache, `multiple master/slave or shard locations <http://niwinz.github.io/django-redis/latest/#_pluggable_clients>`_ can be configured as follows:
+
+.. code-block::
+
+    CACHE_URL='rediscache://master:6379,slave1:6379,slave2:6379/1'
+
 Email settings
 --------------
 
@@ -239,7 +250,6 @@ In order to set email configuration for django you can use this code:
 
     vars().update(EMAIL_CONFIG)
 
-
 SQLite urls
 -----------
 
@@ -248,6 +258,47 @@ and using the "file" portion as the filename of the database.
 This has the effect of four slashes being present for an absolute
 file path: sqlite:////full/path/to/your/database/file.sqlite.
 
+Nested lists
+------------
+
+Some settings such as Django's ``ADMINS`` make use of nested lists. You can use something like this to handle similar cases.
+
+.. code-block:: python
+
+    # DJANGO_ADMINS=John:john@admin.com,Jane:jane@admin.com
+    ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')] 
+
+    # or use more specific function
+
+    from email.utils import getaddresses
+
+    # DJANGO_ADMINS=Full Name <email-with-name@example.com>,anotheremailwithoutname@example.com
+    ADMINS = getaddresses([env('DJANGO_ADMINS')])
+
+Multiline value
+---------------
+
+You can set a multiline variable value:
+
+.. code-block:: python
+
+    # MULTILINE_TEXT=Hello\\nWorld
+    >>> print env.str('MULTILINE_TEXT', multiline=True)
+    Hello
+    World
+
+
+Proxy value
+-----------
+
+You can set a value prefixed by ``$`` to use as a proxy to another variable value:
+
+.. code-block:: python
+
+    # BAR=FOO
+    # PROXY=$BAR
+    >>> print env.str('PROXY')
+    FOO
 
 Tests
 =====
@@ -266,6 +317,23 @@ Django-environ is licensed under the MIT License - see the `LICENSE_FILE`_ file 
 
 Changelog
 =========
+
+
+`0.4.4 - 21-August-2017 <https://github.com/joke2k/django-environ/compare/v0.4.3...v0.4.4>`__
+---------------------------------------------------------------------------------------------
+
+  - Support for django-redis multiple locations (master/slave, shards)
+  - Support for Elasticsearch2
+  - Support for Mysql-connector
+  - Support for pyodbc
+  - Add __contains__ feature to Environ class
+  - Fix Path subtracting
+
+
+`0.4.3 - 21-August-2017 <https://github.com/joke2k/django-environ/compare/v0.4.2...v0.4.3>`__
+---------------------------------------------------------------------------------------------
+
+  - Rollback the default Environ to os.environ
 
 `0.4.2 - 13-April-2017 <https://github.com/joke2k/django-environ/compare/v0.4.1...v0.4.2>`__
 --------------------------------------------------------------------------------------------
