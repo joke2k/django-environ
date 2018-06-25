@@ -1,14 +1,14 @@
 from __future__ import print_function
-import json
 import os
 import sys
 import unittest
 import warnings
 
-from django import VERSION as DJANGO_VERSION
-from django.core.exceptions import ImproperlyConfigured
+from .compat import (
+    json, DJANGO_POSTGRES, ImproperlyConfigured, REDIS_DRIVER, quote
+)
 
-from environ import Env, Path, REDIS_DRIVER
+from environ import Env, Path
 
 
 class BaseTests(unittest.TestCase):
@@ -126,7 +126,7 @@ class EnvTests(BaseTests):
         self.assertTypeAndValue(bool, False, self.env.bool('BOOL_FALSE_VAR'))
 
     def test_proxied_value(self):
-        self.assertTypeAndValue(str, 'bar', self.env('PROXIED_VAR'))
+        self.assertEqual('bar', self.env('PROXIED_VAR'))
 
     def test_int_list(self):
         self.assertTypeAndValue(list, [42, 33], self.env('INT_LIST', cast=[int]))
@@ -168,18 +168,14 @@ class EnvTests(BaseTests):
         self.assertEqual(None, self.env.url('OTHER_URL', default=None))
 
     def test_url_encoded_parts(self):
-        from six.moves import urllib
         password_with_unquoted_characters = "#password"
-        encoded_url = "mysql://user:%s@127.0.0.1:3306/dbname" % urllib.parse.quote(password_with_unquoted_characters)
+        encoded_url = "mysql://user:%s@127.0.0.1:3306/dbname" % quote(password_with_unquoted_characters)
         parsed_url = self.env.db_url_config(encoded_url)
         self.assertEqual(parsed_url['PASSWORD'], password_with_unquoted_characters)
 
     def test_db_url_value(self):
         pg_config = self.env.db()
-        if DJANGO_VERSION < (2, 0):
-            self.assertEqual(pg_config['ENGINE'], 'django.db.backends.postgresql_psycopg2')
-        else:
-            self.assertEqual(pg_config['ENGINE'], 'django.db.backends.postgresql')
+        self.assertEqual(pg_config['ENGINE'], DJANGO_POSTGRES)
         self.assertEqual(pg_config['NAME'], 'd8r82722')
         self.assertEqual(pg_config['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
         self.assertEqual(pg_config['USER'], 'uf07k1')
@@ -311,8 +307,8 @@ class SchemaEnvTests(BaseTests):
         self.assertTypeAndValue(int, 42, env('INT_VAR'))
         self.assertTypeAndValue(float, 33.3, env('NOT_PRESENT_VAR'))
 
-        self.assertTypeAndValue(str, 'bar', env('STR_VAR'))
-        self.assertTypeAndValue(str, 'foo', env('NOT_PRESENT2', default='foo'))
+        self.assertEqual('bar', env('STR_VAR'))
+        self.assertEqual('foo', env('NOT_PRESENT2', default='foo'))
 
         self.assertTypeAndValue(list, [42, 33], env('INT_LIST'))
         self.assertTypeAndValue(list, [2], env('DEFAULT_LIST'))
@@ -327,10 +323,7 @@ class DatabaseTestSuite(unittest.TestCase):
         url = 'postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
         url = Env.db_url_config(url)
 
-        if DJANGO_VERSION < (2, 0):
-            self.assertEqual(url['ENGINE'], 'django.db.backends.postgresql_psycopg2')
-        else:
-            self.assertEqual(url['ENGINE'], 'django.db.backends.postgresql')
+        self.assertEqual(url['ENGINE'], DJANGO_POSTGRES)
         self.assertEqual(url['NAME'], 'd8r82722r2kuvn')
         self.assertEqual(url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
         self.assertEqual(url['USER'], 'uf07k1i6d8ia0v')
