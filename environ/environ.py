@@ -15,7 +15,7 @@ from .compat import (
 logger = logging.getLogger(__name__)
 
 
-VERSION = '0.4.4'
+VERSION = '0.4.5'
 __author__ = 'joke2k'
 __version__ = tuple(VERSION.split('.'))
 
