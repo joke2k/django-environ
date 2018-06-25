@@ -69,7 +69,7 @@ Feature Support
 ---------------
 - Fast and easy multi environment for deploy
 - Fill ``os.environ`` with .env file variables
-- Variables casting (see `Supported types`_ below)
+- Variables casting (see supported_types_ below)
 - Url variables exploded to django specific package settings
 
 Django-environ officially supports Django 1.8 ~ 2.0.
@@ -104,7 +104,7 @@ Documentation
 
 Documentation is available at `RTFD <http://django-environ.rtfd.io/>`_.
 
-.. _`Supported types`:
+.. _supported_types:
 
 Supported types
 ---------------
@@ -246,6 +246,7 @@ Multiple env files
 It is possible to have multiple env files and select one using environment variables.
 
 .. code-block:: python
+
     env = environ.Env()
     env.read_env(env.str('ENV_PATH', '.env'))
 
