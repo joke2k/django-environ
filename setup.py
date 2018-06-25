@@ -36,7 +36,6 @@ setup(
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,
-    install_requires=REQUIREMENTS,
     license=LICENSE,
     packages=find_packages(),
     platforms=["any"],
