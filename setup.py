@@ -15,10 +15,7 @@ DESCRIPTION = "Django-environ allows you to utilize 12factor inspired environmen
 URL = 'https://github.com/joke2k/django-environ'
 EMAIL = 'daniele.faraglia@gmail.com'
 AUTHOR = 'joke2k'
-VERSION = '0.4.4'
-REQUIREMENTS = [
-    'six',
-]
+VERSION = '0.4.5'
 LICENSE = 'MIT'
 
 here = os.path.abspath(os.path.dirname(__file__))

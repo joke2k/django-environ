@@ -334,7 +334,7 @@ class DatabaseTestSuite(unittest.TestCase):
         url = 'postgres:////var/run/postgresql/db'
         url = Env.db_url_config(url)
 
-        self.assertEqual(url['ENGINE'], 'django.db.backends.postgresql_psycopg2')
+        self.assertEqual(url['ENGINE'], DJANGO_POSTGRES)
         self.assertEqual(url['NAME'], 'db')
         self.assertEqual(url['HOST'], '/var/run/postgresql')
 

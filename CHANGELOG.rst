@@ -6,7 +6,7 @@ The format is *inspired* by `Keep a Changelog <http://keepachangelog.com/en/1.0.
 and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 
 
-`v0.4.5-dev`_ - ~June-2018
+`v0.4.5`_ - 25-June-2018
 --------------------------
 Added
 +++++
@@ -119,7 +119,7 @@ Added
   - initial release
 
 
-.. _v0.4.5-dev: https://github.com/joke2k/django-environ/compare/v0.4.4...develop
+.. _v0.4.5: https://github.com/joke2k/django-environ/compare/v0.4.4...v0.4.5
 .. _v0.4.4: https://github.com/joke2k/django-environ/compare/v0.4.3...v0.4.4
 .. _v0.4.3: https://github.com/joke2k/django-environ/compare/v0.4.2...v0.4.3
 .. _v0.4.2: https://github.com/joke2k/django-environ/compare/v0.4.1...v0.4.2
