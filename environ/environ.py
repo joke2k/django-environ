@@ -96,7 +96,7 @@ class Env(object):
         DB_SCHEMES['postgresql'] = 'django.db.backends.postgresql'
         DB_SCHEMES['psql'] = 'django.db.backends.postgresql'
         DB_SCHEMES['pgsql'] = 'django.db.backends.postgresql'
-    _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT']
+    _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT', 'DISABLE_SERVER_SIDE_CURSORS']
 
     DEFAULT_CACHE_ENV = 'CACHE_URL'
     CACHE_SCHEMES = {
