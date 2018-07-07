@@ -283,6 +283,11 @@ class Env(object):
             value = value.lstrip('$')
             value = self.get_value(value, cast=cast, default=default)
 
+        # Substitute any referenced variables in the string
+        if value is not None and type(value) is str:
+            for match in re.finditer(r'\{\{([A-Za-z_0-9]+)\}\}',value):
+                value = value.replace(match.group(0),self.get_value(match.group(1), cast=cast, default=default))
+
         if cast is None and default is not None and not isinstance(default, NoValue):
             cast = type(default)
 
@@ -652,6 +657,38 @@ class Env(object):
                 if m3:
                     val = re.sub(r'\\(.)', r'\1', m3.group(1))
                 cls.ENVIRON.setdefault(key, str(val))
+
+        # set defaults
+        for key, value in overrides.items():
+            cls.ENVIRON.setdefault(key, value)
+
+    @classmethod
+    def read_docker_secrets(cls, secrets_dir='/run/secrets/', **overrides):
+        """
+        Read the files in the Docker Secrets folder into the environment
+
+        The secrets folder is a dict-like structure where for each file:
+            key = filename
+            value = first line of the file
+
+        There is currently no support for dynamically updating individual
+        secrets; the whole application must be reloaded for secrets to be
+        updated.
+        """
+
+        if not os.path.exists(secrets_dir):
+            warnings.warn("%s doesn't exist - check that your Docker node "
+                          "is correctly provisioned with secrets." % secrets_dir)
+            return
+
+        for secret_filename in os.listdir(secrets_dir):
+            with open(os.path.join(secrets_dir, secret_filename), 'r') as fl:
+                try:
+                    cls.ENVIRON.setdefault(secret_filename.upper(), fl.readline().strip())
+                except IOError:
+                    warnings.warn(
+                        "Error reading %s - if you're not configuring your "
+                        "environment separately, check this." % secret_filename)
 
         # set defaults
         for key, value in overrides.items():

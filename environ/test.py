@@ -10,11 +10,11 @@ from .compat import (
 
 from environ import Env, Path
 
-
 class BaseTests(unittest.TestCase):
 
     URL = 'http://www.google.com/'
     POSTGRES = 'postgres://uf07k1:wegauwhg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722'
+    POSTGRES_WITH_VARS = 'postgres://{{USER}}:{{PASSWORD}}@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722'
     MYSQL = 'mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/heroku_97681?reconnect=true'
     MYSQLGIS = 'mysqlgis://user:password@127.0.0.1/some_database'
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
@@ -44,12 +44,16 @@ class BaseTests(unittest.TestCase):
                     BOOL_FALSE_VAR='0',
                     BOOL_FALSE_VAR2='False',
                     PROXIED_VAR='$STR_VAR',
+                    PROXIED_VAR_2='{{STR_VAR}}',
                     INT_LIST='42,33',
                     INT_TUPLE='(42,33)',
                     STR_LIST_WITH_SPACES=' foo,  bar',
                     EMPTY_LIST='',
                     DICT_VAR='foo=bar,test=on',
                     DATABASE_URL=cls.POSTGRES,
+                    USER='uf07k1',
+                    PASSWORD='wegauwhg',
+                    DATABASE_URL_WITH_VARS=cls.POSTGRES_WITH_VARS,
                     DATABASE_MYSQL_URL=cls.MYSQL,
                     DATABASE_MYSQL_GIS_URL=cls.MYSQLGIS,
                     DATABASE_SQLITE_URL=cls.SQLITE,
@@ -127,6 +131,7 @@ class EnvTests(BaseTests):
 
     def test_proxied_value(self):
         self.assertEqual('bar', self.env('PROXIED_VAR'))
+        self.assertEqual('bar', self.env('PROXIED_VAR_2'))
 
     def test_int_list(self):
         self.assertTypeAndValue(list, [42, 33], self.env('INT_LIST', cast=[int]))
@@ -150,7 +155,6 @@ class EnvTests(BaseTests):
         self.assertTypeAndValue(dict, self.DICT, self.env.dict('DICT_VAR'))
 
     def test_dict_parsing(self):
-
         self.assertEqual({'a': '1'}, self.env.parse_value('a=1', dict))
         self.assertEqual({'a': 1}, self.env.parse_value('a=1', dict(value=int)))
         self.assertEqual({'a': ['1', '2', '3']}, self.env.parse_value('a=1,2,3', dict(value=[str])))
@@ -181,6 +185,10 @@ class EnvTests(BaseTests):
         self.assertEqual(pg_config['USER'], 'uf07k1')
         self.assertEqual(pg_config['PASSWORD'], 'wegauwhg')
         self.assertEqual(pg_config['PORT'], 5431)
+
+        pg_config_with_vars = self.env.db('DATABASE_URL_WITH_VARS')
+        self.assertEqual(pg_config_with_vars['USER'], 'uf07k1')
+        self.assertEqual(pg_config_with_vars['PASSWORD'], 'wegauwhg')
 
         mysql_config = self.env.db('DATABASE_MYSQL_URL')
         self.assertEqual(mysql_config['ENGINE'], 'django.db.backends.mysql')
@@ -284,6 +292,11 @@ class FileEnvTests(EnvTests):
         self.env = Env()
         file_path = Path(__file__, is_file=True)('test_env.txt')
         self.env.read_env(file_path, PATH_VAR=Path(__file__, is_file=True).__root__)
+        self.env.read_docker_secrets(Path(__file__, is_file=True)('run/secrets/'))
+
+    def test_docker_secrets(self):
+        self.assertEqual('secret1', self.env('DOCKER_SECRET_1'))
+        self.assertEqual('secret2', self.env('DOCKER_SECRET_2'))
 
 class SubClassTests(EnvTests):
 
