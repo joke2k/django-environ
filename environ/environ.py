@@ -684,7 +684,7 @@ class Env(object):
         for secret_filename in os.listdir(secrets_dir):
             with open(os.path.join(secrets_dir, secret_filename), 'r') as fl:
                 try:
-                    cls.ENVIRON.setdefault(secret_filename.upper(), fl.readline().strip())
+                    cls.ENVIRON.setdefault(os.path.splitext(secret_filename.upper())[0], fl.readline().strip())
                 except IOError:
                     warnings.warn(
                         "Error reading %s - if you're not configuring your "
