@@ -36,6 +36,13 @@ def _cast_int(v):
 def _cast_urlstr(v):
     return unquote_plus(v) if isinstance(v, str) else v
 
+def _make_setenv(envval, overwrite=False):
+    """ Return lambda to set environUse setdefault unless overwrite is specified """
+    if overwrite:
+        return lambda k,v: envval.update({k: str(v)})
+    else:
+        return lambda k,v: envval.setdefault(k,str(v))
+
 
 class NoValue(object):
 
@@ -611,11 +618,13 @@ class Env(object):
         return config
 
     @classmethod
-    def read_env(cls, env_file=None, **overrides):
+    def read_env(cls, env_file=None, overwrite=False, **overrides):
         """Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack backtracking
         to find manage.py and then find the dotenv.
+
+        overwrite=True will force an overwrite of existing environment variables.
 
         http://www.wellfireinteractive.com/blog/easier-12-factor-django/
 
@@ -641,6 +650,8 @@ class Env(object):
 
         logger.debug('Read environment variables from: {0}'.format(env_file))
 
+        setenv = _make_setenv(cls.ENVIRON, overwrite=overwrite)
+
         for line in content.splitlines():
             m1 = re.match(r'\A(?:export )?([A-Za-z_0-9]+)=(.*)\Z', line)
             if m1:
@@ -651,11 +662,11 @@ class Env(object):
                 m3 = re.match(r'\A"(.*)"\Z', val)
                 if m3:
                     val = re.sub(r'\\(.)', r'\1', m3.group(1))
-                cls.ENVIRON.setdefault(key, str(val))
+                setenv(key, val)
 
         # set defaults
         for key, value in overrides.items():
-            cls.ENVIRON.setdefault(key, value)
+            setenv(key, value)
 
 
 class Path(object):
