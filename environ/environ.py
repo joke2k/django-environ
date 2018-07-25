@@ -37,7 +37,7 @@ def _cast_urlstr(v):
     return unquote_plus(v) if isinstance(v, str) else v
 
 def _make_setenv(envval, overwrite=False):
-    """ Return lambda to set environUse setdefault unless overwrite is specified """
+    """ Return lambda to set environ. Use setdefault unless overwrite is specified """
     if overwrite:
         return lambda k,v: envval.update({k: str(v)})
     else:
