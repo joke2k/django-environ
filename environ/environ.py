@@ -376,6 +376,7 @@ class Env(object):
 
         config = {}
 
+        host = url.hostname
         # Remove query strings.
         path = url.path[1:]
         path = unquote_plus(path.split('?', 2)[0])
@@ -392,13 +393,19 @@ class Env(object):
             path = '{scheme}://{hostname}'.format(scheme=url.scheme, hostname=url.hostname)
             if url.port:
                 path += ':{port}'.format(port=url.port)
+        if url.scheme != 'sqlite':
+            # Try to parse socket from url.path
+            # schema://user:password@</var/run/postgresql>[:<port>]/<database>
+            path_parts = url.path.rsplit('/', 1)
+            host = host or path_parts[0].rsplit(':', 1)[0]  # grab socket without port
+            path = path_parts[1] if len(path_parts) > 1 else path
 
         # Update with environment configuration.
         config.update({
             'NAME': path or '',
             'USER': _cast_urlstr(url.username) or '',
             'PASSWORD': _cast_urlstr(url.password) or '',
-            'HOST': url.hostname or '',
+            'HOST': host or '',
             'PORT': _cast_int(url.port) or '',
         })
 
