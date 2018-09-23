@@ -362,6 +362,10 @@ class Env(object):
         {'ENGINE': 'django.db.backends.postgresql', 'HOST': 'ec2-107-21-253-135.compute-1.amazonaws.com', 'NAME': 'd8r82722r2kuvn', 'PASSWORD': 'wegauwhgeuioweg', 'PORT': 5431, 'USER': 'uf07k1i6d8ia0v'}
 
         """
+        # Return blank configuration when url is null or empty
+        if not url:
+            return {}
+        
         if not isinstance(url, cls.URL_CLASS):
             if url == 'sqlite://:memory:':
                 # this is a special case, because if we pass this URL into
@@ -447,6 +451,10 @@ class Env(object):
         :param backend:
         :return:
         """
+        # Return blank configuration when url is null or empty
+        if not url:
+            return {}
+    
         url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
         location = url.netloc.split(',')
@@ -497,6 +505,10 @@ class Env(object):
 
         config = {}
 
+        # Return blank configuration when url is null or empty
+        if not url:
+            return config
+
         url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
         # Remove query strings
@@ -539,6 +551,10 @@ class Env(object):
     @classmethod
     def search_url_config(cls, url, engine=None):
         config = {}
+
+        # Return blank configuration when url is null or empty
+        if not url:
+            return config
 
         url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
