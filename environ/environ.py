@@ -115,6 +115,7 @@ class Env(object):
         "xapian": "haystack.backends.xapian_backend.XapianEngine",
         "simple": "haystack.backends.simple_backend.SimpleEngine",
     }
+    DOCKER_SECRETS_DIR = '/run/secrets/'
 
     def __init__(self, **scheme):
         self.scheme = scheme
@@ -233,6 +234,24 @@ class Env(object):
         """
         return Path(self.get_value(var, default=default), **kwargs)
 
+    def get_docker_secret(self,secret_name):
+
+        secret = ''
+        secret_filepath = os.path.join(self.DOCKER_SECRETS_DIR,secret_name)
+        if not os.path.exists(secret_filepath):
+            warnings.warn("%s doesn't exist - check that your Docker node "
+                          "is correctly provisioned with secrets." % secret_filepath)
+            return secret
+
+        with open(secret_filepath, 'r') as fl:
+            try:
+                secret = fl.readline().strip()
+            except IOError:
+                warnings.warn(
+                    "Error reading %s - if you're not configuring your "
+                    "environment separately, check this." % secret_name)
+        return secret
+
     def get_value(self, var, cast=None, default=NOTSET, parse_default=False):
         """Return value for given environment variable.
 
@@ -287,6 +306,11 @@ class Env(object):
         if value is not None and type(value) is str:
             for match in re.finditer(r'\{\{([A-Za-z_0-9]+)\}\}',value):
                 value = value.replace(match.group(0),self.get_value(match.group(1), cast=cast, default=default))
+
+        # Read the values of docker-secrets
+        if value is not None and type(value) is str:
+            for match in re.finditer(r'\{\{DOCKER-SECRET:([A-Za-z_0-9]+)\}\}', value):
+                value = value.replace(match.group(0), self.get_docker_secret(match.group(1)))
 
         if cast is None and default is not None and not isinstance(default, NoValue):
             cast = type(default)

@@ -15,6 +15,7 @@ class BaseTests(unittest.TestCase):
     URL = 'http://www.google.com/'
     POSTGRES = 'postgres://uf07k1:wegauwhg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722'
     POSTGRES_WITH_VARS = 'postgres://{{USER}}:{{PASSWORD}}@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722'
+    POSTGRES_WITH_DOCKER_SECRETS = 'postgres://{{DOCKER-SECRET:docker_secret_1}}:{{DOCKER-SECRET:docker_secret_2}}@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722'
     MYSQL = 'mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/heroku_97681?reconnect=true'
     MYSQLGIS = 'mysqlgis://user:password@127.0.0.1/some_database'
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
@@ -53,7 +54,10 @@ class BaseTests(unittest.TestCase):
                     DATABASE_URL=cls.POSTGRES,
                     USER='uf07k1',
                     PASSWORD='wegauwhg',
+                    DOCKER_SECRET_3='{{DOCKER-SECRET:docker_secret_1}}',
+                    DOCKER_SECRET_4='{{DOCKER-SECRET:docker_secret_2}}',
                     DATABASE_URL_WITH_VARS=cls.POSTGRES_WITH_VARS,
+                    DATABASE_URL_WITH_DOCKER_SECRETS=cls.POSTGRES_WITH_DOCKER_SECRETS,
                     DATABASE_MYSQL_URL=cls.MYSQL,
                     DATABASE_MYSQL_GIS_URL=cls.MYSQLGIS,
                     DATABASE_SQLITE_URL=cls.SQLITE,
@@ -73,6 +77,7 @@ class BaseTests(unittest.TestCase):
         self._old_environ = os.environ
         os.environ = Env.ENVIRON = self.generateData()
         self.env = Env()
+        self.env.DOCKER_SECRETS_DIR = Path(__file__, is_file=True)('run/secrets/')
 
     def tearDown(self):
         os.environ = self._old_environ
@@ -133,6 +138,10 @@ class EnvTests(BaseTests):
         self.assertEqual('bar', self.env('PROXIED_VAR'))
         self.assertEqual('bar', self.env('PROXIED_VAR_2'))
 
+    def test_docker_secrets(self):
+        self.assertEqual('secret1', self.env('DOCKER_SECRET_3'))
+        self.assertEqual('secret2', self.env('DOCKER_SECRET_4'))
+
     def test_int_list(self):
         self.assertTypeAndValue(list, [42, 33], self.env('INT_LIST', cast=[int]))
         self.assertTypeAndValue(list, [42, 33], self.env.list('INT_LIST', int))
@@ -189,6 +198,10 @@ class EnvTests(BaseTests):
         pg_config_with_vars = self.env.db('DATABASE_URL_WITH_VARS')
         self.assertEqual(pg_config_with_vars['USER'], 'uf07k1')
         self.assertEqual(pg_config_with_vars['PASSWORD'], 'wegauwhg')
+
+        pg_config_with_docker_secrets = self.env.db('DATABASE_URL_WITH_DOCKER_SECRETS')
+        self.assertEqual(pg_config_with_docker_secrets['USER'], 'secret1')
+        self.assertEqual(pg_config_with_docker_secrets['PASSWORD'], 'secret2')
 
         mysql_config = self.env.db('DATABASE_MYSQL_URL')
         self.assertEqual(mysql_config['ENGINE'], 'django.db.backends.mysql')
@@ -290,11 +303,12 @@ class FileEnvTests(EnvTests):
         super(FileEnvTests, self).setUp()
         Env.ENVIRON = {}
         self.env = Env()
+        self.env.DOCKER_SECRETS_DIR = Path(__file__, is_file=True)('run/secrets/')
         file_path = Path(__file__, is_file=True)('test_env.txt')
         self.env.read_env(file_path, PATH_VAR=Path(__file__, is_file=True).__root__)
-        self.env.read_docker_secrets(Path(__file__, is_file=True)('run/secrets/'))
+        self.env.read_docker_secrets(self.env.DOCKER_SECRETS_DIR)
 
-    def test_docker_secrets(self):
+    def test_load_docker_secrets(self):
         self.assertEqual('secret1', self.env('DOCKER_SECRET_1'))
         self.assertEqual('secret2', self.env('DOCKER_SECRET_2'))
 
@@ -306,6 +320,7 @@ class SubClassTests(EnvTests):
         class MyEnv(Env):
             ENVIRON = self.CONFIG
         self.env = MyEnv()
+        self.env.DOCKER_SECRETS_DIR = Path(__file__, is_file=True)('run/secrets/')
 
     def test_singleton_environ(self):
         self.assertTrue(self.CONFIG is self.env.ENVIRON)
