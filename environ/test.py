@@ -320,7 +320,7 @@ class SchemaEnvTests(BaseTests):
 class DatabaseTestSuite(unittest.TestCase):
 
     def test_postgres_parsing(self):
-        url = 'postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
+        url = 'postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn?disable_server_side_cursors=True'
         url = Env.db_url_config(url)
 
         self.assertEqual(url['ENGINE'], DJANGO_POSTGRES)
@@ -329,6 +329,7 @@ class DatabaseTestSuite(unittest.TestCase):
         self.assertEqual(url['USER'], 'uf07k1i6d8ia0v')
         self.assertEqual(url['PASSWORD'], 'wegauwhgeuioweg')
         self.assertEqual(url['PORT'], 5431)
+        self.assertEqual(url['DISABLE_SERVER_SIDE_CURSORS'], True)
 
     def test_postgres_parsing_unix_domain_socket(self):
         url = 'postgres:////var/run/postgresql/db'
