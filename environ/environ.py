@@ -78,7 +78,8 @@ class Env(object):
         'sqlite': 'django.db.backends.sqlite3',
         'ldap': 'ldapdb.backends.ldap',
     }
-    _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT']
+    _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT', 'DISABLE_SERVER_SIDE_CURSORS']
+
 
     DEFAULT_CACHE_ENV = 'CACHE_URL'
     CACHE_SCHEMES = {
