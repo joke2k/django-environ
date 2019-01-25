@@ -131,7 +131,7 @@ class Env(object):
         """
         :rtype: str
         """
-        value = self.get_value(var, default=default)
+        value = self.get_value(var, cast=str, default=default)
         if multiline:
             return value.replace('\\n', '\n')
         return value
