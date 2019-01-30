@@ -563,6 +563,13 @@ class CacheTestSuite(unittest.TestCase):
             'DB': 0
         })
 
+    def test_rediss_parsing(self):
+        url = 'rediss://127.0.0.1:6379/1'
+        url = Env.cache_url_config(url)
+
+        self.assertEqual(url['BACKEND'], REDIS_DRIVER)
+        self.assertEqual(url['LOCATION'], 'rediss://127.0.0.1:6379/1')
+
     def test_options_parsing(self):
         url = 'filecache:///var/tmp/django_cache?timeout=60&max_entries=1000&cull_frequency=0'
         url = Env.cache_url_config(url)
