@@ -96,6 +96,7 @@ class Env(object):
         'redis': REDIS_DRIVER,
     }
     _CACHE_BASE_OPTIONS = ['TIMEOUT', 'KEY_PREFIX', 'VERSION', 'KEY_FUNCTION', 'BINARY']
+    _CACHE_BEHAVIORS_OPTIONS = ['KETAMA', 'REMOVE_FAILED', 'RETRY_TIMEOUT', 'DEAD_TIMEOUT']
 
     DEFAULT_EMAIL_ENV = 'EMAIL_URL'
     EMAIL_SCHEMES = {
@@ -456,11 +457,17 @@ class Env(object):
 
         if url.query:
             config_options = {}
+            config_behaviors = {}
             for k, v in urllib.parse.parse_qs(url.query).items():
                 if k.upper() in cls._CACHE_BASE_OPTIONS:
                     config.update({k.upper(): _cast_int(v[0])})
+                elif k.upper() in cls._CACHE_BEHAVIORS_OPTIONS:
+                    config_behaviors.update({k.upper(): _cast_int(v[0])})
                 else:
                     config_options.update({k: _cast_int(v[0])})
+
+            if len(config_behaviors.keys()) > 0:
+                config_options.update({'behaviors': config_behaviors})
             config['OPTIONS'] = config_options
 
         if backend:
