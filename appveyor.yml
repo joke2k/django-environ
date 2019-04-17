@@ -51,6 +51,12 @@ environment:
     - PYTHON: "C:/Python36"
       DJANGO_VERSION: "Django>=2.1,<2.2"
 
+    - PYTHON: "C:/Python36"
+      DJANGO_VERSION: "Django>=2.2,<3.0"
+
+    - PYTHON: "C:/Python36"
+      DJANGO_VERSION: "https://github.com/django/django/archive/master.tar.gz"
+
 init:
   - "ECHO %PYTHON%"
   - ps: "ls C:/Python*"

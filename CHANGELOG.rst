@@ -9,7 +9,7 @@ and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.
 --------------------------
 Added
 +++++
-  - Support for Django 2.1
+  - Support for Django 2.1 & 2.2
   - Added tox.ini targets
 
 
