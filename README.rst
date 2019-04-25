@@ -125,6 +125,7 @@ Supported types
     -  PostGIS: postgis://
     -  MySQL: mysql:// or mysql2://
     -  MySQL for GeoDjango: mysqlgis://
+    -  Mysql Connector Python from Oracle: mysql-connector//
     -  SQLITE: sqlite://
     -  SQLITE with SPATIALITE for GeoDjango: spatialite://
     -  Oracle: oracle://
