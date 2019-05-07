@@ -81,7 +81,7 @@ class BaseTests(unittest.TestCase):
             Env.ENVIRON.setdefault(key, val)
 
     def tearDown(self):
-        os.environ = dict(os.environ.items() - self.generateEnvironment())
+        os.environ = {key:value for key, value in os.environ.items() if key not in self.generateEnvironment()}
         os.environ.update(self._old_environ)
 
     def assertTypeAndValue(self, type_, expected, actual):
