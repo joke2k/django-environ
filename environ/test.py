@@ -29,6 +29,9 @@ class BaseTests(unittest.TestCase):
     DICT = dict(foo='bar', test='on')
     PATH = '/home/dev'
     EXPORTED = 'exported var'
+    PRESERVE_ENV = 'my bad, I overwrote the environment var'
+
+    PRESERVE_ENVIRONMENT = 'environment var preserved'
 
     @classmethod
     def generateData(cls):
@@ -63,15 +66,23 @@ class BaseTests(unittest.TestCase):
                     URL_VAR=cls.URL,
                     JSON_VAR=json.dumps(cls.JSON),
                     PATH_VAR=cls.PATH,
-                    EXPORTED_VAR=cls.EXPORTED)
+                    EXPORTED_VAR=cls.EXPORTED,
+                    PRESERVE_ENVIRONMENT=cls.PRESERVE_ENV)
+
+    @classmethod
+    def generateEnvironment(cls):
+        return dict(PRESERVE_ENVIRONMENT=cls.PRESERVE_ENVIRONMENT)
 
     def setUp(self):
-        self._old_environ = os.environ
-        os.environ = Env.ENVIRON = self.generateData()
+        self._old_environ = dict(os.environ)
+        os.environ.update(self.generateEnvironment())
         self.env = Env()
+        for key, val in self.generateData().items():
+            Env.ENVIRON.setdefault(key, val)
 
     def tearDown(self):
-        os.environ = self._old_environ
+        os.environ = dict(os.environ.items() - self.generateEnvironment())
+        os.environ.update(self._old_environ)
 
     def assertTypeAndValue(self, type_, expected, actual):
         self.assertEqual(type_, type(actual))
@@ -275,6 +286,9 @@ class EnvTests(BaseTests):
     def test_exported(self):
         self.assertEqual(self.EXPORTED, self.env('EXPORTED_VAR'))
 
+    def test_preserve_environment_var(self):
+        self.assertEqual(self.PRESERVE_ENVIRONMENT, self.env('PRESERVE_ENVIRONMENT'))
+
 
 class FileEnvTests(EnvTests):
 
@@ -289,9 +303,9 @@ class SubClassTests(EnvTests):
 
     def setUp(self):
         super(SubClassTests, self).setUp()
-        self.CONFIG = self.generateData()
         class MyEnv(Env):
-            ENVIRON = self.CONFIG
+            pass
+        self.CONFIG = MyEnv.ENVIRON
         self.env = MyEnv()
 
     def test_singleton_environ(self):

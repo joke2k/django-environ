@@ -117,14 +117,19 @@ class Env(object):
     }
 
     def __init__(self, **scheme):
-        self.ENVIRON.update(os.environ)
+        if Env.ENVIRON == {}:
+            Env.ENVIRON = dict(os.environ)
         self.scheme = scheme
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
         return self.get_value(var, cast=cast, default=default, parse_default=parse_default)
 
     def __contains__(self, var):
-        return var in self.ENVIRON
+        try:
+            self.get_value(var)
+            return True
+        except ImproperlyConfigured:
+            return False
 
     # Shortcuts
 
