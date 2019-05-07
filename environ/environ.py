@@ -55,7 +55,7 @@ class Env(object):
             ...
     """
 
-    ENVIRON = os.environ
+    ENVIRON = {}
     NOTSET = NoValue()
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = ParseResult
@@ -117,6 +117,7 @@ class Env(object):
     }
 
     def __init__(self, **scheme):
+        self.ENVIRON.update(os.environ)
         self.scheme = scheme
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
