@@ -21,7 +21,7 @@ from six import string_types
 logger = logging.getLogger(__name__)
 
 
-VERSION = '0.4.1'
+VERSION = '0.4.2'
 __author__ = 'joke2k'
 __version__ = tuple(VERSION.split('.'))
 
@@ -31,7 +31,7 @@ def _cast_int(v):
     return int(v) if hasattr(v, 'isdigit') and v.isdigit() else v
 
 def _cast_urlstr(v):
-    return urllib.parse.unquote_plus(v) if isinstance(v, str) else v
+    return urllib.parse.unquote(v) if isinstance(v, str) else v
 
 # back compatibility with redis_cache package
 DJANGO_REDIS_DRIVER = 'django_redis.cache.RedisCache'
