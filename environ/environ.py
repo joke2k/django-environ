@@ -233,6 +233,20 @@ class Env(object):
         """
         return Path(self.get_value(var, default=default), **kwargs)
 
+    def re(self, var, regex, default=NOTSET):
+        """Returns the string that satisfies the given regex.
+        If it's not satisfied returns the var as string
+
+        :param var: Name of variable.
+        :param regex: Regular expression to apply to var.
+        :param default: If var not present in environ, return this instead.
+
+        :returns: str
+        """
+        str_var = self.str(var, default)
+        re_obj = re.search(regex, str_var)
+        return re_obj.group(0) if re_obj else str_var
+
     def get_value(self, var, cast=None, default=NOTSET, parse_default=False):
         """Return value for given environment variable.
 
@@ -768,7 +782,7 @@ class Path(object):
 
     def __getitem__(self, *args, **kwargs):
         return self.__str__().__getitem__(*args, **kwargs)
-    
+
     def __fspath__(self):
         return self.__str__()
 

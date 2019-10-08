@@ -119,6 +119,7 @@ Supported types
 - dict (BAR=key=val,foo=bar) #environ.Env(BAR=(dict, {}))
 - dict (BAR=key=val;foo=1.1;baz=True) #environ.Env(BAR=(dict(value=unicode, cast=dict(foo=float,baz=bool)), {}))
 - url
+- re
 - path (environ.Path)
 - db_url
     -  PostgreSQL: postgres://, pgsql://, psql:// or postgresql://
@@ -207,7 +208,7 @@ Some settings such as Django's ``ADMINS`` make use of nested lists. You can use 
 .. code-block:: python
 
     # DJANGO_ADMINS=John:john@admin.com,Jane:jane@admin.com
-    ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')] 
+    ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')]
 
     # or use more specific function
 

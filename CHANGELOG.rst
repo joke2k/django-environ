@@ -6,6 +6,13 @@ The format is *inspired* by `Keep a Changelog <http://keepachangelog.com/en/1.0.
 and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 
 
+`unreleased`_
+--------------------------
+Added
++++++
+  - New type: re
+
+
 `v0.4.5`_ - 25-June-2018
 --------------------------
 Added

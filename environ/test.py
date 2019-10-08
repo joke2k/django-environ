@@ -34,6 +34,7 @@ class BaseTests(unittest.TestCase):
     def generateData(cls):
         return dict(STR_VAR='bar',
                     MULTILINE_STR_VAR='foo\\nbar',
+                    STR_RE_VAR='bar-1.0.0',
                     INT_VAR='42',
                     FLOAT_VAR='33.3',
                     FLOAT_COMMA_VAR='33,3',
@@ -96,6 +97,11 @@ class EnvTests(BaseTests):
         self.assertTypeAndValue(str, 'bar', self.env.str('STR_VAR'))
         self.assertTypeAndValue(str, 'foo\\nbar', self.env.str('MULTILINE_STR_VAR'))
         self.assertTypeAndValue(str, 'foo\nbar', self.env.str('MULTILINE_STR_VAR', multiline=True))
+
+    def test_re(self):
+        self.assertTypeAndValue(str, '1.0.0', self.env.re('STR_RE_VAR', r'\d+.\d+.\d+'))
+        self.assertTypeAndValue(str, 'foo', self.env.re('MULTILINE_STR_VAR', r'\w+'))
+        self.assertTypeAndValue(str, 'bar', self.env.re('STR_VAR', r'\d+'))
 
     def test_bytes(self):
         self.assertTypeAndValue(bytes, b'bar', self.env.bytes('STR_VAR'))
@@ -395,7 +401,7 @@ class DatabaseTestSuite(unittest.TestCase):
 
         self.assertEqual(url['ENGINE'], 'django.db.backends.sqlite3')
         self.assertEqual(url['NAME'], ':memory:')
-        
+
     def test_memory_sqlite_url_warns_about_netloc(self):
         url = 'sqlite://missing-slash-path'
         with warnings.catch_warnings(record=True) as w:
