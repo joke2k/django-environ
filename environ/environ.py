@@ -447,7 +447,14 @@ class Env(object):
         :param backend:
         :return:
         """
-        url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        if not isinstance(url, cls.URL_CLASS):
+            if not url:
+                return {}
+            else:
+                url = urlparse(url)
+
+        if url.scheme not in cls.CACHE_SCHEMES:
+            raise ImproperlyConfigured('Invalid cache schema {}'.format(url.scheme))
 
         location = url.netloc.split(',')
         if len(location) == 1:
