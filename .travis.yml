@@ -5,6 +5,7 @@ python:
  - "3.4"
  - "3.5"
  - "3.6"
+ - "3.7"
  - "nightly"
  - "pypy"
 env:
@@ -14,6 +15,8 @@ env:
    - DJANGO="Django>=1.10,<1.11"
    - DJANGO="Django>=1.11,<2.0"
    - DJANGO="Django>=2.0,<2.1"
+   - DJANGO="Django>=2.1,<2.2"
+   - DJANGO="Django>=2.2,<2.3"
    - DJANGO="https://github.com/django/django/archive/master.tar.gz"
 install:
  # The default pip doesn't properly support pre-release version specifiers.
@@ -30,27 +33,44 @@ branches:
 script: coverage run --source=environ setup.py test
 matrix:
   fast_finish: true
-  include:
-    - python: "3.3"
-      env: DJANGO="Django>=1.8,<1.9"
-    # Django 1.11+ supports Python 3.6
-    - python: "3.6"
-      env: DJANGO="Django>=1.11,<2.0"
-    - python: "3.6"
-      env: DJANGO="Django>=2.0,<2.1"
   exclude:
     # Django 2.0+ dropped support for Python 2.
     - python: "2.7"
       env: DJANGO="Django>=2.0,<2.1"
-    - python: "pypy"
-      env: DJANGO="Django>=2.0,<2.1"
+    - python: "2.7"
+      env: DJANGO="Django>=2.1,<2.2"
+    - python: "2.7"
+      env: DJANGO="Django>=2.2,<2.3"
     - python: "2.7"
       env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
     - python: "pypy"
+      env: DJANGO="Django>=2.0,<2.1"
+    - python: "pypy"
+      env: DJANGO="Django>=2.1,<2.2"
+    - python: "pypy"
+      env: DJANGO="Django>=2.2,<2.3"
+    - python: "pypy"
       env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
-    # Django master dropped support for Python 3.4.
+    # Python 3.4 is dropped since Django 2.1
+    - python: "3.4"
+      env: DJANGO="Django>=2.1,<2.2"
+    - python: "3.4"
+      env: DJANGO="Django>=2.2,<2.3"
     - python: "3.4"
       env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
+    # Since 1.11, Django works with Python 3.6+
+    - python: "3.6"
+      env: DJANGO="Django>=1.8,<1.9"
+    - python: "3.6"
+      env: DJANGO="Django>=1.9,<1.10"
+    - python: "3.6"
+      env: DJANGO="Django>=1.10,<1.11"
+    - python: "3.7"
+      env: DJANGO="Django>=1.8,<1.9"
+    - python: "3.7"
+      env: DJANGO="Django>=1.9,<1.10"
+    - python: "3.7"
+      env: DJANGO="Django>=1.10,<1.11"
   allow_failures:
     - env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
 after_success:

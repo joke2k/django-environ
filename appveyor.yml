@@ -30,6 +30,34 @@ environment:
     - PYTHON: "C:/Python35"
       DJANGO_VERSION: "Django>=2.0,<2.1"
 
+    # Django works with Python 3.6 since version 1.11
+
+    - PYTHON: "C:/Python36"
+      DJANGO_VERSION: "Django>=1.11,<2.0"
+
+    - PYTHON: "C:/Python36"
+      DJANGO_VERSION: "Django>=2.0,<2.1"
+
+    - PYTHON: "C:/Python36"
+      DJANGO_VERSION: "Django>=2.1,<2.2"
+
+    - PYTHON: "C:/Python36"
+      DJANGO_VERSION: "Django>=2.2,<2.3"
+
+    # Django works with Python 3.7 since version 1.11
+
+    - PYTHON: "C:/Python37"
+      DJANGO_VERSION: "Django>=1.11,<2.0"
+
+    - PYTHON: "C:/Python37"
+      DJANGO_VERSION: "Django>=2.0,<2.1"
+
+    - PYTHON: "C:/Python37"
+      DJANGO_VERSION: "Django>=2.1,<2.2"
+
+    - PYTHON: "C:/Python37"
+      DJANGO_VERSION: "Django>=2.2,<2.3"
+
 init:
   - "ECHO %PYTHON%"
   - ps: "ls C:/Python*"
