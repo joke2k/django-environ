@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Django-environ documentation build configuration file, created by
 # sphinx-quickstart on Mon Apr  1 23:01:04 2013.
@@ -40,8 +39,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Django-environ'
-copyright = u'2013-2015, Daniele Faraglia and other contributors'
+project = 'Django-environ'
+copyright = '2013-2015, Daniele Faraglia and other contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -183,8 +182,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'Django-environ.tex', u'Django-environ Documentation',
-   u'joke2k', 'manual'),
+  ('index', 'Django-environ.tex', 'Django-environ Documentation',
+   'joke2k', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -213,8 +212,8 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'django-environ', u'Django-environ Documentation',
-     [u'joke2k'], 1)
+    ('index', 'django-environ', 'Django-environ Documentation',
+     ['joke2k'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -227,8 +226,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Django-environ', u'Django-environ Documentation',
-   u'joke2k', 'Django-environ', "Django-environ allows you to utilize 12factor inspired environment "
+  ('index', 'Django-environ', 'Django-environ Documentation',
+   'joke2k', 'Django-environ', "Django-environ allows you to utilize 12factor inspired environment "
                                 "variables to configure your Django application.",
    'Miscellaneous'),
 ]
