@@ -326,7 +326,7 @@ class Env(object):
                 [val.split('=') for val in value.split(';') if val]
             ))
         elif cast is dict:
-            value = dict([val.split('=') for val in value.split(',') if val])
+            value = dict([val.split('=', 1) for val in value.split(',') if val])
         elif cast is list:
             value = [x for x in value.split(',') if x]
         elif cast is tuple:
