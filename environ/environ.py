@@ -785,21 +785,3 @@ class Path(object):
             raise ImproperlyConfigured(
                 "Create required path: {0}".format(absolute_path))
         return absolute_path
-
-
-def register_scheme(scheme):
-    for method in dir(urlparselib):
-        if method.startswith('uses_'):
-            getattr(urlparselib, method).append(scheme)
-
-
-def register_schemes(schemes):
-    for scheme in schemes:
-        register_scheme(scheme)
-
-
-# Register database and cache schemes in URLs.
-register_schemes(Env.DB_SCHEMES.keys())
-register_schemes(Env.CACHE_SCHEMES.keys())
-register_schemes(Env.SEARCH_SCHEMES.keys())
-register_schemes(Env.EMAIL_SCHEMES.keys())
