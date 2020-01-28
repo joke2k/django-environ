@@ -3,9 +3,8 @@ import sys
 import unittest
 import warnings
 
-from .compat import (
-    json, DJANGO_POSTGRES, ImproperlyConfigured, REDIS_DRIVER, quote
-)
+from urllib.parse import quote
+from .compat import json, DJANGO_POSTGRES, ImproperlyConfigured, REDIS_DRIVER
 
 from environ import Env, Path
 
@@ -394,7 +393,7 @@ class DatabaseTestSuite(unittest.TestCase):
 
         self.assertEqual(url['ENGINE'], 'django.db.backends.sqlite3')
         self.assertEqual(url['NAME'], ':memory:')
-        
+
     def test_memory_sqlite_url_warns_about_netloc(self):
         url = 'sqlite://missing-slash-path'
         with warnings.catch_warnings(record=True) as w:
