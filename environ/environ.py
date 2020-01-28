@@ -8,9 +8,12 @@ import os
 import re
 import sys
 import warnings
+import urllib.parse as urlparselib
+
+from urllib.parse import urlparse, urlunparse, ParseResult, parse_qs, unquote_plus
+
 from .compat import (
-    json, urlparselib, urlparse, urlunparse, ParseResult, parse_qs,
-    unquote_plus, DJANGO_POSTGRES, REDIS_DRIVER, ImproperlyConfigured, basestring)
+    json, DJANGO_POSTGRES, REDIS_DRIVER, ImproperlyConfigured, basestring)
 
 logger = logging.getLogger(__name__)
 

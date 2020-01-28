@@ -4,21 +4,10 @@ environ.compat
 This module handles import compatibility issues
 """
 
-import sys
 import pkgutil
 
-import urllib.parse as urlparselib
-
-
-quote = urlparselib.quote
-unquote_plus = urlparselib.unquote_plus
 
 basestring = str
-
-urlparse = urlparselib.urlparse
-urlunparse = urlparselib.urlunparse
-ParseResult = urlparselib.ParseResult
-parse_qs = urlparselib.parse_qs
 
 if pkgutil.find_loader('simplejson'):
     import simplejson as json
