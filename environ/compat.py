@@ -7,8 +7,6 @@ This module handles import compatibility issues
 import pkgutil
 
 
-basestring = str
-
 if pkgutil.find_loader('simplejson'):
     import simplejson as json
 else:

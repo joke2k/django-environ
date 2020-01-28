@@ -12,8 +12,7 @@ import urllib.parse as urlparselib
 
 from urllib.parse import urlparse, urlunparse, ParseResult, parse_qs, unquote_plus
 
-from .compat import (
-    json, DJANGO_POSTGRES, REDIS_DRIVER, ImproperlyConfigured, basestring)
+from .compat import json, DJANGO_POSTGRES, REDIS_DRIVER, ImproperlyConfigured
 
 logger = logging.getLogger(__name__)
 
@@ -634,7 +633,7 @@ class Env:
                 return
 
         try:
-            with open(env_file) if isinstance(env_file, basestring) else env_file as f:
+            with open(env_file) if isinstance(env_file, str) else env_file as f:
                 content = f.read()
         except OSError:
             warnings.warn(
@@ -741,7 +740,7 @@ class Path:
     def __sub__(self, other):
         if isinstance(other, int):
             return self.path('../' * other)
-        elif isinstance(other, basestring):
+        elif isinstance(other, str):
             if self.__root__.endswith(other):
                 return Path(self.__root__.rstrip(other))
         raise TypeError(
@@ -771,7 +770,7 @@ class Path:
 
     def __getitem__(self, *args, **kwargs):
         return self.__str__().__getitem__(*args, **kwargs)
-    
+
     def __fspath__(self):
         return self.__str__()
 
