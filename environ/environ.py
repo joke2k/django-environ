@@ -651,7 +651,8 @@ class Env(object):
                 m3 = re.match(r'\A"(.*)"\Z', val)
                 if m3:
                     val = re.sub(r'\\(.)', r'\1', m3.group(1))
-                cls.ENVIRON.setdefault(key, str(val))
+                env_var = {key: str(val)}
+                cls.ENVIRON.update(**env_var)
 
         # set defaults
         for key, value in overrides.items():
