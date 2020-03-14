@@ -207,7 +207,7 @@ Some settings such as Django's ``ADMINS`` make use of nested lists. You can use 
 .. code-block:: python
 
     # DJANGO_ADMINS=John:john@admin.com,Jane:jane@admin.com
-    ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')] 
+    ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')]
 
     # or use more specific function
 
