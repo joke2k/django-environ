@@ -307,7 +307,7 @@ Thank you to all our backers!
 
 Sponsors
 -----------------
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. `become_sponsor`_
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. `Became sponsor`_.
 
 |ocsponsor0| |ocsponsor1| |ocsponsor2|
 
@@ -392,7 +392,7 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
     :target: https://opencollective.com/django-environ
     :alt: Repo Contributors
 
-.. _become_sponsor: https://opencollective.com/django-environ#sponsor
+.. _`Became sponsor`: https://opencollective.com/django-environ#sponsor
 
 .. |ocsponsor0| image:: https://opencollective.com/django-environ/sponsor/0/avatar.svg
     :target: https://opencollective.com/django-environ/sponsor/0/website
