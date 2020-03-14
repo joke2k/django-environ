@@ -1,3 +1,4 @@
 include *.rst
 include *.txt
 include environ/test_env.txt
+LICENSE.txt
