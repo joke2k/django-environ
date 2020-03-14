@@ -186,7 +186,7 @@ In order to set email configuration for django you can use this code:
 .. code-block:: python
 
     EMAIL_CONFIG = env.email_url(
-        'EMAIL_URL', default='smtp://user@:password@localhost:25')
+        'EMAIL_URL', default='smtp://user:password@localhost:25')
 
     vars().update(EMAIL_CONFIG)
 
