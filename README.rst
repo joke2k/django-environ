@@ -298,8 +298,8 @@ Credits
 .. _rconradharris: https://github.com/rconradharris
 .. _envparse: https://github.com/rconradharris/envparse
 
-.. _kennethreitz: https://github.com/kennethreitz
-.. _dj-database-url: https://github.com/kennethreitz/dj-database-url
+.. _jacobian: https://github.com/jacobian
+.. _dj-database-url: https://github.com/jacobian/dj-database-url
 
 .. _migonzalvar: https://github.com/migonzalvar
 .. _dj-email-url: https://github.com/migonzalvar/dj-email-url
