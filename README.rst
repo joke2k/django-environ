@@ -139,7 +139,7 @@ Supported types
     -  Memory: locmemcache://
     -  Memcached: memcache://
     -  Python memory: pymemcache://
-    -  Redis: rediscache://
+    -  Redis: rediscache://, redis://, or rediss://
 - search_url
     - ElasticSearch: elasticsearch://
     - Solr: solr://
