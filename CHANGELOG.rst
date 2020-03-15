@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is *inspired* by `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 
+`unreleased`_
+--------------------------
+Added
++++++
+  - Support for Django 2.1 & 2.2
+  - Added tox.ini targets
+
 
 `v0.4.5`_ - 25-June-2018
 --------------------------

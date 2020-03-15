@@ -1,4 +1,5 @@
 language: python
+dist: xenial
 sudo: false
 python:
  - "2.7"
@@ -8,17 +9,42 @@ python:
  - "nightly"
  - "pypy"
 env:
-  matrix:
-   - DJANGO="Django>=1.8,<1.9"
-   - DJANGO="Django>=1.9,<1.10"
-   - DJANGO="Django>=1.10,<1.11"
-   - DJANGO="Django>=1.11,<2.0"
-   - DJANGO="Django>=2.0,<2.1"
-   - DJANGO="https://github.com/django/django/archive/master.tar.gz"
+  - DJANGO="1.8"
+  - DJANGO="1.9"
+  - DJANGO="1.10"
+  - DJANGO="1.11"
+  - DJANGO="2.0"
+  - DJANGO="2.1"
+  - DJANGO="2.2"
+  - DJANGO="master"
+matrix:
+  fast_finish: true
+  exclude:
+    - python: 2.7
+      env: DJANGO="2.0"
+
+    - python: 2.7
+      env: DJANGO="2.1"
+
+    - python: 2.7
+      env: DJANGO="master"
+
+    - python: 3.4
+      env: DJANGO="2.1"
+
+    - python: 3.4
+      env: DJANGO="master"
+
+    - python: 3.5
+      env: DJANGO="master"
+  allow_failures:
+  	- env: DJANGO="master"
+
 install:
  # The default pip doesn't properly support pre-release version specifiers.
  - pip install -U pip
- - pip install . coverage $DJANGO
+ - pip install tox
+ - pip install -q tox-travis
 branches:
  only:
   - master
@@ -27,33 +53,7 @@ branches:
   - /^release\/.+/
   - /^hotfix\/.+/
   - /^v[\d\.]+/
-script: coverage run --source=environ setup.py test
-matrix:
-  fast_finish: true
-  include:
-    - python: "3.3"
-      env: DJANGO="Django>=1.8,<1.9"
-    # Django 1.11+ supports Python 3.6
-    - python: "3.6"
-      env: DJANGO="Django>=1.11,<2.0"
-    - python: "3.6"
-      env: DJANGO="Django>=2.0,<2.1"
-  exclude:
-    # Django 2.0+ dropped support for Python 2.
-    - python: "2.7"
-      env: DJANGO="Django>=2.0,<2.1"
-    - python: "pypy"
-      env: DJANGO="Django>=2.0,<2.1"
-    - python: "2.7"
-      env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
-    - python: "pypy"
-      env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
-    # Django master dropped support for Python 3.4.
-    - python: "3.4"
-      env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
-  allow_failures:
-    - env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
+script: tox
 after_success:
-  - coverage report
   - pip install --quiet python-coveralls
   - coveralls

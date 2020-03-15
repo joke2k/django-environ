@@ -79,8 +79,7 @@ class Env(object):
         'ldap': 'ldapdb.backends.ldap',
     }
     _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT', 'DISABLE_SERVER_SIDE_CURSORS']
-
-
+    
     DEFAULT_CACHE_ENV = 'CACHE_URL'
     CACHE_SCHEMES = {
         'dbcache': 'django.core.cache.backends.db.DatabaseCache',
@@ -91,6 +90,7 @@ class Env(object):
         'pymemcache': 'django.core.cache.backends.memcached.PyLibMCCache',
         'rediscache': REDIS_DRIVER,
         'redis': REDIS_DRIVER,
+        'rediss': REDIS_DRIVER,
     }
     _CACHE_BASE_OPTIONS = ['TIMEOUT', 'KEY_PREFIX', 'VERSION', 'KEY_FUNCTION', 'BINARY']
 

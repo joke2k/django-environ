@@ -1,7 +1,7 @@
 Django-environ
 ==============
 
-|pypi| |unix_build| |windows_build| |coverage| |contributors| |license| |say_thanks|
+|pypi| |unix_build| |windows_build| |coverage| |contributors| |license| |say_thanks| |ocbackers| |ocsponsors| 
 
 **django-environ** allows you to use `Twelve-factor methodology`_ to configure your Django application with environment variables.
 
@@ -69,7 +69,7 @@ Feature Support
 ---------------
 - Fast and easy multi environment for deploy
 - Fill ``os.environ`` with .env file variables
-- Variables casting (see `Supported types`_ below)
+- Variables casting (see supported_types_ below)
 - Url variables exploded to django specific package settings
 
 Django-environ officially supports Django 1.8 ~ 2.0.
@@ -91,7 +91,7 @@ Then create a ``.env`` file:
 
     DEBUG=on
     SECRET_KEY=your-secret-key
-    DATABASE_URL=psql://urser:un-githubbedpassword@127.0.0.1:8458/database
+    DATABASE_URL=psql://user:un-githubbedpassword@127.0.0.1:8458/database
     SQLITE_URL=sqlite:///my-local-sqlite.db
     CACHE_URL=memcache://127.0.0.1:11211,127.0.0.1:11212,127.0.0.1:11213
     REDIS_URL=rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=ungithubbed-secret
@@ -104,7 +104,7 @@ Documentation
 
 Documentation is available at `RTFD <http://django-environ.rtfd.io/>`_.
 
-.. _`Supported types`:
+.. _supported_types:
 
 Supported types
 ---------------
@@ -186,7 +186,7 @@ In order to set email configuration for django you can use this code:
 .. code-block:: python
 
     EMAIL_CONFIG = env.email_url(
-        'EMAIL_URL', default='smtp://user@:password@localhost:25')
+        'EMAIL_URL', default='smtp://user:password@localhost:25')
 
     vars().update(EMAIL_CONFIG)
 
@@ -207,7 +207,7 @@ Some settings such as Django's ``ADMINS`` make use of nested lists. You can use 
 .. code-block:: python
 
     # DJANGO_ADMINS=John:john@admin.com,Jane:jane@admin.com
-    ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')] 
+    ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')]
 
     # or use more specific function
 
@@ -246,6 +246,7 @@ Multiple env files
 It is possible to have multiple env files and select one using environment variables.
 
 .. code-block:: python
+
     env = environ.Env()
     env.read_env(env.str('ENV_PATH', '.env'))
 
@@ -294,11 +295,27 @@ Credits
 - `Distribute`_
 - `modern-package-template`_
 
+Contributors
+-----------------
+Thank you to all the people who have already contributed. 
+|occontributorimage|
+
+Backers
+-----------------
+Thank you to all our backers! 
+|ocbackerimage|
+
+Sponsors
+-----------------
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. `Became sponsor`_.
+
+|ocsponsor0| |ocsponsor1| |ocsponsor2|
+
 .. _rconradharris: https://github.com/rconradharris
 .. _envparse: https://github.com/rconradharris/envparse
 
-.. _kennethreitz: https://github.com/kennethreitz
-.. _dj-database-url: https://github.com/kennethreitz/dj-database-url
+.. _jacobian: https://github.com/jacobian
+.. _dj-database-url: https://github.com/jacobian/dj-database-url
 
 .. _migonzalvar: https://github.com/migonzalvar
 .. _dj-email-url: https://github.com/migonzalvar/dj-email-url
@@ -360,3 +377,29 @@ Credits
 .. _`Authors file`: https://github.com/joke2k/django-environ/blob/develop/AUTHORS.rst
 .. _`Contributor Friendly`: https://github.com/joke2k/django-environ/issues?direction=desc&labels=contributor-friendly&page=1&sort=updated&state=open
 .. _`the repository`: https://github.com/joke2k/django-environ
+
+.. |ocbackers| image:: https://opencollective.com/django-environ/backers/badge.svg
+    :target: https://opencollective.com/django-environ
+    :alt: Backers on Open Collective
+.. |ocsponsors| image:: https://opencollective.com/django-environ/sponsors/badge.svg
+    :target: https://opencollective.com/django-environ
+    :alt: Sponsors on Open Collective
+    
+.. |ocbackerimage| image:: https://opencollective.com/django-environ/backers.svg?width=890
+    :target: https://opencollective.com/django-environ
+    :alt: Backers on Open Collective
+.. |occontributorimage| image:: https://opencollective.com/django-environ/contributors.svg?width=890&button=false
+    :target: https://opencollective.com/django-environ
+    :alt: Repo Contributors
+
+.. _`Became sponsor`: https://opencollective.com/django-environ#sponsor
+
+.. |ocsponsor0| image:: https://opencollective.com/django-environ/sponsor/0/avatar.svg
+    :target: https://opencollective.com/django-environ/sponsor/0/website
+    :alt: Sponsor
+.. |ocsponsor1| image:: https://opencollective.com/django-environ/sponsor/1/avatar.svg
+    :target: https://opencollective.com/django-environ/sponsor/1/website
+    :alt: Sponsor
+.. |ocsponsor2| image:: https://opencollective.com/django-environ/sponsor/2/avatar.svg
+    :target: https://opencollective.com/django-environ/sponsor/2/website
+    :alt: Sponsor
