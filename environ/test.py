@@ -594,6 +594,17 @@ class CacheTestSuite(unittest.TestCase):
             'BARS': 9001,
         })
 
+    def test_unknown_backend(self):
+        url = 'unknown-scheme://127.0.0.1:1000'
+        with self.assertRaises(ImproperlyConfigured) as cm:
+            Env.cache_url_config(url)
+        self.assertEqual(str(cm.exception),
+                         'Invalid cache schema unknown-scheme')
+
+    def test_empty_url_is_mapped_to_empty_config(self):
+        self.assertEqual(Env.cache_url_config(''), {})
+        self.assertEqual(Env.cache_url_config(None), {})
+
 
 class SearchTestSuite(unittest.TestCase):
 
