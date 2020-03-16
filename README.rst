@@ -125,6 +125,7 @@ Supported types
     -  PostGIS: postgis://
     -  MySQL: mysql:// or mysql2://
     -  MySQL for GeoDjango: mysqlgis://
+    -  Mysql Connector Python from Oracle: mysql-connector://
     -  SQLITE: sqlite://
     -  SQLITE with SPATIALITE for GeoDjango: spatialite://
     -  Oracle: oracle://
@@ -168,6 +169,15 @@ In order to use unsafe characters you have to encode with ``urllib.parse.encode`
     DATABASE_URL=mysql://user:%23password@127.0.0.1:3306/dbname
 
 See https://perishablepress.com/stop-using-unsafe-characters-in-urls/ for reference.
+
+Smart Casting
+~~~~~~~~~~~~~
+
+django-environ has a "Smart-casting" enabled by default, if you don't provide a `cast` type, it will be detected from `default` type.
+This could raise side effects (see `#192 <https://github.com/joke2k/django-environ/issues/192>`_).
+To disable it use `env.smart_caset = False`.
+New major release will disable it as default. 
+
 
 Multiple redis cache locations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

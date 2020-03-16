@@ -118,6 +118,7 @@ class Env(object):
     }
 
     def __init__(self, **scheme):
+        self.smart_cast = True
         self.scheme = scheme
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
@@ -125,7 +126,7 @@ class Env(object):
 
     def __contains__(self, var):
         return var in self.ENVIRON
-
+    
     # Shortcuts
 
     def str(self, var, default=NOTSET, multiline=False):
@@ -284,8 +285,10 @@ class Env(object):
             value = value.lstrip('$')
             value = self.get_value(value, cast=cast, default=default)
 
-        if cast is None and default is not None and not isinstance(default, NoValue):
-            cast = type(default)
+        # Smart casting
+        if self.smart_cast:
+            if cast is None and default is not None and not isinstance(default, NoValue):
+                cast = type(default)
 
         if value != default or (parse_default and value):
             value = self.parse_value(value, cast)
