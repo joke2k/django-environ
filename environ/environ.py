@@ -18,15 +18,9 @@ import re
 import sys
 import urllib.parse as urlparselib
 import warnings
-from urllib.parse import (
-    parse_qs,
-    ParseResult,
-    unquote_plus,
-    urlparse,
-    urlunparse,
-)
+from urllib.parse import ParseResult, parse_qs, unquote_plus, urlparse, urlunparse
 
-from .compat import DJANGO_POSTGRES, ImproperlyConfigured, json, REDIS_DRIVER
+from .compat import DJANGO_POSTGRES, REDIS_DRIVER, ImproperlyConfigured, json
 
 try:
     from os import PathLike
@@ -734,22 +728,21 @@ class Env:
     def read_env(cls, env_file=None, **overrides):
         """Read a .env file into os.environ.
 
-        If not given a path to a dotenv path, does filthy magic stack
-        backtracking to find the dotenv in the same directory as the file that
-        called read_env.
-
-        Refs:
-        - https://wellfire.co/learn/easier-12-factor-django
-        - https://gist.github.com/bennylope/2999704
+        :param env_file: The path to the `.env` file your application should
+            use. If a path is not provided, `read_env` will attempt to import
+            the Django settings module and use the BASE_DIR constant to find
+            the .env file. Failing that, it will create an INFO-level log
+            message that no `.env` file was found and continue on.
+        :param **overrides: Any additional keyword arguments provided directly 
+            to read_env will be added to the environment. If the key matches an
+            existing environment variable, the value will be overridden.
         """
         if env_file is None:
-            frame = sys._getframe()
-            env_file = os.path.join(
-                os.path.dirname(frame.f_back.f_code.co_filename),
-                '.env'
-            )
-            if not os.path.exists(env_file):
-                warnings.warn(
+            try:
+                from django.conf import settings
+                env_file = os.path.join(settings.BASE_DIR, '.env')
+            except ImportError:
+                logger.info(
                     "%s doesn't exist - if you're not configuring your "
                     "environment separately, create one." % env_file)
                 return
@@ -786,8 +779,31 @@ class Env:
             cls.ENVIRON.setdefault(key, value)
 
 
-class Path:
-    """Inspired to Django Two-scoops, handling File Paths in Settings."""
+class Path(object):
+
+    """Inspired to Django Two-scoops, handling File Paths in Settings.
+
+        >>> from environ import Path
+        >>> root = Path('/home')
+        >>> root, root(), root('dev')
+        (<Path:/home>, '/home', '/home/dev')
+        >>> root == Path('/home')
+        True
+        >>> root in Path('/'), root not in Path('/other/path')
+        (True, True)
+        >>> root('dev', 'not_existing_dir', required=True)
+        Traceback (most recent call last):
+        environ.environ.ImproperlyConfigured: Create required path: /home/not_existing_dir
+        >>> public = root.path('public')
+        >>> public, public.root, public('styles')
+        (<Path:/home/public>, '/home/public', '/home/public/styles')
+        >>> assets, scripts = public.path('assets'), public.path('assets', 'scripts')
+        >>> assets.root, scripts.root
+        ('/home/public/assets', '/home/public/assets/scripts')
+        >>> assets + 'styles', str(assets + 'styles'), ~assets
+        (<Path:/home/public/assets/styles>, '/home/public/assets/styles', <Path:/home/public>)
+
+    """
 
     def path(self, *paths, **kwargs):
         """Create new Path based on self.root and provided paths.
