@@ -40,7 +40,7 @@ Django-environ
         'redis': env.cache('REDIS_URL')
     }
 
-See the `similar code, sans django-environ <https://gist.github.com/joke2k/cc30ed2d5ccda52d5b551ccbc17e536b>`_.
+See the `similar code, without django-environ <https://gist.github.com/joke2k/cc30ed2d5ccda52d5b551ccbc17e536b>`_.
 
 ::
 
