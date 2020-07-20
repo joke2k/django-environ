@@ -626,7 +626,7 @@ class Env(object):
         """Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack backtracking
-        to find manage.py and then find the dotenv.
+        to find the dotenv in the same directory as the file that called read_env.
 
         http://www.wellfireinteractive.com/blog/easier-12-factor-django/
 
