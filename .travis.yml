@@ -1,40 +1,56 @@
 version: ~> 1.0
 language: python
 os: linux
+cache: pip
+git:
+  depth: 1
 python:
- - "3.5"
- - "3.6"
- - "3.7"
- - "3.8"
- - "nightly"
- - "pypy"
-jobs:
-  matrix:
-   - DJANGO="Django==1.11.*"
-   - DJANGO="Django==2.0.*"
-   - DJANGO="Django==2.1.*"
-   - DJANGO="Django==2.2.*"
-   - DJANGO="Django==3.0"
-   - DJANGO="https://github.com/django/django/archive/master.tar.gz"
-install:
- # The default pip doesn't properly support pre-release version specifiers.
- - pip install --upgrade pip wheel setuptools
- - pip install tox
- - pip install -q tox-travis
-branches:
- only:
-  - master
-  - develop
-  - /^feature\/.+/
-  - /^release\/.+/
-  - /^hotfix\/.+/
-  - /^v[\d\.]+/
-script: 
-  tox
-jobs:
-  fast_finish: true
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "nightly"
+env:
+  - DJANGO="Django==1.11.*"
+  - DJANGO="Django==2.0.*"
+  - DJANGO="Django==2.1.*"
+  - DJANGO="Django==2.2.*"
+  - DJANGO="Django==3.0.*"
+  - DJANGO="https://github.com/django/django/archive/master.tar.gz"
+matrix:
+  exclude:
+    - env: DJANGO="Django==1.11.*"
+      python: "3.8"
+    - env: DJANGO="Django==2.0.*"
+      python: "3.8"
+    - env: DJANGO="Django==2.1.*"
+      python: "3.8"
+    - env: DJANGO="Django==3.0.*"
+      python: "3.5"
+    - env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
+      python: "3.5"
   allow_failures:
     - env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
+
+before_install: pip install --upgrade pip
+  pip install tox
+  pip install -q tox-travis
+install:
+  # The default pip doesn't properly support pre-release version specifiers.
+  - pip install --upgrade pip wheel setuptools
+  - pip install tox
+  - pip install --quiet tox-travis
+branches:
+  only:
+    - master
+    - develop
+    - /^feature\/.+/
+    - /^release\/.+/
+    - /^hotfix\/.+/
+    - /^v[\d\.]+/
+script: tox
+jobs:
+  fast_finish: true
 after_success:
   - pip install --quiet python-coveralls
   - coveralls
