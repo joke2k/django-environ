@@ -1,12 +1,10 @@
-from __future__ import print_function
 import os
 import sys
 import unittest
 import warnings
 
-from .compat import (
-    json, DJANGO_POSTGRES, ImproperlyConfigured, REDIS_DRIVER, quote
-)
+from urllib.parse import quote
+from .compat import json, DJANGO_POSTGRES, ImproperlyConfigured, REDIS_DRIVER
 
 from environ import Env, Path
 
@@ -279,7 +277,7 @@ class EnvTests(BaseTests):
 class FileEnvTests(EnvTests):
 
     def setUp(self):
-        super(FileEnvTests, self).setUp()
+        super().setUp()
         Env.ENVIRON = {}
         self.env = Env()
         file_path = Path(__file__, is_file=True)('test_env.txt')
@@ -288,7 +286,7 @@ class FileEnvTests(EnvTests):
 class SubClassTests(EnvTests):
 
     def setUp(self):
-        super(SubClassTests, self).setUp()
+        super().setUp()
         self.CONFIG = self.generateData()
         class MyEnv(Env):
             ENVIRON = self.CONFIG
@@ -395,7 +393,7 @@ class DatabaseTestSuite(unittest.TestCase):
 
         self.assertEqual(url['ENGINE'], 'django.db.backends.sqlite3')
         self.assertEqual(url['NAME'], ':memory:')
-        
+
     def test_memory_sqlite_url_warns_about_netloc(self):
         url = 'sqlite://missing-slash-path'
         with warnings.catch_warnings(record=True) as w:
@@ -623,7 +621,7 @@ class SearchTestSuite(unittest.TestCase):
     def test_solr_multicore_parsing(self):
         timeout = 360
         index = 'solr_index'
-        url = '%s/%s?TIMEOUT=%s' % (self.solr_url, index, timeout)
+        url = '{}/{}?TIMEOUT={}'.format(self.solr_url, index, timeout)
         url = Env.search_url_config(url)
 
         self.assertEqual(url['ENGINE'], 'haystack.backends.solr_backend.SolrEngine')
@@ -634,7 +632,7 @@ class SearchTestSuite(unittest.TestCase):
 
     def test_elasticsearch_parsing(self):
         timeout = 360
-        url = '%s?TIMEOUT=%s' % (self.elasticsearch_url, timeout)
+        url = '{}?TIMEOUT={}'.format(self.elasticsearch_url, timeout)
         url = Env.search_url_config(url)
 
         self.assertEqual(url['ENGINE'], 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine')
@@ -647,7 +645,7 @@ class SearchTestSuite(unittest.TestCase):
     def test_whoosh_parsing(self):
         storage = 'file'  # or ram
         post_limit = 128 * 1024 * 1024
-        url = '%s?STORAGE=%s&POST_LIMIT=%s' % (self.whoosh_url, storage, post_limit)
+        url = '{}?STORAGE={}&POST_LIMIT={}'.format(self.whoosh_url, storage, post_limit)
         url = Env.search_url_config(url)
 
         self.assertEqual(url['ENGINE'], 'haystack.backends.whoosh_backend.WhooshEngine')
@@ -661,7 +659,7 @@ class SearchTestSuite(unittest.TestCase):
 
     def test_xapian_parsing(self):
         flags = 'myflags'
-        url = '%s?FLAGS=%s' % (self.xapian_url, flags)
+        url = '{}?FLAGS={}'.format(self.xapian_url, flags)
         url = Env.search_url_config(url)
 
         self.assertEqual(url['ENGINE'], 'haystack.backends.xapian_backend.XapianEngine')
@@ -682,7 +680,7 @@ class SearchTestSuite(unittest.TestCase):
         excluded_indexes = 'myapp.indexes.A,myapp.indexes.B'
         include_spelling = 1
         batch_size = 100
-        params = 'EXCLUDED_INDEXES=%s&INCLUDE_SPELLING=%s&BATCH_SIZE=%s' % (
+        params = 'EXCLUDED_INDEXES={}&INCLUDE_SPELLING={}&BATCH_SIZE={}'.format(
             excluded_indexes,
             include_spelling,
             batch_size
@@ -777,7 +775,7 @@ if __name__ == "__main__":
     try:
         if sys.argv[1] == '-o':
             for key, value in BaseTests.generateData().items():
-                print("{0}={1}".format(key, value))
+                print("{}={}".format(key, value))
             sys.exit()
     except IndexError:
         pass

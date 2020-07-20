@@ -1,45 +1,11 @@
-# -*- coding: utf-8 -*-
-
 """
 environ.compat
 ~~~~~~~~~~~~~~~
-This module handles import compatibility issues between Python 2 and
-Python 3.
+This module handles import compatibility issues
 """
 
-import sys
 import pkgutil
 
-# -------
-# Pythons
-# -------
-
-# Syntax sugar.
-_ver = sys.version_info
-
-#: Python 2.x?
-is_py2 = (_ver[0] == 2)
-
-#: Python 3.x?
-is_py3 = (_ver[0] == 3)
-
-if is_py2:
-    import urlparse as urlparselib
-    from urllib import quote, unquote_plus
-
-    basestring = basestring
-
-elif is_py3:
-    import urllib.parse as urlparselib
-    quote = urlparselib.quote
-    unquote_plus = urlparselib.unquote_plus
-
-    basestring = str
-
-urlparse = urlparselib.urlparse
-urlunparse = urlparselib.urlunparse
-ParseResult = urlparselib.ParseResult
-parse_qs = urlparselib.parse_qs
 
 if pkgutil.find_loader('simplejson'):
     import simplejson as json

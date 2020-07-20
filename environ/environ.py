@@ -8,9 +8,11 @@ import os
 import re
 import sys
 import warnings
-from .compat import (
-    json, urlparselib, urlparse, urlunparse, ParseResult, parse_qs,
-    unquote_plus, DJANGO_POSTGRES, REDIS_DRIVER, ImproperlyConfigured, basestring)
+import urllib.parse as urlparselib
+
+from urllib.parse import urlparse, urlunparse, ParseResult, parse_qs, unquote_plus
+
+from .compat import json, DJANGO_POSTGRES, REDIS_DRIVER, ImproperlyConfigured
 
 logger = logging.getLogger(__name__)
 
@@ -37,13 +39,13 @@ def _cast_urlstr(v):
     return unquote_plus(v) if isinstance(v, str) else v
 
 
-class NoValue(object):
+class NoValue:
 
     def __repr__(self):
-        return '<{0}>'.format(self.__class__.__name__)
+        return '<{}>'.format(self.__class__.__name__)
 
 
-class Env(object):
+class Env:
 
     """Provide scheme-based lookups of environment variables so that each
     caller doesn't have to pass in `cast` and `default` parameters.
@@ -246,7 +248,7 @@ class Env(object):
         :returns: Value from environment or default (if set)
         """
 
-        logger.debug("get '{0}' casted as '{1}' with default '{2}'".format(
+        logger.debug("get '{}' casted as '{}' with default '{}'".format(
             var, cast, default
         ))
 
@@ -275,7 +277,7 @@ class Env(object):
             value = self.ENVIRON[var]
         except KeyError:
             if default is self.NOTSET:
-                error_msg = "Set the {0} environment variable".format(var)
+                error_msg = "Set the {} environment variable".format(var)
                 raise ImproperlyConfigured(error_msg)
 
             value = default
@@ -344,7 +346,7 @@ class Env(object):
             if len(parts) == 1:
                 float_str = parts[0]
             else:
-                float_str = "{0}.{1}".format(''.join(parts[0:-1]), parts[-1])
+                float_str = "{}.{}".format(''.join(parts[0:-1]), parts[-1])
             value = float(float_str)
         else:
             value = cast(value)
@@ -438,7 +440,7 @@ class Env(object):
             config['ENGINE'] = Env.DB_SCHEMES[config['ENGINE']]
 
         if not config.get('ENGINE', False):
-            warnings.warn("Engine not recognized from url: {0}".format(config))
+            warnings.warn("Engine not recognized from url: {}".format(config))
             return {}
 
         return config
@@ -642,15 +644,15 @@ class Env(object):
                 return
 
         try:
-            with open(env_file) if isinstance(env_file, basestring) else env_file as f:
+            with open(env_file) if isinstance(env_file, str) else env_file as f:
                 content = f.read()
-        except IOError:
+        except OSError:
             warnings.warn(
                 "Error reading %s - if you're not configuring your "
                 "environment separately, check this." % env_file)
             return
 
-        logger.debug('Read environment variables from: {0}'.format(env_file))
+        logger.debug('Read environment variables from: {}'.format(env_file))
 
         for line in content.splitlines():
             m1 = re.match(r'\A(?:export )?([A-Za-z_0-9]+)=(.*)\Z', line)
@@ -669,7 +671,7 @@ class Env(object):
             cls.ENVIRON.setdefault(key, value)
 
 
-class Path(object):
+class Path:
 
     """Inspired to Django Two-scoops, handling File Paths in Settings.
 
@@ -722,7 +724,7 @@ class Path(object):
 
     def __init__(self, start='', *paths, **kwargs):
 
-        super(Path, self).__init__()
+        super().__init__()
 
         if kwargs.get('is_file', False):
             start = os.path.dirname(start)
@@ -749,7 +751,7 @@ class Path(object):
     def __sub__(self, other):
         if isinstance(other, int):
             return self.path('../' * other)
-        elif isinstance(other, basestring):
+        elif isinstance(other, str):
             if self.__root__.endswith(other):
                 return Path(self.__root__.rstrip(other))
         raise TypeError(
@@ -769,7 +771,7 @@ class Path(object):
         return item.__root__.startswith(base_path)
 
     def __repr__(self):
-        return "<Path:{0}>".format(self.__root__)
+        return "<Path:{}>".format(self.__root__)
 
     def __str__(self):
         return self.__root__
@@ -779,7 +781,7 @@ class Path(object):
 
     def __getitem__(self, *args, **kwargs):
         return self.__str__().__getitem__(*args, **kwargs)
-    
+
     def __fspath__(self):
         return self.__str__()
 
@@ -794,7 +796,7 @@ class Path(object):
         absolute_path = os.path.abspath(os.path.join(base, *paths))
         if kwargs.get('required', False) and not os.path.exists(absolute_path):
             raise ImproperlyConfigured(
-                "Create required path: {0}".format(absolute_path))
+                "Create required path: {}".format(absolute_path))
         return absolute_path
 
 

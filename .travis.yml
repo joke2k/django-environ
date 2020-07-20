@@ -1,45 +1,21 @@
+version: ~> 1.0
 language: python
-dist: xenial
-sudo: false
+os: linux
 python:
- - "2.7"
- - "3.4"
  - "3.5"
  - "3.6"
+ - "3.7"
+ - "3.8"
  - "nightly"
  - "pypy"
-env:
-  - DJANGO="1.8"
-  - DJANGO="1.9"
-  - DJANGO="1.10"
-  - DJANGO="1.11"
-  - DJANGO="2.0"
-  - DJANGO="2.1"
-  - DJANGO="2.2"
-  - DJANGO="master"
-matrix:
-  fast_finish: true
-  exclude:
-    - python: 2.7
-      env: DJANGO="2.0"
-
-    - python: 2.7
-      env: DJANGO="2.1"
-
-    - python: 2.7
-      env: DJANGO="master"
-
-    - python: 3.4
-      env: DJANGO="2.1"
-
-    - python: 3.4
-      env: DJANGO="master"
-
-    - python: 3.5
-      env: DJANGO="master"
-  allow_failures:
-  	- env: DJANGO="master"
-
+jobs:
+  matrix:
+   - DJANGO="Django==1.11.*"
+   - DJANGO="Django==2.0.*"
+   - DJANGO="Django==2.1.*"
+   - DJANGO="Django==2.2.*"
+   - DJANGO="Django==3.0"
+   - DJANGO="https://github.com/django/django/archive/master.tar.gz"
 install:
  # The default pip doesn't properly support pre-release version specifiers.
  - pip install -U pip
@@ -53,7 +29,11 @@ branches:
   - /^release\/.+/
   - /^hotfix\/.+/
   - /^v[\d\.]+/
-script: tox
+script: coverage run --source=environ setup.py test
+jobs:
+  fast_finish: true
+  allow_failures:
+    - env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
 after_success:
   - pip install --quiet python-coveralls
   - coveralls
