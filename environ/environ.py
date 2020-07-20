@@ -80,8 +80,8 @@ class Env:
         'sqlite': 'django.db.backends.sqlite3',
         'ldap': 'ldapdb.backends.ldap',
     }
-    _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT']
-
+    _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT', 'DISABLE_SERVER_SIDE_CURSORS']
+    
     DEFAULT_CACHE_ENV = 'CACHE_URL'
     CACHE_SCHEMES = {
         'dbcache': 'django.core.cache.backends.db.DatabaseCache',
@@ -92,6 +92,7 @@ class Env:
         'pymemcache': 'django.core.cache.backends.memcached.PyLibMCCache',
         'rediscache': REDIS_DRIVER,
         'redis': REDIS_DRIVER,
+        'rediss': REDIS_DRIVER,
     }
     _CACHE_BASE_OPTIONS = ['TIMEOUT', 'KEY_PREFIX', 'VERSION', 'KEY_FUNCTION', 'BINARY']
 
@@ -119,6 +120,7 @@ class Env:
     }
 
     def __init__(self, **scheme):
+        self.smart_cast = True
         self.scheme = scheme
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
@@ -126,14 +128,14 @@ class Env:
 
     def __contains__(self, var):
         return var in self.ENVIRON
-
+    
     # Shortcuts
 
     def str(self, var, default=NOTSET, multiline=False):
         """
         :rtype: str
         """
-        value = self.get_value(var, default=default)
+        value = self.get_value(var, cast=str, default=default)
         if multiline:
             return value.replace('\\n', '\n')
         return value
@@ -285,8 +287,10 @@ class Env:
             value = value.lstrip('$')
             value = self.get_value(value, cast=cast, default=default)
 
-        if cast is None and default is not None and not isinstance(default, NoValue):
-            cast = type(default)
+        # Smart casting
+        if self.smart_cast:
+            if cast is None and default is not None and not isinstance(default, NoValue):
+                cast = type(default)
 
         if value != default or (parse_default and value):
             value = self.parse_value(value, cast)
@@ -449,7 +453,14 @@ class Env:
         :param backend:
         :return:
         """
-        url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        if not isinstance(url, cls.URL_CLASS):
+            if not url:
+                return {}
+            else:
+                url = urlparse(url)
+
+        if url.scheme not in cls.CACHE_SCHEMES:
+            raise ImproperlyConfigured('Invalid cache schema {}'.format(url.scheme))
 
         location = url.netloc.split(',')
         if len(location) == 1:
@@ -617,7 +628,7 @@ class Env:
         """Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack backtracking
-        to find manage.py and then find the dotenv.
+        to find the dotenv in the same directory as the file that called read_env.
 
         http://www.wellfireinteractive.com/blog/easier-12-factor-django/
 

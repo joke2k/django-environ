@@ -1,7 +1,7 @@
 Django-environ
 ==============
 
-|pypi| |unix_build| |windows_build| |coverage| |contributors| |license| |say_thanks|
+|pypi| |unix_build| |windows_build| |coverage| |contributors| |license| |say_thanks| |ocbackers| |ocsponsors| 
 
 **django-environ** allows you to use `Twelve-factor methodology`_ to configure your Django application with environment variables.
 
@@ -40,7 +40,7 @@ Django-environ
         'redis': env.cache('REDIS_URL')
     }
 
-See the `similar code, sans django-environ <https://gist.github.com/joke2k/cc30ed2d5ccda52d5b551ccbc17e536b>`_.
+See the `similar code, without django-environ <https://gist.github.com/joke2k/cc30ed2d5ccda52d5b551ccbc17e536b>`_.
 
 ::
 
@@ -91,7 +91,7 @@ Then create a ``.env`` file:
 
     DEBUG=on
     SECRET_KEY=your-secret-key
-    DATABASE_URL=psql://urser:un-githubbedpassword@127.0.0.1:8458/database
+    DATABASE_URL=psql://user:un-githubbedpassword@127.0.0.1:8458/database
     SQLITE_URL=sqlite:///my-local-sqlite.db
     CACHE_URL=memcache://127.0.0.1:11211,127.0.0.1:11212,127.0.0.1:11213
     REDIS_URL=rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=ungithubbed-secret
@@ -125,6 +125,7 @@ Supported types
     -  PostGIS: postgis://
     -  MySQL: mysql:// or mysql2://
     -  MySQL for GeoDjango: mysqlgis://
+    -  Mysql Connector Python from Oracle: mysql-connector://
     -  SQLITE: sqlite://
     -  SQLITE with SPATIALITE for GeoDjango: spatialite://
     -  Oracle: oracle://
@@ -139,7 +140,7 @@ Supported types
     -  Memory: locmemcache://
     -  Memcached: memcache://
     -  Python memory: pymemcache://
-    -  Redis: rediscache://
+    -  Redis: rediscache://, redis://, or rediss://
 - search_url
     - ElasticSearch: elasticsearch://
     - Solr: solr://
@@ -169,6 +170,15 @@ In order to use unsafe characters you have to encode with ``urllib.parse.encode`
 
 See https://perishablepress.com/stop-using-unsafe-characters-in-urls/ for reference.
 
+Smart Casting
+~~~~~~~~~~~~~
+
+django-environ has a "Smart-casting" enabled by default, if you don't provide a ``cast`` type, it will be detected from ``default`` type.
+This could raise side effects (see `#192 <https://github.com/joke2k/django-environ/issues/192>`_).
+To disable it use ``env.smart_caset = False``.
+New major release will disable it as default. 
+
+
 Multiple redis cache locations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -186,7 +196,7 @@ In order to set email configuration for django you can use this code:
 .. code-block:: python
 
     EMAIL_CONFIG = env.email_url(
-        'EMAIL_URL', default='smtp://user@:password@localhost:25')
+        'EMAIL_URL', default='smtp://user:password@localhost:25')
 
     vars().update(EMAIL_CONFIG)
 
@@ -207,7 +217,7 @@ Some settings such as Django's ``ADMINS`` make use of nested lists. You can use 
 .. code-block:: python
 
     # DJANGO_ADMINS=John:john@admin.com,Jane:jane@admin.com
-    ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')] 
+    ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')]
 
     # or use more specific function
 
@@ -295,11 +305,27 @@ Credits
 - `Distribute`_
 - `modern-package-template`_
 
+Contributors
+-----------------
+Thank you to all the people who have already contributed. 
+|occontributorimage|
+
+Backers
+-----------------
+Thank you to all our backers! 
+|ocbackerimage|
+
+Sponsors
+-----------------
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. `Became sponsor`_.
+
+|ocsponsor0| |ocsponsor1| |ocsponsor2|
+
 .. _rconradharris: https://github.com/rconradharris
 .. _envparse: https://github.com/rconradharris/envparse
 
-.. _kennethreitz: https://github.com/kennethreitz
-.. _dj-database-url: https://github.com/kennethreitz/dj-database-url
+.. _jacobian: https://github.com/jacobian
+.. _dj-database-url: https://github.com/jacobian/dj-database-url
 
 .. _migonzalvar: https://github.com/migonzalvar
 .. _dj-email-url: https://github.com/migonzalvar/dj-email-url
@@ -361,3 +387,29 @@ Credits
 .. _`Authors file`: https://github.com/joke2k/django-environ/blob/develop/AUTHORS.rst
 .. _`Contributor Friendly`: https://github.com/joke2k/django-environ/issues?direction=desc&labels=contributor-friendly&page=1&sort=updated&state=open
 .. _`the repository`: https://github.com/joke2k/django-environ
+
+.. |ocbackers| image:: https://opencollective.com/django-environ/backers/badge.svg
+    :target: https://opencollective.com/django-environ
+    :alt: Backers on Open Collective
+.. |ocsponsors| image:: https://opencollective.com/django-environ/sponsors/badge.svg
+    :target: https://opencollective.com/django-environ
+    :alt: Sponsors on Open Collective
+    
+.. |ocbackerimage| image:: https://opencollective.com/django-environ/backers.svg?width=890
+    :target: https://opencollective.com/django-environ
+    :alt: Backers on Open Collective
+.. |occontributorimage| image:: https://opencollective.com/django-environ/contributors.svg?width=890&button=false
+    :target: https://opencollective.com/django-environ
+    :alt: Repo Contributors
+
+.. _`Became sponsor`: https://opencollective.com/django-environ#sponsor
+
+.. |ocsponsor0| image:: https://opencollective.com/django-environ/sponsor/0/avatar.svg
+    :target: https://opencollective.com/django-environ/sponsor/0/website
+    :alt: Sponsor
+.. |ocsponsor1| image:: https://opencollective.com/django-environ/sponsor/1/avatar.svg
+    :target: https://opencollective.com/django-environ/sponsor/1/website
+    :alt: Sponsor
+.. |ocsponsor2| image:: https://opencollective.com/django-environ/sponsor/2/avatar.svg
+    :target: https://opencollective.com/django-environ/sponsor/2/website
+    :alt: Sponsor

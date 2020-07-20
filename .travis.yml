@@ -19,7 +19,8 @@ jobs:
 install:
  # The default pip doesn't properly support pre-release version specifiers.
  - pip install -U pip
- - pip install . coverage $DJANGO
+ - pip install tox
+ - pip install -q tox-travis
 branches:
  only:
   - master
@@ -34,6 +35,5 @@ jobs:
   allow_failures:
     - env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
 after_success:
-  - coverage report
   - pip install --quiet python-coveralls
   - coveralls
