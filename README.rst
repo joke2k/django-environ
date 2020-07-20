@@ -72,7 +72,7 @@ Feature Support
 - Variables casting (see supported_types_ below)
 - Url variables exploded to django specific package settings
 
-Django-environ officially supports Django 1.8 ~ 2.0.
+Django-environ officially supports Django 1.11, 2.2 and 3.0.
 
 
 Installation
