@@ -336,6 +336,31 @@ class DatabaseTestSuite(unittest.TestCase):
         self.assertEqual(url['NAME'], 'db')
         self.assertEqual(url['HOST'], '/var/run/postgresql')
 
+    def test_postgres_parsing_unix_domain_socket(self):
+        url = 'postgres://user:password@//cloudsql/project-1234:us-central1:instance/dbname'
+        url = Env.db_url_config(url)
+
+        self.assertEqual(url['ENGINE'], DJANGO_POSTGRES)
+        self.assertEqual(url['NAME'], 'dbname')
+        self.assertEqual(url['HOST'], '/cloudsql/project-1234:us-central1:instance')
+        self.assertEqual(url['USER'], 'user')
+        self.assertEqual(url['PASSWORD'], 'password')
+
+
+    def test_postgres_parsing_unix_domain_socket_with_schema_aliases(self):
+        """ Verify all the POSTGRES aliases parse the same as postgres """
+
+        env_url = 'postgres://user:password@//cloudsql/project-1234:us-central1:instance/dbname'
+        url = Env.db_url_config(env_url)
+
+        ALIASES = ['postgres', 'postgresql', 'psql', 'pgsql']
+        for scheme in ALIASES:
+            env_url2 = '{}://user:password@//cloudsql/project-1234:us-central1:instance/dbname'.format(scheme)
+            url2 = Env.db_url_config(env_url2)
+
+            self.assertEqual(url, url2)
+
+
     def test_postgis_parsing(self):
         url = 'postgis://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
         url = Env.db_url_config(url)
@@ -346,6 +371,17 @@ class DatabaseTestSuite(unittest.TestCase):
         self.assertEqual(url['USER'], 'uf07k1i6d8ia0v')
         self.assertEqual(url['PASSWORD'], 'wegauwhgeuioweg')
         self.assertEqual(url['PORT'], 5431)
+
+    def test_postgis_parsing_with_socket_directory(self):
+        url = 'postgis://user:password@//cloudsql/project-1234:us-central1:instance/dbname'
+        url = Env.db_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'django.contrib.gis.db.backends.postgis')
+        self.assertEqual(url['NAME'], 'dbname')
+        self.assertEqual(url['HOST'], '/cloudsql/project-1234:us-central1:instance')
+        self.assertEqual(url['USER'], 'user')
+        self.assertEqual(url['PASSWORD'], 'password')
+        self.assertEqual(url['PORT'], '')
 
     def test_mysql_gis_parsing(self):
         url = 'mysqlgis://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'

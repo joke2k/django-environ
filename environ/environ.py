@@ -62,6 +62,8 @@ class Env:
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = ParseResult
     DEFAULT_DATABASE_ENV = 'DATABASE_URL'
+
+    POSTGRES_FAMILY = ['postgres', 'postgresql', 'psql', 'pgsql', 'postgis']
     DB_SCHEMES = {
         'postgres': DJANGO_POSTGRES,
         'postgresql': DJANGO_POSTGRES,
@@ -81,7 +83,7 @@ class Env:
         'ldap': 'ldapdb.backends.ldap',
     }
     _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT', 'DISABLE_SERVER_SIDE_CURSORS']
-    
+
     DEFAULT_CACHE_ENV = 'CACHE_URL'
     CACHE_SCHEMES = {
         'dbcache': 'django.core.cache.backends.db.DatabaseCache',
@@ -128,7 +130,7 @@ class Env:
 
     def __contains__(self, var):
         return var in self.ENVIRON
-    
+
     # Shortcuts
 
     def str(self, var, default=NOTSET, multiline=False):
@@ -408,7 +410,7 @@ class Env:
             'PORT': _cast_int(url.port) or '',
         })
 
-        if url.scheme == 'postgres' and path.startswith('/'):
+        if url.scheme in cls.POSTGRES_FAMILY and path.startswith('/'):
             config['HOST'], config['NAME'] = path.rsplit('/', 1)
 
         if url.scheme == 'oracle' and path == '':
