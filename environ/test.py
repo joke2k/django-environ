@@ -347,7 +347,7 @@ class DatabaseTestSuite(unittest.TestCase):
         self.assertEqual(url['PASSWORD'], 'password')
 
 
-    def test_postgres_parsing_unix_domain_socket_with_schema_aliases(self):
+    def test_postgres_parsing_with_scheme_aliases(self):
         """ Verify all the POSTGRES aliases parse the same as postgres """
 
         env_url = 'postgres://user:password@//cloudsql/project-1234:us-central1:instance/dbname'
