@@ -340,7 +340,7 @@ class Env:
             value = tuple([x for x in val if x])
         elif cast is float:
             # clean string
-            float_str = re.sub(r'[^\d,\.]', '', value)
+            float_str = re.sub(r'[^\d,\.\-]', '', value)
             # split for avoid thousand separator and different locale comma/dot symbol
             parts = re.split(r'[,\.]', float_str)
             if len(parts) == 1:
