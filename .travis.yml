@@ -17,6 +17,9 @@ env:
   - DJANGO="Django==2.2.*"
   - DJANGO="Django==3.0.*"
   - DJANGO="https://github.com/django/django/archive/master.tar.gz"
+arch:
+  - amd64
+  - ppc64le
 matrix:
   exclude:
     - env: DJANGO="Django==1.11.*"
