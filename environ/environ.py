@@ -644,7 +644,7 @@ class Env:
                 return
 
         try:
-            with open(env_file) if isinstance(env_file, str) else env_file as f:
+            with open(env_file) if isinstance(env_file, (str, Path)) else env_file as f:
                 content = f.read()
         except OSError:
             warnings.warn(
