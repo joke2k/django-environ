@@ -665,6 +665,8 @@ class Env:
                 if m3:
                     val = re.sub(r'\\(.)', r'\1', m3.group(1))
                 cls.ENVIRON.setdefault(key, str(val))
+            else:
+                logger.warn('Invalid line: %s', line)
 
         # set defaults
         for key, value in overrides.items():
