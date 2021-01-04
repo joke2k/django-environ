@@ -789,6 +789,8 @@ class Env:
                     val = re.sub(r'\\(.)', _keep_escaped_format_characters,
                                  m3.group(1))
                 cls.ENVIRON.setdefault(key, str(val))
+            else:
+                logger.warn('Invalid line: %s', line)
 
         # set defaults
         for key, value in overrides.items():
