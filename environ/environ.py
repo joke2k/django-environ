@@ -10,6 +10,8 @@ import sys
 import warnings
 import urllib.parse as urlparselib
 
+from pathlib import WindowsPath
+
 from urllib.parse import urlparse, urlunparse, ParseResult, parse_qs, unquote_plus
 
 from .compat import json, DJANGO_POSTGRES, REDIS_DRIVER, ImproperlyConfigured
@@ -81,7 +83,7 @@ class Env:
         'ldap': 'ldapdb.backends.ldap',
     }
     _DB_BASE_OPTIONS = ['CONN_MAX_AGE', 'ATOMIC_REQUESTS', 'AUTOCOMMIT', 'DISABLE_SERVER_SIDE_CURSORS']
-    
+
     DEFAULT_CACHE_ENV = 'CACHE_URL'
     CACHE_SCHEMES = {
         'dbcache': 'django.core.cache.backends.db.DatabaseCache',
@@ -128,7 +130,7 @@ class Env:
 
     def __contains__(self, var):
         return var in self.ENVIRON
-    
+
     # Shortcuts
 
     def str(self, var, default=NOTSET, multiline=False):
@@ -644,7 +646,8 @@ class Env:
                 return
 
         try:
-            with open(env_file) if isinstance(env_file, str) else env_file as f:
+            with (open(env_file) if isinstance(env_file, str) else
+                  open(env_file.__str__()) if isinstance(env_file, WindowsPath) else env_file) as f:
                 content = f.read()
         except OSError:
             warnings.warn(
