@@ -18,7 +18,7 @@ env:
   - DJANGO="Django==3.0.*"
   - DJANGO="Django==3.1.*"
   - DJANGO="Django==3.2.*"
-  - DJANGO="https://github.com/django/django/archive/master.tar.gz"
+  - DJANGO="https://github.com/django/django/archive/refs/heads/main.zip"
 matrix:
   exclude:
     - env: DJANGO="Django==1.11.*"
@@ -33,10 +33,10 @@ matrix:
       python: "3.5"
     - env: DJANGO="Django==3.2.*"
       python: "3.5"
-    - env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
+    - env: DJANGO="https://github.com/django/django/archive/refs/heads/main.zip"
       python: "3.5"
   allow_failures:
-    - env: DJANGO="https://github.com/django/django/archive/master.tar.gz"
+    - env: DJANGO="https://github.com/django/django/archive/refs/heads/main.zip"
 
 before_install: pip install --upgrade pip
   pip install tox
