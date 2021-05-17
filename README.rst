@@ -175,8 +175,8 @@ Smart Casting
 
 django-environ has a "Smart-casting" enabled by default, if you don't provide a ``cast`` type, it will be detected from ``default`` type.
 This could raise side effects (see `#192 <https://github.com/joke2k/django-environ/issues/192>`_).
-To disable it use ``env.smart_caset = False``.
-New major release will disable it as default. 
+To disable it use ``env.smart_cast = False``.
+The next major release will disable it by default.
 
 
 Multiple redis cache locations
