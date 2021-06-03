@@ -31,6 +31,8 @@ class FakeEnv:
     def generate_data(cls):
         return dict(STR_VAR='bar',
                     MULTILINE_STR_VAR='foo\\nbar',
+                    MULTILINE_QUOTED_STR_VAR='---BEGIN---\\r\\n---END---',
+                    MULTILINE_ESCAPED_STR_VAR='---BEGIN---\\\\n---END---',
                     INT_VAR='42',
                     FLOAT_VAR='33.3',
                     FLOAT_COMMA_VAR='33,3',

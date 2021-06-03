@@ -57,6 +57,10 @@ class TestEnv:
             ('STR_VAR', 'bar', False),
             ('MULTILINE_STR_VAR', 'foo\\nbar', False),
             ('MULTILINE_STR_VAR', 'foo\nbar', True),
+            ('MULTILINE_QUOTED_STR_VAR', '---BEGIN---\\r\\n---END---', False),
+            ('MULTILINE_QUOTED_STR_VAR', '---BEGIN---\n---END---', True),
+            ('MULTILINE_ESCAPED_STR_VAR', '---BEGIN---\\\\n---END---', False),
+            ('MULTILINE_ESCAPED_STR_VAR', '---BEGIN---\\\n---END---', True),
         ],
     )
     def test_str(self, var, val, multiline):
