@@ -608,6 +608,8 @@ class SearchTestSuite(unittest.TestCase):
 
     solr_url = 'solr://127.0.0.1:8983/solr'
     elasticsearch_url = 'elasticsearch://127.0.0.1:9200/index'
+    elasticsearch2_url = 'elasticsearch2://127.0.0.1:9200/index'
+    elasticsearch5_url = 'elasticsearch5://127.0.0.1:9200/index'
     whoosh_url = 'whoosh:///home/search/whoosh_index'
     xapian_url = 'xapian:///home/search/xapian_index'
     simple_url = 'simple:///'
@@ -636,6 +638,33 @@ class SearchTestSuite(unittest.TestCase):
         url = Env.search_url_config(url)
 
         self.assertEqual(url['ENGINE'], 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine')
+        self.assertEqual(url['URL'], 'http://127.0.0.1:9200')
+        self.assertTrue('INDEX_NAME' in url.keys())
+        self.assertEqual(url['INDEX_NAME'], 'index')
+        self.assertTrue('TIMEOUT' in url.keys())
+        self.assertEqual(url['TIMEOUT'], timeout)
+        self.assertTrue('PATH' not in url)
+
+    def test_elasticsearch2_parsing(self):
+        timeout = 360
+        url = '{}?TIMEOUT={}'.format(self.elasticsearch2_url, timeout)
+        url = Env.search_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'haystack.backends.elasticsearch2_backend.Elasticsearch2SearchEngine')
+        self.assertEqual(url['URL'], 'http://127.0.0.1:9200')
+        self.assertTrue('INDEX_NAME' in url.keys())
+        self.assertEqual(url['INDEX_NAME'], 'index')
+        self.assertTrue('TIMEOUT' in url.keys())
+        self.assertEqual(url['TIMEOUT'], timeout)
+        self.assertTrue('PATH' not in url)
+
+    def test_elasticsearch5_parsing(self):
+        timeout = 360
+        url = '{}?TIMEOUT={}'.format(self.elasticsearch5_url, timeout)
+        url = Env.search_url_config(url)
+
+        self.assertEqual(url['ENGINE'], 'haystack.backends.elasticsearch5_backend.Elasticsearch5SearchEngine')
+        self.assertEqual(url['URL'], 'http://127.0.0.1:9200')
         self.assertTrue('INDEX_NAME' in url.keys())
         self.assertEqual(url['INDEX_NAME'], 'index')
         self.assertTrue('TIMEOUT' in url.keys())
