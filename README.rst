@@ -16,8 +16,9 @@ Django-environ
         # set casting, default value
         DEBUG=(bool, False)
     )
+    BASE_DIR = # PATH TO BASE_DIR
     # reading .env file
-    environ.Env.read_env()
+    environ.Env.read_env(env_file=os.path.join(BASE_DIR, '.env'))
 
     # False if not in os.environ
     DEBUG = env('DEBUG')
