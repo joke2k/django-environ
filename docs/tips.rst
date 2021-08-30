@@ -91,7 +91,13 @@ You can use something like this to handle similar cases.
 Multiline value
 ===============
 
-To escape newline/tab characters pass ``multiline=False`` to ```str()```.
+To get multiline value pass ``multiline=True`` to ```str()```.
+
+.. note::
+
+   You shouldn't escape newline/tab characters yourself if you want to preserve
+   the formatting.
+
 The following example demonstrates the above:
 
 **.env file**:
@@ -101,6 +107,7 @@ The following example demonstrates the above:
    # .env file contents
    UNQUOTED_CERT=---BEGIN---\r\n---END---
    QUOTED_CERT="---BEGIN---\r\n---END---"
+   ESCAPED_CERT=---BEGIN---\\n---END---
 
 **settings.py file**:
 
@@ -125,6 +132,13 @@ The following example demonstrates the above:
 
    print(env.str('QUOTED_CERT', multiline=False))
    # ---BEGIN---\r\n---END---
+
+   print(env.str('ESCAPED_CERT', multiline=True))
+   # ---BEGIN---\
+   # ---END---
+
+   print(env.str('ESCAPED_CERT', multiline=False))
+   # ---BEGIN---\\n---END---
 
 Proxy value
 ===========
