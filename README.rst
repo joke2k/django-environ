@@ -82,6 +82,9 @@ See the `similar code, without django-environ <https://gist.github.com/joke2k/cc
         |__/             |___/
 
 
+Project Information
+===================
+
 The idea of this package is to unify a lot of packages that make the same stuff:
 Take a string from ``os.environ``, parse and cast it to some of useful python typed variables.
 To do that and to use the `12factor`_ approach, some connection strings are expressed as url,
@@ -204,7 +207,7 @@ Smart Casting
 django-environ has a "Smart-casting" enabled by default, if you don't provide a ``cast`` type, it will be detected from ``default`` type.
 This could raise side effects (see `#192 <https://github.com/joke2k/django-environ/issues/192>`_).
 To disable it use ``env.smart_caset = False``.
-New major release will disable it as default. 
+New major release will disable it as default.
 
 
 Multiple redis cache locations
@@ -323,7 +326,7 @@ Credits
 - `12factor-django`_
 - `Two Scoops of Django`_
 - `rconradharris`_ / `envparse`_
-- `kennethreitz`_ / `dj-database-url`_
+- `jacobian`_ / `dj-database-url`_
 - `migonzalvar`_ / `dj-email-url`_
 - `ghickman`_ / `django-cache-url`_
 - `dstufft`_ / `dj-search-url`_
@@ -335,12 +338,12 @@ Credits
 
 Contributors
 -----------------
-Thank you to all the people who have already contributed. 
+Thank you to all the people who have already contributed.
 |occontributorimage|
 
 Backers
 -----------------
-Thank you to all our backers! 
+Thank you to all our backers!
 |ocbackerimage|
 
 Sponsors
@@ -388,7 +391,7 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 .. _`Authors file`: https://github.com/joke2k/django-environ/blob/develop/AUTHORS.rst
 .. _`Contributor Friendly`: https://github.com/joke2k/django-environ/issues?direction=desc&labels=contributor-friendly&page=1&sort=updated&state=open
 .. _`the repository`: https://github.com/joke2k/django-environ
-    
+
 .. |ocbackerimage| image:: https://opencollective.com/django-environ/backers.svg?width=890
     :target: https://opencollective.com/django-environ
     :alt: Backers on Open Collective
