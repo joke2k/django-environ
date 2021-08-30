@@ -7,6 +7,14 @@ and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.
 
 `unreleased`_
 --------------------------
+Added
++++++
+  - Move CI to GitHub Actions
+
+Fixed
++++++
+  - Fix various code linting errors
+
 
 `v0.5.0`_ - 30-August-2021
 --------------------------
