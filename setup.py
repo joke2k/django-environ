@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
-from setuptools import setup, find_packages
-import io
 import os
 
+from setuptools import setup, find_packages
 
 # Package meta-data.
 NAME = 'django-environ'
@@ -13,7 +12,7 @@ DESCRIPTION = "Django-environ allows you to utilize 12factor inspired environmen
 URL = 'https://github.com/joke2k/django-environ'
 EMAIL = 'daniele.faraglia@gmail.com'
 AUTHOR = 'joke2k'
-VERSION = '1.0.0'
+VERSION = '0.5.0'
 LICENSE = 'MIT'
 
 here = os.path.abspath(os.path.dirname(__file__))

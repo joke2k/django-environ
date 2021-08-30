@@ -17,7 +17,7 @@ from .compat import json, DJANGO_POSTGRES, REDIS_DRIVER, ImproperlyConfigured
 logger = logging.getLogger(__name__)
 
 
-VERSION = '0.4.5'
+VERSION = '0.5.0'
 __author__ = 'joke2k'
 __version__ = tuple(VERSION.split('.'))
 
