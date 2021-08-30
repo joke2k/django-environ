@@ -38,6 +38,7 @@ __author_email__ = 'daniele.faraglia@gmail.com'
 __maintainer__ = 'Serghei Iakovlev'
 __maintainer_email__ = 'egrep@protonmail.ch'
 __url__ = 'https://django-environ.readthedocs.org'
-__description__ = 'Configure Django made easy.'  # noqa
-
-from .environ import *
+__description__ = (
+    'django-environ allows you to utilize 12factor inspired environment '
+    'variables to configure your Django application.'
+)
