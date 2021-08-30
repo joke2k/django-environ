@@ -11,6 +11,18 @@ Added
 +++++
   - Support for Django 2.1 & 2.2
   - Added tox.ini targets
+  - Added secure redis backend URLs via ``rediss://``
+  - Add ``cast=str`` to ``str()`` method
+
+Fixed
++++++
+  - Fixed misspelling in the documentation
+
+Changed
++++++++
+  - Validate empty cache url and invalid cache schema
+  - Set ``long_description_content_type`` in setup
+  - Improved Django 1.11 database configuration support
 
 
 `v0.4.5`_ - 25-June-2018
@@ -24,12 +36,12 @@ Added
 
 Changed
 +++++++
-  - Fix parsing option values None, True and False
-  - Order of importance of engine configuration in db_url_config
+  - Fix parsing option values ``None``, ``True`` and ``False``
+  - Order of importance of engine configuration in ``db_url_config``
 
 Removed
 +++++++
-  - Remove django and six dependencies
+  - Remove ``django`` and ``six`` dependencies
 
 
 `v0.4.4`_ - 21-August-2017
@@ -37,14 +49,14 @@ Removed
 
 Added
 +++++
-  - Support for django-redis multiple locations (master/slave, shards)
+  - Support for ``django-redis`` multiple locations (master/slave, shards)
   - Support for Elasticsearch2
   - Support for Mysql-connector
-  - Support for pyodbc
-  - Add __contains__ feature to Environ class
+  - Support for ``pyodbc``
+  - Add ``__contains__`` feature to Environ class
 
-Changed
-+++++++
+Fixed
++++++
   - Fix Path subtracting
 
 
@@ -52,7 +64,7 @@ Changed
 --------------------------
 Changed
 +++++++
-  - Rollback the default Environ to os.environ
+  - Rollback the default Environ to ``os.environ``
 
 `v0.4.2`_ - 13-April-2017
 -------------------------
@@ -64,7 +76,7 @@ Added
 Changed
 +++++++
   - Fix uwsgi settings reload problem (#55)
-  - Update support for django-redis urls (#109)
+  - Update support for ``django-redis`` urls (#109)
 
 `v0.4.1`_ - 13-November-2016
 ----------------------------
@@ -77,20 +89,20 @@ Changed
   - Fix for unsafe characters into URLs
   - Clarifying warning on missing or unreadable file. Thanks to @nickcatal
   - Fix support for Oracle urls
-  - Fix support for django-redis
+  - Fix support for ``django-redis``
 
 `v0.4.0`_ - 23-September-2015
 -----------------------------
 Added
 +++++
-  - New email schemes - smtp+ssl and smtp+tls (smtps would be deprecated)
+  - New email schemes - ``smtp+ssl`` and ``smtp+tls`` (``smtps`` would be deprecated)
   - Add tuple support. Thanks to @anonymouzz
   - Add LDAP url support for database (django-ldapdb)
 
 Changed
 +++++++
   - Fix non-ascii values (broken in Python 2.x)
-  - redis_cache replaced by django_redis
+  - redis_cache replaced by ``django_redis``
   - Fix psql/pgsql url
 
 `v0.3`_ - 03-June-2014
@@ -109,7 +121,7 @@ Changed
 -------------------
 Changed
 +++++++
-  - environ/environ.py: Env.__call__ now uses Env.get_value instance method
+  - environ/environ.py: ``Env.__call__`` now uses ``Env.get_value`` instance method
 
 0.2 16-April-2013
 -----------------
@@ -123,9 +135,10 @@ Changed
 -----------------
 Added
 +++++
-  - initial release
+  - Initial release
 
 
+.. _unreleased: https://github.com/joke2k/django-environ/compare/v0.4.5...develop
 .. _v0.4.5: https://github.com/joke2k/django-environ/compare/v0.4.4...v0.4.5
 .. _v0.4.4: https://github.com/joke2k/django-environ/compare/v0.4.3...v0.4.4
 .. _v0.4.3: https://github.com/joke2k/django-environ/compare/v0.4.2...v0.4.3
