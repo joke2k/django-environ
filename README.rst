@@ -1,37 +1,11 @@
-.. raw:: html
+django-environ
+==============
 
-    <h1 align="center">django-environ</h1>
-    <p align="center">
-        <a href="https://pypi.python.org/pypi/django-environ">
-            <img src="https://img.shields.io/pypi/v/django-environ.svg" alt="Latest version released on PyPi" />
-        </a>
-        <a href="https://coveralls.io/github/joke2k/django-environ">
-            <img src="https://coveralls.io/repos/github/joke2k/django-environ/badge.svg" alt="Coverage Status" />
-        </a>
-        <a href="https://github.com/joke2k/django-environ/actions?workflow=CI">
-            <img src="https://github.com/joke2k/django-environ/workflows/CI/badge.svg?branch=develop" alt="CI Status" />
-        </a>
-        <a href="https://opencollective.com/django-environ">
-            <img src="https://opencollective.com/django-environ/sponsors/badge.svg" alt="Sponsors on Open Collective" />
-        </a>
-        <a href="https://opencollective.com/django-environ">
-            <img src="https://opencollective.com/django-environ/backers/badge.svg" alt="Backers on Open Collective" />
-        </a>
-        <a href="https://saythanks.io/to/joke2k">
-            <img src="https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg" alt="Say Thanks!" />
-        </a>
-        <a href="https://raw.githubusercontent.com/joke2k/django-environ/main/LICENSE.txt">
-            <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Package license" />
-        </a>
-    </p>
-
-.. -teaser-begin-
+|pypi| |build_status| |coverage| |contributors| |license| |say_thanks| |ocbackers| |ocsponsors|
 
 **django-environ** is the Python package that allows you to use
 `Twelve-factor methodology`_ to configure your Django application with
 environment variables.
-
-.. -teaser-end-
 
 |cover|
 
@@ -81,9 +55,6 @@ See the `similar code, without django-environ <https://gist.github.com/joke2k/cc
          _/ |             __/ |
         |__/             |___/
 
-
-Project Information
-===================
 
 The idea of this package is to unify a lot of packages that make the same stuff:
 Take a string from ``os.environ``, parse and cast it to some of useful python typed variables.
@@ -382,6 +353,36 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 .. _`modern-package-template`: http://pypi.python.org/pypi/modern-package-template
 
 .. _cookiecutter-django: https://github.com/pydanny/cookiecutter-django
+
+.. |pypi| image:: https://img.shields.io/pypi/v/django-environ.svg?style=flat-square
+    :target: https://pypi.python.org/pypi/django-environ
+    :alt: Latest version released on PyPi
+
+.. |coverage| image:: https://img.shields.io/coveralls/joke2k/django-environ/main.svg?style=flat-square
+    :target: https://coveralls.io/r/joke2k/django-environ?branch=main
+    :alt: Test coverage
+
+.. |build_status| image:: https://github.com/joke2k/django-environ/workflows/CI/badge.svg?branch=main
+    :target: https://github.com/joke2k/django-environ/actions?workflow=CI
+    :alt: Build status of the main branch on Mac/Linux
+
+.. |contributors| image:: https://img.shields.io/github/contributors/joke2k/django-environ.svg?style=flat-square
+    :target: https://github.com/joke2k/django-environ/graphs/contributors
+
+.. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
+    :target: https://raw.githubusercontent.com/joke2k/django-environ/main/LICENSE.txt
+    :alt: Package license
+
+.. |say_thanks| image:: https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg?style=flat-square
+    :target: https://saythanks.io/to/joke2k
+    :alt: Say Thanks!
+
+.. |ocbackers| image:: https://opencollective.com/django-environ/backers/badge.svg
+    :target: https://opencollective.com/django-environ
+    :alt: Backers on Open Collective
+.. |ocsponsors| image:: https://opencollective.com/django-environ/sponsors/badge.svg
+    :target: https://opencollective.com/django-environ
+    :alt: Sponsors on Open Collective
 
 .. |cover| image:: https://farm2.staticflickr.com/1745/42580036751_35f76a92fe_h.jpg
     :alt: Photo by Singkham from Pexels
