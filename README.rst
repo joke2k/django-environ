@@ -1,9 +1,37 @@
-Django-environ
-==============
+.. raw:: html
 
-|pypi| |unix_build| |windows_build| |coverage| |contributors| |license| |say_thanks| |ocbackers| |ocsponsors| 
+    <h1 align="center">django-environ</h1>
+    <p align="center">
+        <a href="https://pypi.python.org/pypi/django-environ">
+            <img src="https://img.shields.io/pypi/v/django-environ.svg" alt="Latest version released on PyPi" />
+        </a>
+        <a href="https://coveralls.io/github/joke2k/django-environ">
+            <img src="https://coveralls.io/repos/github/joke2k/django-environ/badge.svg" alt="Coverage Status" />
+        </a>
+        <a href="https://github.com/joke2k/django-environ/actions?workflow=CI">
+            <img src="https://github.com/joke2k/django-environ/workflows/CI/badge.svg?branch=develop" alt="CI Status" />
+        </a>
+        <a href="https://opencollective.com/django-environ">
+            <img src="https://opencollective.com/django-environ/sponsors/badge.svg" alt="Sponsors on Open Collective" />
+        </a>
+        <a href="https://opencollective.com/django-environ">
+            <img src="https://opencollective.com/django-environ/backers/badge.svg" alt="Backers on Open Collective" />
+        </a>
+        <a href="https://saythanks.io/to/joke2k">
+            <img src="https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg" alt="Say Thanks!" />
+        </a>
+        <a href="https://raw.githubusercontent.com/joke2k/django-environ/main/LICENSE.txt">
+            <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Package license" />
+        </a>
+    </p>
 
-**django-environ** allows you to use `Twelve-factor methodology`_ to configure your Django application with environment variables.
+.. -teaser-begin-
+
+**django-environ** is the Python package that allows you to use
+`Twelve-factor methodology`_ to configure your Django application with
+environment variables.
+
+.. -teaser-end-
 
 |cover|
 
@@ -352,33 +380,6 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 
 .. _cookiecutter-django: https://github.com/pydanny/cookiecutter-django
 
-.. |pypi| image:: https://img.shields.io/pypi/v/django-environ.svg?style=flat-square
-    :target: https://pypi.python.org/pypi/django-environ
-    :alt: Latest version released on PyPi
-
-.. |coverage| image:: https://img.shields.io/coveralls/joke2k/django-environ/master.svg?style=flat-square
-    :target: https://coveralls.io/r/joke2k/django-environ?branch=master
-    :alt: Test coverage
-
-.. |unix_build| image:: https://img.shields.io/travis/joke2k/django-environ/master.svg?style=flat-square&logo=travis
-    :target: http://travis-ci.org/joke2k/django-environ
-    :alt: Build status of the master branch on Mac/Linux
-
-.. |windows_build|  image:: https://img.shields.io/appveyor/ci/joke2k/django-environ.svg?style=flat-square&logo=windows
-    :target: https://ci.appveyor.com/project/joke2k/django-environ
-    :alt: Build status of the master branch on Windows
-
-.. |contributors| image:: https://img.shields.io/github/contributors/joke2k/django-environ.svg?style=flat-square
-    :target: https://github.com/joke2k/django-environ/graphs/contributors
-
-.. |license| image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
-    :target: https://raw.githubusercontent.com/joke2k/django-environ/master/LICENSE.txt
-    :alt: Package license
-
-.. |say_thanks| image:: https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg?style=flat-square
-    :target: https://saythanks.io/to/joke2k
-    :alt: Say Thanks!
-
 .. |cover| image:: https://farm2.staticflickr.com/1745/42580036751_35f76a92fe_h.jpg
     :alt: Photo by Singkham from Pexels
 
@@ -387,13 +388,6 @@ Support this project by becoming a sponsor. Your logo will show up here with a l
 .. _`Authors file`: https://github.com/joke2k/django-environ/blob/develop/AUTHORS.rst
 .. _`Contributor Friendly`: https://github.com/joke2k/django-environ/issues?direction=desc&labels=contributor-friendly&page=1&sort=updated&state=open
 .. _`the repository`: https://github.com/joke2k/django-environ
-
-.. |ocbackers| image:: https://opencollective.com/django-environ/backers/badge.svg
-    :target: https://opencollective.com/django-environ
-    :alt: Backers on Open Collective
-.. |ocsponsors| image:: https://opencollective.com/django-environ/sponsors/badge.svg
-    :target: https://opencollective.com/django-environ
-    :alt: Sponsors on Open Collective
     
 .. |ocbackerimage| image:: https://opencollective.com/django-environ/backers.svg?width=890
     :target: https://opencollective.com/django-environ
