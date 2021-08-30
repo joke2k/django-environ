@@ -2,26 +2,38 @@ import os
 import sys
 import unittest
 import warnings
-
+from json import dumps
 from urllib.parse import quote
-from .compat import json, DJANGO_POSTGRES, ImproperlyConfigured, REDIS_DRIVER
 
 from environ import Env, Path
 
+from .compat import DJANGO_POSTGRES, ImproperlyConfigured, REDIS_DRIVER
+
 
 class BaseTests(unittest.TestCase):
-
     URL = 'http://www.google.com/'
-    POSTGRES = 'postgres://uf07k1:wegauwhg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722'
-    MYSQL = 'mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/heroku_97681?reconnect=true'
+    POSTGRES = (
+        'postgres://uf07k1:wegauwhg@'
+        'ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722'
+    )
+    MYSQL = (
+        'mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/'
+        'heroku_97681?reconnect=true'
+    )
     MYSQLGIS = 'mysqlgis://user:password@127.0.0.1/some_database'
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
     ORACLE_TNS = 'oracle://user:password@sid/'
     ORACLE = 'oracle://user:password@host:1521/sid'
     CUSTOM_BACKEND = 'custom.backend://user:password@example.com:5430/database'
-    REDSHIFT = 'redshift://user:password@examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev'
+    REDSHIFT = (
+        'redshift://user:password@examplecluster.abc123xyz789.'
+        'us-west-2.redshift.amazonaws.com:5439/dev'
+    )
     MEMCACHE = 'memcache://127.0.0.1:11211'
-    REDIS = 'rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=secret'
+    REDIS = (
+        'rediscache://127.0.0.1:6379/1'
+        '?client_class=django_redis.client.DefaultClient&password=secret'
+    )
     EMAIL = 'smtps://user@domain.com:password@smtp.example.com:587'
     JSON = dict(one='bar', two=2, three=33.44)
     DICT = dict(foo='bar', test='on')
@@ -59,7 +71,7 @@ class BaseTests(unittest.TestCase):
                     CACHE_REDIS=cls.REDIS,
                     EMAIL_URL=cls.EMAIL,
                     URL_VAR=cls.URL,
-                    JSON_VAR=json.dumps(cls.JSON),
+                    JSON_VAR=dumps(cls.JSON),
                     PATH_VAR=cls.PATH,
                     EXPORTED_VAR=cls.EXPORTED)
 
@@ -92,8 +104,10 @@ class EnvTests(BaseTests):
     def test_str(self):
         self.assertTypeAndValue(str, 'bar', self.env('STR_VAR'))
         self.assertTypeAndValue(str, 'bar', self.env.str('STR_VAR'))
-        self.assertTypeAndValue(str, 'foo\\nbar', self.env.str('MULTILINE_STR_VAR'))
-        self.assertTypeAndValue(str, 'foo\nbar', self.env.str('MULTILINE_STR_VAR', multiline=True))
+        self.assertTypeAndValue(
+            str, 'foo\\nbar', self.env.str('MULTILINE_STR_VAR'))
+        self.assertTypeAndValue(
+            str, 'foo\nbar', self.env.str('MULTILINE_STR_VAR', multiline=True))
 
     def test_bytes(self):
         self.assertTypeAndValue(bytes, b'bar', self.env.bytes('STR_VAR'))
@@ -103,37 +117,58 @@ class EnvTests(BaseTests):
         self.assertTypeAndValue(int, 42, self.env.int('INT_VAR'))
 
     def test_int_with_none_default(self):
-        self.assertTrue(self.env('NOT_PRESENT_VAR', cast=int, default=None) is None)
+        self.assertTrue(
+            self.env('NOT_PRESENT_VAR', cast=int, default=None) is None)
 
     def test_float(self):
         self.assertTypeAndValue(float, 33.3, self.env('FLOAT_VAR', cast=float))
         self.assertTypeAndValue(float, 33.3, self.env.float('FLOAT_VAR'))
 
-        self.assertTypeAndValue(float, 33.3, self.env('FLOAT_COMMA_VAR', cast=float))
-        self.assertTypeAndValue(float, 123420333.3, self.env('FLOAT_STRANGE_VAR1', cast=float))
-        self.assertTypeAndValue(float, 123420333.3, self.env('FLOAT_STRANGE_VAR2', cast=float))
+        self.assertTypeAndValue(
+            float, 33.3, self.env('FLOAT_COMMA_VAR', cast=float))
+        self.assertTypeAndValue(
+            float, 123420333.3, self.env('FLOAT_STRANGE_VAR1', cast=float))
+        self.assertTypeAndValue(
+            float, 123420333.3, self.env('FLOAT_STRANGE_VAR2', cast=float))
 
     def test_bool_true(self):
-        self.assertTypeAndValue(bool, True, self.env('BOOL_TRUE_VAR', cast=bool))
-        self.assertTypeAndValue(bool, True, self.env('BOOL_TRUE_VAR2', cast=bool))
+        self.assertTypeAndValue(
+            bool, True, self.env('BOOL_TRUE_VAR', cast=bool))
+        self.assertTypeAndValue(
+            bool, True, self.env('BOOL_TRUE_VAR2', cast=bool))
         self.assertTypeAndValue(bool, True, self.env.bool('BOOL_TRUE_VAR'))
 
     def test_bool_false(self):
-        self.assertTypeAndValue(bool, False, self.env('BOOL_FALSE_VAR', cast=bool))
-        self.assertTypeAndValue(bool, False, self.env('BOOL_FALSE_VAR2', cast=bool))
+        self.assertTypeAndValue(
+            bool, False, self.env('BOOL_FALSE_VAR', cast=bool))
+        self.assertTypeAndValue(
+            bool, False, self.env('BOOL_FALSE_VAR2', cast=bool))
         self.assertTypeAndValue(bool, False, self.env.bool('BOOL_FALSE_VAR'))
 
     def test_proxied_value(self):
         self.assertEqual('bar', self.env('PROXIED_VAR'))
 
     def test_int_list(self):
-        self.assertTypeAndValue(list, [42, 33], self.env('INT_LIST', cast=[int]))
+        self.assertTypeAndValue(
+            list, [42, 33], self.env('INT_LIST', cast=[int]))
         self.assertTypeAndValue(list, [42, 33], self.env.list('INT_LIST', int))
 
     def test_int_tuple(self):
-        self.assertTypeAndValue(tuple, (42, 33), self.env('INT_LIST', cast=(int,)))
-        self.assertTypeAndValue(tuple, (42, 33), self.env.tuple('INT_LIST', int))
-        self.assertTypeAndValue(tuple, ('42', '33'), self.env.tuple('INT_LIST'))
+        self.assertTypeAndValue(
+            tuple,
+            (42, 33),
+            self.env('INT_LIST', cast=(int,))
+        )
+        self.assertTypeAndValue(
+            tuple,
+            (42, 33),
+            self.env.tuple('INT_LIST', int)
+        )
+        self.assertTypeAndValue(
+            tuple,
+            ('42', '33'),
+            self.env.tuple('INT_LIST')
+        )
 
     def test_str_list_with_spaces(self):
         self.assertTypeAndValue(list, [' foo', '  bar'],
@@ -148,16 +183,34 @@ class EnvTests(BaseTests):
         self.assertTypeAndValue(dict, self.DICT, self.env.dict('DICT_VAR'))
 
     def test_dict_parsing(self):
-
         self.assertEqual({'a': '1'}, self.env.parse_value('a=1', dict))
-        self.assertEqual({'a': 1}, self.env.parse_value('a=1', dict(value=int)))
-        self.assertEqual({'a': ['1', '2', '3']}, self.env.parse_value('a=1,2,3', dict(value=[str])))
-        self.assertEqual({'a': [1, 2, 3]}, self.env.parse_value('a=1,2,3', dict(value=[int])))
-        self.assertEqual({'a': 1, 'b': [1.1, 2.2], 'c': 3},
-                         self.env.parse_value('a=1;b=1.1,2.2;c=3', dict(value=int, cast=dict(b=[float]))))
+        self.assertEqual(
+            {'a': 1},
+            self.env.parse_value('a=1', dict(value=int))
+        )
+        self.assertEqual(
+            {'a': ['1', '2', '3']},
+            self.env.parse_value('a=1,2,3', dict(value=[str]))
+        )
+        self.assertEqual(
+            {'a': [1, 2, 3]},
+            self.env.parse_value('a=1,2,3', dict(value=[int]))
+        )
+        self.assertEqual(
+            {'a': 1, 'b': [1.1, 2.2], 'c': 3},
+            self.env.parse_value(
+                'a=1;b=1.1,2.2;c=3',
+                dict(value=int, cast=dict(b=[float]))
+            )
+        )
 
-        self.assertEqual({'a': "uname", 'c': "http://www.google.com", 'b': True},
-                         self.env.parse_value('a=uname;c=http://www.google.com;b=True', dict(value=str, cast=dict(b=bool))))
+        self.assertEqual(
+            {'a': "uname", 'c': "http://www.google.com", 'b': True},
+            self.env.parse_value(
+                'a=uname;c=http://www.google.com;b=True',
+                dict(value=str, cast=dict(b=bool))
+            )
+        )
 
     def test_url_value(self):
         url = self.env.url('URL_VAR')
@@ -167,15 +220,20 @@ class EnvTests(BaseTests):
 
     def test_url_encoded_parts(self):
         password_with_unquoted_characters = "#password"
-        encoded_url = "mysql://user:%s@127.0.0.1:3306/dbname" % quote(password_with_unquoted_characters)
+        encoded_url = "mysql://user:%s@127.0.0.1:3306/dbname" % \
+                      quote(password_with_unquoted_characters)
         parsed_url = self.env.db_url_config(encoded_url)
-        self.assertEqual(parsed_url['PASSWORD'], password_with_unquoted_characters)
+        self.assertEqual(
+            parsed_url['PASSWORD'], password_with_unquoted_characters)
 
     def test_db_url_value(self):
         pg_config = self.env.db()
         self.assertEqual(pg_config['ENGINE'], DJANGO_POSTGRES)
         self.assertEqual(pg_config['NAME'], 'd8r82722')
-        self.assertEqual(pg_config['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
+        self.assertEqual(
+            pg_config['HOST'],
+            'ec2-107-21-253-135.compute-1.amazonaws.com'
+        )
         self.assertEqual(pg_config['USER'], 'uf07k1')
         self.assertEqual(pg_config['PASSWORD'], 'wegauwhg')
         self.assertEqual(pg_config['PORT'], 5431)
@@ -189,7 +247,10 @@ class EnvTests(BaseTests):
         self.assertEqual(mysql_config['PORT'], '')
 
         mysql_gis_config = self.env.db('DATABASE_MYSQL_GIS_URL')
-        self.assertEqual(mysql_gis_config['ENGINE'], 'django.contrib.gis.db.backends.mysql')
+        self.assertEqual(
+            mysql_gis_config['ENGINE'],
+            'django.contrib.gis.db.backends.mysql'
+        )
         self.assertEqual(mysql_gis_config['NAME'], 'some_database')
         self.assertEqual(mysql_gis_config['HOST'], '127.0.0.1')
         self.assertEqual(mysql_gis_config['USER'], 'user')
@@ -215,14 +276,17 @@ class EnvTests(BaseTests):
         redshift_config = self.env.db('DATABASE_REDSHIFT_URL')
         self.assertEqual(redshift_config['ENGINE'], 'django_redshift_backend')
         self.assertEqual(redshift_config['NAME'], 'dev')
-        self.assertEqual(redshift_config['HOST'], 'examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com')
+        self.assertEqual(
+            redshift_config['HOST'],
+            'examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com')
         self.assertEqual(redshift_config['USER'], 'user')
         self.assertEqual(redshift_config['PASSWORD'], 'password')
         self.assertEqual(redshift_config['PORT'], 5439)
 
         sqlite_config = self.env.db('DATABASE_SQLITE_URL')
         self.assertEqual(sqlite_config['ENGINE'], 'django.db.backends.sqlite3')
-        self.assertEqual(sqlite_config['NAME'], '/full/path/to/your/database/file.sqlite')
+        self.assertEqual(sqlite_config['NAME'],
+                         '/full/path/to/your/database/file.sqlite')
 
         custom_backend_config = self.env.db('DATABASE_CUSTOM_BACKEND_URL')
         self.assertEqual(custom_backend_config['ENGINE'], 'custom.backend')
@@ -235,11 +299,13 @@ class EnvTests(BaseTests):
     def test_cache_url_value(self):
 
         cache_config = self.env.cache_url()
-        self.assertEqual(cache_config['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(cache_config['BACKEND'],
+                         'django.core.cache.backends.memcached.MemcachedCache')
         self.assertEqual(cache_config['LOCATION'], '127.0.0.1:11211')
 
         redis_config = self.env.cache_url('CACHE_REDIS')
-        self.assertEqual(redis_config['BACKEND'], 'django_redis.cache.RedisCache')
+        self.assertEqual(redis_config['BACKEND'],
+                         'django_redis.cache.RedisCache')
         self.assertEqual(redis_config['LOCATION'], 'redis://127.0.0.1:6379/1')
         self.assertEqual(redis_config['OPTIONS'], {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
@@ -249,7 +315,8 @@ class EnvTests(BaseTests):
     def test_email_url_value(self):
 
         email_config = self.env.email_url()
-        self.assertEqual(email_config['EMAIL_BACKEND'], 'django.core.mail.backends.smtp.EmailBackend')
+        self.assertEqual(email_config['EMAIL_BACKEND'],
+                         'django.core.mail.backends.smtp.EmailBackend')
         self.assertEqual(email_config['EMAIL_HOST'], 'smtp.example.com')
         self.assertEqual(email_config['EMAIL_HOST_PASSWORD'], 'password')
         self.assertEqual(email_config['EMAIL_HOST_USER'], 'user@domain.com')
@@ -264,9 +331,10 @@ class EnvTests(BaseTests):
         self.assertTypeAndValue(Path, Path(self.PATH), root)
 
     def test_smart_cast(self):
-        self.assertEqual(self.env.get_value('STR_VAR', default='string'), 'bar')
-        self.assertEqual(self.env.get_value('BOOL_TRUE_VAR', default=True), True)
-        self.assertEqual(self.env.get_value('BOOL_FALSE_VAR', default=True), False)
+        self.assertEqual(
+            self.env.get_value('STR_VAR', default='string'), 'bar')
+        self.assertTrue(self.env.get_value('BOOL_TRUE_VAR', default=True))
+        self.assertFalse(self.env.get_value('BOOL_FALSE_VAR', default=True))
         self.assertEqual(self.env.get_value('INT_VAR', default=1), 42)
         self.assertEqual(self.env.get_value('FLOAT_VAR', default=1.2), 33.3)
 
@@ -275,19 +343,20 @@ class EnvTests(BaseTests):
 
 
 class FileEnvTests(EnvTests):
-
     def setUp(self):
         super().setUp()
         Env.ENVIRON = {}
         self.env = Env()
         file_path = Path(__file__, is_file=True)('test_env.txt')
-        self.env.read_env(file_path, PATH_VAR=Path(__file__, is_file=True).__root__)
+        self.env.read_env(file_path,
+                          PATH_VAR=Path(__file__, is_file=True).__root__)
+
 
 class SubClassTests(EnvTests):
-
     def setUp(self):
         super().setUp()
         self.CONFIG = self.generateData()
+
         class MyEnv(Env):
             ENVIRON = self.CONFIG
         self.env = MyEnv()
@@ -318,12 +387,16 @@ class SchemaEnvTests(BaseTests):
 class DatabaseTestSuite(unittest.TestCase):
 
     def test_postgres_parsing(self):
-        url = 'postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
+        url = (
+            'postgres://uf07k1i6d8ia0v:wegauwhgeuioweg'
+            '@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
+        )
         url = Env.db_url_config(url)
 
         self.assertEqual(url['ENGINE'], DJANGO_POSTGRES)
         self.assertEqual(url['NAME'], 'd8r82722r2kuvn')
-        self.assertEqual(url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
+        self.assertEqual(url['HOST'],
+                         'ec2-107-21-253-135.compute-1.amazonaws.com')
         self.assertEqual(url['USER'], 'uf07k1i6d8ia0v')
         self.assertEqual(url['PASSWORD'], 'wegauwhgeuioweg')
         self.assertEqual(url['PORT'], 5431)
@@ -337,29 +410,42 @@ class DatabaseTestSuite(unittest.TestCase):
         self.assertEqual(url['HOST'], '/var/run/postgresql')
 
     def test_postgis_parsing(self):
-        url = 'postgis://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
+        url = (
+            'postgis://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.'
+            'compute-1.amazonaws.com:5431/d8r82722r2kuvn'
+        )
         url = Env.db_url_config(url)
 
-        self.assertEqual(url['ENGINE'], 'django.contrib.gis.db.backends.postgis')
+        self.assertEqual(url['ENGINE'],
+                         'django.contrib.gis.db.backends.postgis')
         self.assertEqual(url['NAME'], 'd8r82722r2kuvn')
-        self.assertEqual(url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
+        self.assertEqual(url['HOST'],
+                         'ec2-107-21-253-135.compute-1.amazonaws.com')
         self.assertEqual(url['USER'], 'uf07k1i6d8ia0v')
         self.assertEqual(url['PASSWORD'], 'wegauwhgeuioweg')
         self.assertEqual(url['PORT'], 5431)
 
     def test_mysql_gis_parsing(self):
-        url = 'mysqlgis://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722r2kuvn'
+        url = (
+            'mysqlgis://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.'
+            'compute-1.amazonaws.com:5431/d8r82722r2kuvn'
+        )
         url = Env.db_url_config(url)
 
-        self.assertEqual(url['ENGINE'], 'django.contrib.gis.db.backends.mysql')
+        self.assertEqual(url['ENGINE'],
+                         'django.contrib.gis.db.backends.mysql')
         self.assertEqual(url['NAME'], 'd8r82722r2kuvn')
-        self.assertEqual(url['HOST'], 'ec2-107-21-253-135.compute-1.amazonaws.com')
+        self.assertEqual(url['HOST'],
+                         'ec2-107-21-253-135.compute-1.amazonaws.com')
         self.assertEqual(url['USER'], 'uf07k1i6d8ia0v')
         self.assertEqual(url['PASSWORD'], 'wegauwhgeuioweg')
         self.assertEqual(url['PORT'], 5431)
 
     def test_cleardb_parsing(self):
-        url = 'mysql://bea6eb025ca0d8:69772142@us-cdbr-east.cleardb.com/heroku_97681db3eff7580?reconnect=true'
+        url = (
+            'mysql://bea6eb025ca0d8:69772142'
+            '@us-cdbr-east.cleardb.com/heroku_97681db3eff7580?reconnect=true'
+        )
         url = Env.db_url_config(url)
 
         self.assertEqual(url['ENGINE'], 'django.db.backends.mysql')
@@ -408,20 +494,29 @@ class DatabaseTestSuite(unittest.TestCase):
         url = Env.db_url_config(url)
         self.assertEqual(url['CONN_MAX_AGE'], 600)
 
-        url = 'postgres://user:pass@host:1234/dbname?conn_max_age=None&autocommit=True&atomic_requests=False'
+        url = (
+            'postgres://user:pass@host:1234/dbname'
+            '?conn_max_age=None&autocommit=True&atomic_requests=False'
+        )
         url = Env.db_url_config(url)
         self.assertEqual(url['CONN_MAX_AGE'], None)
         self.assertEqual(url['AUTOCOMMIT'], True)
         self.assertEqual(url['ATOMIC_REQUESTS'], False)
 
-        url = 'mysql://user:pass@host:1234/dbname?init_command=SET storage_engine=INNODB'
+        url = (
+            'mysql://user:pass@host:1234/dbname'
+            '?init_command=SET storage_engine=INNODB'
+        )
         url = Env.db_url_config(url)
         self.assertEqual(url['OPTIONS'], {
             'init_command': 'SET storage_engine=INNODB',
         })
 
     def test_database_ldap_url(self):
-        url = 'ldap://cn=admin,dc=nodomain,dc=org:some_secret_password@ldap.nodomain.org/'
+        url = (
+            'ldap://cn=admin,dc=nodomain'
+            ',dc=org:some_secret_password@ldap.nodomain.org/'
+        )
         url = Env.db_url_config(url)
 
         self.assertEqual(url['ENGINE'], 'ldapdb.backends.ldap')
@@ -435,7 +530,10 @@ class DatabaseTestSuite(unittest.TestCase):
 class CacheTestSuite(unittest.TestCase):
 
     def test_base_options_parsing(self):
-        url = 'memcache://127.0.0.1:11211/?timeout=0&key_prefix=cache_&key_function=foo.get_key&version=1'
+        url = (
+            'memcache://127.0.0.1:11211/'
+            '?timeout=0&key_prefix=cache_&key_function=foo.get_key&version=1'
+        )
         url = Env.cache_url_config(url)
 
         self.assertEqual(url['KEY_PREFIX'], 'cache_')
@@ -452,74 +550,88 @@ class CacheTestSuite(unittest.TestCase):
         url = 'memcache://127.0.0.1:11211'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(url['BACKEND'],
+                         'django.core.cache.backends.memcached.MemcachedCache')
         self.assertEqual(url['LOCATION'], '127.0.0.1:11211')
 
     def test_memcache_pylib_parsing(self):
         url = 'pymemcache://127.0.0.1:11211'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.memcached.PyLibMCCache')
+        self.assertEqual(url['BACKEND'],
+                         'django.core.cache.backends.memcached.PyLibMCCache')
         self.assertEqual(url['LOCATION'], '127.0.0.1:11211')
 
     def test_memcache_multiple_parsing(self):
         url = 'memcache://172.19.26.240:11211,172.19.26.242:11212'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
-        self.assertEqual(url['LOCATION'], ['172.19.26.240:11211', '172.19.26.242:11212'])
+        self.assertEqual(url['BACKEND'],
+                         'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(url['LOCATION'],
+                         ['172.19.26.240:11211', '172.19.26.242:11212'])
 
     def test_memcache_socket_parsing(self):
         url = 'memcache:///tmp/memcached.sock'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.memcached.MemcachedCache')
+        self.assertEqual(url['BACKEND'],
+                         'django.core.cache.backends.memcached.MemcachedCache')
         self.assertEqual(url['LOCATION'], 'unix:/tmp/memcached.sock')
 
     def test_dbcache_parsing(self):
         url = 'dbcache://my_cache_table'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.db.DatabaseCache')
+        self.assertEqual(url['BACKEND'],
+                         'django.core.cache.backends.db.DatabaseCache')
         self.assertEqual(url['LOCATION'], 'my_cache_table')
 
     def test_filecache_parsing(self):
         url = 'filecache:///var/tmp/django_cache'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
+        self.assertEqual(url['BACKEND'],
+                         'django.core.cache.backends.filebased.FileBasedCache')
         self.assertEqual(url['LOCATION'], '/var/tmp/django_cache')
 
     def test_filecache_windows_parsing(self):
         url = 'filecache://C:/foo/bar'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
+        self.assertEqual(url['BACKEND'],
+                         'django.core.cache.backends.filebased.FileBasedCache')
         self.assertEqual(url['LOCATION'], 'C:/foo/bar')
 
     def test_locmem_parsing(self):
         url = 'locmemcache://'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.locmem.LocMemCache')
+        self.assertEqual(url['BACKEND'],
+                         'django.core.cache.backends.locmem.LocMemCache')
         self.assertEqual(url['LOCATION'], '')
 
     def test_locmem_named_parsing(self):
         url = 'locmemcache://unique-snowflake'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.locmem.LocMemCache')
+        self.assertEqual(url['BACKEND'],
+                         'django.core.cache.backends.locmem.LocMemCache')
         self.assertEqual(url['LOCATION'], 'unique-snowflake')
 
     def test_dummycache_parsing(self):
         url = 'dummycache://'
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.dummy.DummyCache')
+        self.assertEqual(url['BACKEND'],
+                         'django.core.cache.backends.dummy.DummyCache')
         self.assertEqual(url['LOCATION'], '')
 
     def test_redis_parsing(self):
-        url = 'rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=secret'
+        url = (
+            'rediscache://127.0.0.1:6379/1'
+            '?client_class=django_redis.client.DefaultClient&password=secret'
+        )
         url = Env.cache_url_config(url)
 
         self.assertEqual(url['BACKEND'], REDIS_DRIVER)
@@ -539,7 +651,8 @@ class CacheTestSuite(unittest.TestCase):
         url = 'rediscache://:redispass@127.0.0.1:6379/0'
         url = Env.cache_url_config(url)
         self.assertEqual(REDIS_DRIVER, url['BACKEND'])
-        self.assertEqual(url['LOCATION'], 'redis://:redispass@127.0.0.1:6379/0')
+        self.assertEqual(url['LOCATION'],
+                         'redis://:redispass@127.0.0.1:6379/0')
 
     def test_redis_multi_location_parsing(self):
         url = 'rediscache://host1:6379,host2:6379,host3:9999/1'
@@ -556,7 +669,8 @@ class CacheTestSuite(unittest.TestCase):
         url = 'redis://:redispass@/path/to/socket.sock?db=0'
         url = Env.cache_url_config(url)
         self.assertEqual(REDIS_DRIVER, url['BACKEND'])
-        self.assertEqual(url['LOCATION'], 'unix://:redispass@/path/to/socket.sock')
+        self.assertEqual(url['LOCATION'],
+                         'unix://:redispass@/path/to/socket.sock')
         self.assertEqual(url['OPTIONS'], {
             'DB': 0
         })
@@ -569,10 +683,14 @@ class CacheTestSuite(unittest.TestCase):
         self.assertEqual(url['LOCATION'], 'rediss://127.0.0.1:6379/1')
 
     def test_options_parsing(self):
-        url = 'filecache:///var/tmp/django_cache?timeout=60&max_entries=1000&cull_frequency=0'
+        url = (
+            'filecache:///var/tmp/django_cache'
+            '?timeout=60&max_entries=1000&cull_frequency=0'
+        )
         url = Env.cache_url_config(url)
 
-        self.assertEqual(url['BACKEND'], 'django.core.cache.backends.filebased.FileBasedCache')
+        self.assertEqual(url['BACKEND'],
+                         'django.core.cache.backends.filebased.FileBasedCache')
         self.assertEqual(url['LOCATION'], '/var/tmp/django_cache')
         self.assertEqual(url['TIMEOUT'], 60)
         self.assertEqual(url['OPTIONS'], {
@@ -615,7 +733,8 @@ class SearchTestSuite(unittest.TestCase):
     def test_solr_parsing(self):
         url = Env.search_url_config(self.solr_url)
 
-        self.assertEqual(url['ENGINE'], 'haystack.backends.solr_backend.SolrEngine')
+        self.assertEqual(url['ENGINE'],
+                         'haystack.backends.solr_backend.SolrEngine')
         self.assertEqual(url['URL'], 'http://127.0.0.1:8983/solr')
 
     def test_solr_multicore_parsing(self):
@@ -624,7 +743,8 @@ class SearchTestSuite(unittest.TestCase):
         url = '{}/{}?TIMEOUT={}'.format(self.solr_url, index, timeout)
         url = Env.search_url_config(url)
 
-        self.assertEqual(url['ENGINE'], 'haystack.backends.solr_backend.SolrEngine')
+        self.assertEqual(url['ENGINE'],
+                         'haystack.backends.solr_backend.SolrEngine')
         self.assertEqual(url['URL'], 'http://127.0.0.1:8983/solr/solr_index')
         self.assertEqual(url['TIMEOUT'], timeout)
         self.assertTrue('INDEX_NAME' not in url)
@@ -635,7 +755,10 @@ class SearchTestSuite(unittest.TestCase):
         url = '{}?TIMEOUT={}'.format(self.elasticsearch_url, timeout)
         url = Env.search_url_config(url)
 
-        self.assertEqual(url['ENGINE'], 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine')
+        self.assertEqual(
+            url['ENGINE'],
+            'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine'
+        )
         self.assertTrue('INDEX_NAME' in url.keys())
         self.assertEqual(url['INDEX_NAME'], 'index')
         self.assertTrue('TIMEOUT' in url.keys())
@@ -645,10 +768,15 @@ class SearchTestSuite(unittest.TestCase):
     def test_whoosh_parsing(self):
         storage = 'file'  # or ram
         post_limit = 128 * 1024 * 1024
-        url = '{}?STORAGE={}&POST_LIMIT={}'.format(self.whoosh_url, storage, post_limit)
+        url = '{}?STORAGE={}&POST_LIMIT={}'.format(
+            self.whoosh_url,
+            storage,
+            post_limit,
+        )
         url = Env.search_url_config(url)
 
-        self.assertEqual(url['ENGINE'], 'haystack.backends.whoosh_backend.WhooshEngine')
+        self.assertEqual(url['ENGINE'],
+                         'haystack.backends.whoosh_backend.WhooshEngine')
         self.assertTrue('PATH' in url.keys())
         self.assertEqual(url['PATH'], '/home/search/whoosh_index')
         self.assertTrue('STORAGE' in url.keys())
@@ -662,7 +790,8 @@ class SearchTestSuite(unittest.TestCase):
         url = '{}?FLAGS={}'.format(self.xapian_url, flags)
         url = Env.search_url_config(url)
 
-        self.assertEqual(url['ENGINE'], 'haystack.backends.xapian_backend.XapianEngine')
+        self.assertEqual(url['ENGINE'],
+                         'haystack.backends.xapian_backend.XapianEngine')
         self.assertTrue('PATH' in url.keys())
         self.assertEqual(url['PATH'], '/home/search/xapian_index')
         self.assertTrue('FLAGS' in url.keys())
@@ -672,7 +801,8 @@ class SearchTestSuite(unittest.TestCase):
     def test_simple_parsing(self):
         url = Env.search_url_config(self.simple_url)
 
-        self.assertEqual(url['ENGINE'], 'haystack.backends.simple_backend.SimpleEngine')
+        self.assertEqual(url['ENGINE'],
+                         'haystack.backends.simple_backend.SimpleEngine')
         self.assertTrue('INDEX_NAME' not in url)
         self.assertTrue('PATH' not in url)
 
@@ -680,7 +810,8 @@ class SearchTestSuite(unittest.TestCase):
         excluded_indexes = 'myapp.indexes.A,myapp.indexes.B'
         include_spelling = 1
         batch_size = 100
-        params = 'EXCLUDED_INDEXES={}&INCLUDE_SPELLING={}&BATCH_SIZE={}'.format(
+        params = 'EXCLUDED_INDEXES={}&INCLUDE_SPELLING={}&BATCH_SIZE={}'
+        params = params.format(
             excluded_indexes,
             include_spelling,
             batch_size
@@ -698,7 +829,7 @@ class SearchTestSuite(unittest.TestCase):
             self.assertTrue('EXCLUDED_INDEXES' in url.keys())
             self.assertTrue('myapp.indexes.A' in url['EXCLUDED_INDEXES'])
             self.assertTrue('myapp.indexes.B' in url['EXCLUDED_INDEXES'])
-            self.assertTrue('INCLUDE_SPELLING'in url.keys())
+            self.assertTrue('INCLUDE_SPELLING' in url.keys())
             self.assertTrue(url['INCLUDE_SPELLING'])
             self.assertTrue('BATCH_SIZE' in url.keys())
             self.assertEqual(url['BATCH_SIZE'], 100)
@@ -710,7 +841,8 @@ class EmailTests(unittest.TestCase):
         url = 'smtps://user@domain.com:password@smtp.example.com:587'
         url = Env.email_url_config(url)
 
-        self.assertEqual(url['EMAIL_BACKEND'], 'django.core.mail.backends.smtp.EmailBackend')
+        self.assertEqual(url['EMAIL_BACKEND'],
+                         'django.core.mail.backends.smtp.EmailBackend')
         self.assertEqual(url['EMAIL_HOST'], 'smtp.example.com')
         self.assertEqual(url['EMAIL_HOST_PASSWORD'], 'password')
         self.assertEqual(url['EMAIL_HOST_USER'], 'user@domain.com')
@@ -721,9 +853,9 @@ class EmailTests(unittest.TestCase):
 class PathTests(unittest.TestCase):
 
     def test_path_class(self):
-
         root = Path(__file__, '..', is_file=True)
-        root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
+        root_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), '../'))
         self.assertEqual(root(), root_path)
         self.assertEqual(root.__root__, root_path)
 
@@ -732,9 +864,10 @@ class PathTests(unittest.TestCase):
         self.assertEqual(web('css'), os.path.join(root_path, 'public', 'css'))
 
     def test_required_path(self):
-
-        self.assertRaises(ImproperlyConfigured, Path, '/not/existing/path/', required=True)
-        self.assertRaises(ImproperlyConfigured, Path(__file__), 'not_existing_path', required=True)
+        self.assertRaises(ImproperlyConfigured, Path,
+                          '/not/existing/path/', required=True)
+        self.assertRaises(ImproperlyConfigured, Path(__file__),
+                          'not_existing_path', required=True)
 
     def test_comparison(self):
 
@@ -744,16 +877,20 @@ class PathTests(unittest.TestCase):
         self.assertTrue(Path('/home') == Path('/home'))
         self.assertTrue(Path('/home') != Path('/home/dev'))
 
-        self.assertEqual(Path('/home/foo/').rfind('/'), str(Path('/home/foo')).rfind('/'))
-        self.assertEqual(Path('/home/foo/').find('/home'), str(Path('/home/foo/')).find('/home'))
+        self.assertEqual(Path('/home/foo/').rfind('/'),
+                         str(Path('/home/foo')).rfind('/'))
+        self.assertEqual(Path('/home/foo/').find('/home'),
+                         str(Path('/home/foo/')).find('/home'))
         self.assertEqual(Path('/home/foo/')[1], str(Path('/home/foo/'))[1])
-        self.assertEqual(Path('/home/foo/').__fspath__(), str(Path('/home/foo/')))
+        self.assertEqual(Path('/home/foo/').__fspath__(),
+                         str(Path('/home/foo/')))
 
         self.assertEqual(~Path('/home'), Path('/'))
         self.assertEqual(Path('/') + 'home', Path('/home'))
         self.assertEqual(Path('/') + '/home/public', Path('/home/public'))
         self.assertEqual(Path('/home/dev/public') - 2, Path('/home'))
-        self.assertEqual(Path('/home/dev/public') - 'public', Path('/home/dev'))
+        self.assertEqual(Path('/home/dev/public') - 'public',
+                         Path('/home/dev'))
 
         self.assertRaises(TypeError, lambda _: Path('/home/dev/') - 'not int')
 
