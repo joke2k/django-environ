@@ -102,7 +102,8 @@ jobs:
           COVERALLS_SERVICE_NAME: github
         run: |
           python -m pip --use-feature=in-tree-build install coveralls
-          coveralls
+          # Do not fail job if coveralls.io is down
+          coveralls || true
 
       - name: Success Reporting
         if: success()
