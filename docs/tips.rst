@@ -91,15 +91,40 @@ You can use something like this to handle similar cases.
 Multiline value
 ===============
 
-You can set a multiline variable value:
+To escape newline/tab characters pass ``multiline=False`` to ```str()```.
+The following example demonstrates the above:
+
+**.env file**:
+
+.. code-block:: shell
+
+   # .env file contents
+   UNQUOTED_CERT=---BEGIN---\r\n---END---
+   QUOTED_CERT="---BEGIN---\r\n---END---"
+
+**settings.py file**:
 
 .. code-block:: python
 
-   # MULTILINE_TEXT=Hello\\nWorld
-   >>> print env.str('MULTILINE_TEXT', multiline=True)
-   Hello
-   World
+   # settings.py file contents
+   import environ
 
+
+   env = environ.Env()
+
+   print(env.str('UNQUOTED_CERT', multiline=True))
+   # ---BEGIN---
+   # ---END---
+
+   print(env.str('UNQUOTED_CERT', multiline=False))
+   # ---BEGIN---\r\n---END---
+
+   print(env.str('QUOTED_CERT', multiline=True))
+   # ---BEGIN---
+   # ---END---
+
+   print(env.str('QUOTED_CERT', multiline=False))
+   # ---BEGIN---\r\n---END---
 
 Proxy value
 ===========
