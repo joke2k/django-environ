@@ -60,7 +60,7 @@ The idea of this package is to unify a lot of packages that make the same stuff:
 Take a string from ``os.environ``, parse and cast it to some of useful python typed variables.
 To do that and to use the `12factor`_ approach, some connection strings are expressed as url,
 so this package can parse it and return a ``urllib.parse.ParseResult``.
-These strings from ``os.environ`` are loaded from a `.env` file and filled in ``os.environ`` with ``setdefault`` method,
+These strings from ``os.environ`` are loaded from a ``.env`` file and filled in ``os.environ`` with ``setdefault`` method,
 to avoid to overwrite the real environ.
 A similar approach is used in `Two Scoops of Django`_ book and explained in `12factor-django`_ article.
 
