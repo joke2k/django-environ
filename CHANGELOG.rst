@@ -9,11 +9,17 @@ and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.
 --------------------------
 Added
 +++++
-  - Move CI to GitHub Actions
+  - Python 3.9, 3.10 and pypy 3.7 are now supported
+  - Django 3.1 and 3.2 are now supported
 
 Fixed
 +++++
   - Fix various code linting errors
+
+Changed
++++++++
+  - Refactor tests to use pytest and follow DRY
+  - Move CI to GitHub Actions
 
 
 `v0.5.0`_ - 30-August-2021

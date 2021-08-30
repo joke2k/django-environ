@@ -1,41 +1,30 @@
+# This file is part of the django-environ.
+#
+# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
+#
+# For the full copyright and license information, please view
+# the LICENSE.txt file that was distributed with this source code.
+
+# Please do not use this ignore file to define platform specific files.
+#
+# For these purposes create a global .gitignore file, which is a list of rules
+# for ignoring files in every Git repository on your computer.
+#
+# https://help.github.com/articles/ignoring-files/#create-a-global-gitignore
+
+# Directories to ignore (do not add trailing '/'s, they skip symlinks).
+/.tox
+/build
+/dist
+/*.egg-info
+/htmlcov
+/docs/_build
+
+# Python cache.
 *.py[cod]
+__pycache__
 
-# C extensions
-*.so
-
-# Packages
-*.egg
-*.egg-info
-dist
-build
-docs/_build
-eggs
-parts
-var
-sdist
-develop-eggs
-.installed.cfg
-lib
-lib64
-
-# Installer logs
-pip-log.txt
-
-# Unit test / coverage reports
-.coverage
-.tox
-nosetests.xml
-
-# Translations
-*.mo
-
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
-.idea
-.projectile
-.ropeproject
-
-# pyenv/pyenv-virtualenv
-.python-version
+# Ignore codecoverage stuff.
+.coverage*
+coverage.xml
