@@ -31,11 +31,6 @@ from .compat import DJANGO_POSTGRES, ImproperlyConfigured, json, REDIS_DRIVER
 logger = logging.getLogger(__name__)
 
 
-VERSION = '0.5.0'
-__author__ = 'joke2k'
-__version__ = tuple(VERSION.split('.'))
-
-
 def _cast(value):
     # Safely evaluate an expression node or a string containing a Python
     # literal or container display.
