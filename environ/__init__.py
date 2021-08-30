@@ -31,7 +31,7 @@ from .environ import *
 
 
 __copyright__ = 'Copyright (C) 2021 Daniele Faraglia'
-__version__ = '0.5.0'
+__version__ = '0.6.0'
 __license__ = 'MIT'
 __author__ = 'Daniele Faraglia'
 __author_email__ = 'daniele.faraglia@gmail.com'
