@@ -18,8 +18,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
     name: Build and test package distribution
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
 
     steps:
       - name: Checkout code
@@ -40,6 +44,18 @@ jobs:
 
       - name: Build and test package
         run: tox -e build
+
+      - name: Archive build artifacts
+        if: success()
+        uses: actions/upload-artifact@v2
+        with:
+          # To ensure that jobs don't overwrite existing artifacts,
+          # use a different name per job.
+          name: build-${{ matrix.os }}
+          path: .tox/build/tmp/build
+          # Artifacts are retained for 90 days by default.
+          # In fact, we don't need such long period.
+          retention-days: 60
 
   install-dev:
     name: Verify dev environment
