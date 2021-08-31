@@ -167,8 +167,8 @@ DEPENDENCY_LINKS = []
 EXTRAS_REQUIRE = {
     # Dependencies that are required to run tests
     'testing': [
-        'coverage[toml]>=5.4',  # Code coverage measurement for Python
-        'pytest>=6.1.2',  # Our tests framework (6.1.2 due to python 3.5)
+        'coverage[toml]>=5.0a4',  # Code coverage measurement for Python
+        'pytest>=4.6.11',  # Our tests framework
     ],
     # Dependencies that are required to build documentation
     'docs': [
@@ -214,7 +214,7 @@ if __name__ == '__main__':
         platforms=['any'],
         include_package_data=True,
         zip_safe=False,
-        python_requires='>=3, <4',
+        python_requires='>=3.4,<4',
         install_requires=INSTALL_REQUIRES,
         dependency_links=DEPENDENCY_LINKS,
         extras_require=EXTRAS_REQUIRE,
