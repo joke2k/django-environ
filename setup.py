@@ -31,8 +31,11 @@ def load_long_description():
     """Load long description from file README.rst."""
     def changes():
         changelog = path.join(PKG_DIR, 'CHANGELOG.rst')
-        pat = r'(\d+.\d+.\d+ \(.*?\)\r?\n.*?)\r?\n\r?\n\r?\n----\r?\n\r?\n\r?\n'  # noqa: E501
-        result = re.search(pat, read_file(changelog), re.S)
+        pattern = (
+            r'(`(v\d+.\d+.\d+)`_ - \d+.-\w+-\d{4}\r?\n-+\r?\n.*?)'
+            r'\r?\n\r?\n\r?\n`v\d+.\d+.\d+`_'
+        )
+        result = re.search(pattern, read_file(changelog), re.S)
 
         return result.group(1) if result else ''
 
