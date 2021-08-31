@@ -14,6 +14,7 @@
 # https://help.github.com/articles/ignoring-files/#create-a-global-gitignore
 
 # Directories to ignore (do not add trailing '/'s, they skip symlinks).
+/.pytest_cache
 /.tox
 /build
 /dist
