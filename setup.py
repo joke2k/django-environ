@@ -183,7 +183,6 @@ EXTRAS_REQUIRE['develop'] = \
 # Project's URLs
 PROJECT_URLS = {
     'Documentation': 'https://django-environ.readthedocs.io',
-    # TODO(serghei): implement changelog
     'Changelog': f"{find_meta('url')}/en/latest/changelog.html",
     'Bug Tracker': 'https://github.com/joke2k/django-environ/issues',
     'Source Code': 'https://github.com/joke2k/django-environ',
