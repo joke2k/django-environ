@@ -27,7 +27,7 @@
 
 .. -teaser-begin-
 
-**django-environ** is the Python package that allows you to use
+``django-environ`` is the Python package that allows you to use
 `Twelve-factor methodology <http://www.12factor.net/>`_ to configure your
 Django application with environment variables.
 
@@ -102,8 +102,8 @@ book and explained in `12factor-django <http://www.wellfireinteractive.com/blog/
 article.
 
 
-Using **django-environ** you can stop to make a lot of unversioned
-``settings_*.py``to configure your app.
+Using ``django-environ`` you can stop to make a lot of unversioned
+``settings_*.py`` to configure your app.
 See `cookiecutter-django <https://github.com/pydanny/cookiecutter-django>`_ for
 a concrete example on using with a django project.
 
@@ -137,3 +137,20 @@ Support
 Should you have any question, any remark, or if you find a bug, or if there is
 something you can't do with the ``django-environ``, please
 `open an issue <https://github.com/joke2k/django-environ>`_.
+
+.. -credits-
+
+Credits
+=======
+
+The existence of ``django-environ`` would have been impossible without these
+projects:
+
+- `rconradharris/envparse <https://github.com/rconradharris/envparse>`_
+- `jacobian/dj-database-url <https://github.com/jacobian/dj-database-url>`_
+- `migonzalvar/dj-email-url <https://github.com/migonzalvar/dj-email-url>`_
+- `ghickman/django-cache-url <https://github.com/ghickman/django-cache-url>`_
+- `dstufft/dj-search-url <https://github.com/dstufft/dj-search-url>`_
+- `julianwachholz/dj-config-url <https://github.com/julianwachholz/dj-config-url>`_
+- `nickstenning/honcho <https://github.com/nickstenning/honcho>`_
+- `rconradharris/envparse <https://github.com/rconradharris/envparse>`_
