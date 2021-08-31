@@ -32,16 +32,16 @@ def load_long_description():
     def changes():
         changelog = path.join(PKG_DIR, 'CHANGELOG.rst')
         pattern = (
-            r'(`(v\d+.\d+.\d+)`_ - \d+.-\w+-\d{4}\r?\n-+\r?\n.*?)'
+            r'(`(v\d+.\d+.\d+)`_( - \d+.-\w+-\d{4}\r?\n-+\r?\n.*?))'
             r'\r?\n\r?\n\r?\n`v\d+.\d+.\d+`_'
         )
         result = re.search(pattern, read_file(changelog), re.S)
 
-        return result.group(1) if result else ''
+        return result.group(2) + result.group(3) if result else ''
 
     try:
-        title = '{}: {}'.format(PKG_NAME, find_meta('description'))
-        head = '=' * (len(title) - 1)
+        title = PKG_NAME
+        head = '=' * (len(title))
 
         contents = (
             head,
