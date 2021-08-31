@@ -64,10 +64,26 @@ def test_comparison():
 
 
 def test_sum():
+    """Make sure Path correct handle __add__."""
     assert Path('/') + 'home' == Path('/home')
     assert Path('/') + '/home/public' == Path('/home/public')
+
+
+def test_subtraction():
+    """Make sure Path correct handle __sub__."""
     assert Path('/home/dev/public') - 2 == Path('/home')
     assert Path('/home/dev/public') - 'public' == Path('/home/dev')
+
+
+def test_subtraction_not_int():
+    """Subtraction with an invalid type should raise TypeError."""
+    with pytest.raises(TypeError) as excinfo:
+        Path('/home/dev/') - 'not int'
+    assert str(excinfo.value) == (
+        "unsupported operand type(s) for -: '<class 'environ.environ.Path'>' "
+        "and '<class 'str'>' unless value of <class 'environ.environ.Path'> "
+        "ends with value of <class 'str'>"
+    )
 
 
 def test_required_path():
@@ -79,16 +95,6 @@ def test_required_path():
     with pytest.raises(ImproperlyConfigured) as excinfo:
         Path('/not/existing/path/', required=True)
     assert "Create required path:" in str(excinfo.value)
-
-
-def test_subtraction_not_int():
-    with pytest.raises(TypeError) as excinfo:
-        Path('/home/dev/') - 'not int'
-    assert str(excinfo.value) == (
-        "unsupported operand type(s) for -: '<class 'environ.environ.Path'>' "
-        "and '<class 'str'>' unless value of <class 'environ.environ.Path'> "
-        "ends with value of <class 'str'>"
-    )
 
 
 def test_complex_manipulation(volume):
