@@ -28,6 +28,13 @@ from urllib.parse import (
 
 from .compat import DJANGO_POSTGRES, ImproperlyConfigured, json, REDIS_DRIVER
 
+try:
+    from os import PathLike
+    Openable = (str, PathLike)
+except ImportError:
+    Openable = (str,)
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -735,7 +742,7 @@ class Env:
                 return
 
         try:
-            if isinstance(env_file, str):
+            if isinstance(env_file, Openable):
                 with open(env_file) as f:
                     content = f.read()
             else:

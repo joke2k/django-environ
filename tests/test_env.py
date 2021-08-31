@@ -275,6 +275,34 @@ class TestFileEnv(TestEnv):
             PATH_VAR=Path(__file__, is_file=True).__root__
         )
 
+    def test_read_env_path_like(self):
+        import pathlib
+        import tempfile
+
+        path_like = (pathlib.Path(tempfile.gettempdir()) / 'test_pathlib.env')
+        try:
+            path_like.unlink()
+        except FileNotFoundError:
+            pass
+
+        assert not path_like.exists()
+
+        env_key = 'SECRET'
+        env_val = 'enigma'
+        env_str = env_key + '=' + env_val
+
+        # open() doesn't take path-like on Python < 3.6
+        try:
+            with open(path_like, 'w', encoding='utf-8') as f:
+                f.write(env_str + '\n')
+        except TypeError:
+            return
+
+        assert path_like.exists()
+        self.env.read_env(path_like)
+        assert env_key in self.env.ENVIRON
+        assert self.env.ENVIRON[env_key] == env_val
+
 
 class TestSubClass(TestEnv):
     def setup_method(self, method):

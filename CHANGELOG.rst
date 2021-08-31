@@ -12,6 +12,7 @@ Added
   - Python 3.9, 3.10 and pypy 3.7 are now supported
   - Django 3.1 and 3.2 are now supported
   - Added missed classifiers to ``setup.py``
+  - Accept Python 3.6 path-like objects for ``read_env``
 
 Fixed
 +++++
