@@ -3,7 +3,8 @@ name: Build
 on:
   push:
     branches:
-      - master
+      - develop
+      - main
       - 'feature/**'
       - 'release/**'
       - 'fix/**'
@@ -12,7 +13,8 @@ on:
 
   pull_request:
     branches:
-      - master
+      - develop
+      - main
 
 jobs:
   build:
