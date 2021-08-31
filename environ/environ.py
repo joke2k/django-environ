@@ -270,7 +270,7 @@ class Env:
 
     def email_url(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
         """Returns a config dictionary, defaulting to EMAIL_URL.
-        
+
         The email method is an alias for email_url.
 
         :rtype: dict
