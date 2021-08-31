@@ -1,4 +1,4 @@
-name: CS
+name: Docs
 
 on:
   push:
@@ -15,9 +15,9 @@ on:
       - main
 
 jobs:
-  lint:
+  docs:
     runs-on: ubuntu-latest
-    name: Code linting
+    name: Build and test package documentation
 
     steps:
       - name: Checkout code
@@ -33,5 +33,5 @@ jobs:
           python -m pip install --upgrade pip
           pip --use-feature=in-tree-build install tox tox-gh-actions
 
-      - name: Lint with tox
-        run: tox -e lint
+      - name: Build and test package documentation
+        run: tox -e docs
