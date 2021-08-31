@@ -44,7 +44,7 @@ def find_version(meta_file):
 
 # General information about the project.
 project = 'django-environ'
-copyright = '2021, Daniele Faraglia and other contributors'
+copyright = '2013-2021, Daniele Faraglia and other contributors'
 author = u"Daniele Faraglia"
 
 #
