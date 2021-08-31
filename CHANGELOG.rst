@@ -23,6 +23,7 @@ Changed
   - Move CI to GitHub Actions
   - Restructure project documentation
   - Build and test package documentation as a part of CI pipeline
+  - Add ``pytest`` and ``coverage[toml]`` to setuptools' ``extras_require``
 
 
 `v0.5.0`_ - 30-August-2021

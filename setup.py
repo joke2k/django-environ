@@ -166,7 +166,10 @@ DEPENDENCY_LINKS = []
 #
 EXTRAS_REQUIRE = {
     # Dependencies that are required to run tests
-    'testing': [],
+    'testing': [
+        'coverage[toml]>=5.4',  # Code coverage measurement for Python
+        'pytest>=6.2.5',  # Our tests framework
+    ],
     # Dependencies that are required to build documentation
     'docs': [
         'furo>=2021.8.17b43,==2021.8.*',  # Sphinx documentation theme
