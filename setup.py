@@ -12,7 +12,7 @@ import codecs
 import re
 from os import path
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 
 def read_file(filepath):
