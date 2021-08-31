@@ -46,6 +46,7 @@ jobs:
 
       matrix:
         python:
+          - '3.5'
           - '3.6'
           - '3.7'
           - '3.8'
@@ -80,7 +81,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip --use-feature=in-tree-build install tox tox-gh-actions
+          python -m pip install tox tox-gh-actions
 
       - name: Setuptools self-test
         run: |
@@ -100,7 +101,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COVERALLS_SERVICE_NAME: github
         run: |
-          python -m pip --use-feature=in-tree-build install coveralls
+          python -m pip install coveralls
           # Do not fail job if coveralls.io is down
           coveralls || true
 
