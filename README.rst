@@ -107,8 +107,8 @@ Using ``django-environ`` you can stop to make a lot of unversioned
 See `cookiecutter-django <https://github.com/pydanny/cookiecutter-django>`_ for
 a concrete example on using with a django project.
 
-Feature Support
----------------
+**Feature Support**
+
 - Fast and easy multi environment for deploy
 - Fill ``os.environ`` with .env file variables
 - Variables casting
