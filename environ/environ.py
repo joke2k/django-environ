@@ -245,6 +245,8 @@ class Env:
     def db_url(self, var=DEFAULT_DATABASE_ENV, default=NOTSET, engine=None):
         """Returns a config dictionary, defaulting to DATABASE_URL.
 
+        The db method is an alias for db_url.
+
         :rtype: dict
         """
         return self.db_url_config(
@@ -256,6 +258,8 @@ class Env:
     def cache_url(self, var=DEFAULT_CACHE_ENV, default=NOTSET, backend=None):
         """Returns a config dictionary, defaulting to CACHE_URL.
 
+        The cache method is an alias for cache_url.
+
         :rtype: dict
         """
         return self.cache_url_config(
@@ -266,6 +270,8 @@ class Env:
 
     def email_url(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
         """Returns a config dictionary, defaulting to EMAIL_URL.
+        
+        The email method is an alias for email_url.
 
         :rtype: dict
         """
