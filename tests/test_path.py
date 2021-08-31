@@ -18,9 +18,9 @@ def test_str(volume):
     root = Path('/home')
 
     if sys.platform == 'win32':
-        assert str(root) == f'{volume}home'
-        assert str(root()) == f'{volume}home'
-        assert str(root('dev')) == f'{volume}home\\dev'
+        assert str(root) == '{}home'.format(volume)
+        assert str(root()) == '{}home'.format(volume)
+        assert str(root('dev')) == '{}home\\dev'.format(volume)
     else:
         assert str(root) == '/home'
         assert str(root()) == '/home'
@@ -42,7 +42,7 @@ def test_path_class():
 def test_repr(volume):
     root = Path('/home')
     if sys.platform == 'win32':
-        assert root.__repr__() == f'<Path:{volume}home>'
+        assert root.__repr__() == '<Path:{}home>'.format(volume)
     else:
         assert root.__repr__() == '<Path:/home>'
 
@@ -97,18 +97,22 @@ def test_complex_manipulation(volume):
     assets, scripts = public.path('assets'), public.path('assets', 'scripts')
 
     if sys.platform == 'win32':
-        assert public.__repr__() == f'<Path:{volume}home\\public>'
-        assert str(public.root) == f'{volume}home\\public'
-        assert str(public('styles')) == f'{volume}home\\public\\styles'
-        assert str(assets.root) == f'{volume}home\\public\\assets'
-        assert str(scripts.root) == f'{volume}home\\public\\assets\\scripts'
+        assert public.__repr__() == '<Path:{}home\\public>'.format(volume)
+        assert str(public.root) == '{}home\\public'.format(volume)
+        assert str(public('styles')) == '{}home\\public\\styles'.format(volume)
+        assert str(assets.root) == '{}home\\public\\assets'.format(volume)
+        assert str(scripts.root) == '{}home\\public\\assets\\scripts'.format(
+            volume
+        )
 
-        assert (~assets).__repr__() == f'<Path:{volume}home\\public>'
+        assert (~assets).__repr__() == '<Path:{}home\\public>'.format(
+            volume
+        )
         assert str(assets + 'styles') == (
-            f'{volume}home\\public\\assets\\styles'
+            '{}home\\public\\assets\\styles'.format(volume)
         )
         assert (assets + 'styles').__repr__() == (
-            f'<Path:{volume}home\\public\\assets\\styles>'
+            '<Path:{}home\\public\\assets\\styles>'.format(volume)
         )
     else:
         assert public.__repr__() == '<Path:/home/public>'

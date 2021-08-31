@@ -40,7 +40,7 @@ def load_long_description():
         return result.group(1) if result else ''
 
     try:
-        title = f"{PKG_NAME}: {find_meta('description')}"
+        title = '{}: {}'.format(PKG_NAME, find_meta('description'))
         head = '=' * (len(title) - 1)
 
         contents = (
@@ -57,7 +57,9 @@ def load_long_description():
             '===================\n',
             changes(),
             '',
-            f"`Full changelog <{find_meta('url')}/en/latest/changelog.html>`_.",  # noqa: E501
+            '`Full changelog <{}/en/latest/changelog.html>`_.'.format(
+                find_meta('url')
+            ),
             '',
             read_file(path.join(PKG_DIR, 'SECURITY.rst')),
             '',
@@ -67,7 +69,7 @@ def load_long_description():
         return '\n'.join(contents)
     except (RuntimeError, FileNotFoundError) as read_error:
         message = 'Long description could not be read from README.rst'
-        raise RuntimeError(f'{message}: {read_error}') from read_error
+        raise RuntimeError('%s: %s' % (message, read_error)) from read_error
 
 
 def is_canonical_version(version):
@@ -90,7 +92,7 @@ def find_meta(meta):
     if meta_match:
         return meta_match.group(1)
     raise RuntimeError(
-        f'Unable to find __{meta}__ string in package meta file')
+        'Unable to find __%s__ string in package meta file' % meta)
 
 
 def get_version_string():
@@ -183,7 +185,7 @@ EXTRAS_REQUIRE['develop'] = \
 # Project's URLs
 PROJECT_URLS = {
     'Documentation': 'https://django-environ.readthedocs.io',
-    'Changelog': f"{find_meta('url')}/en/latest/changelog.html",
+    'Changelog': '{}/en/latest/changelog.html'.format(find_meta('url')),
     'Bug Tracker': 'https://github.com/joke2k/django-environ/issues',
     'Source Code': 'https://github.com/joke2k/django-environ',
 }
