@@ -168,7 +168,7 @@ EXTRAS_REQUIRE = {
     # Dependencies that are required to run tests
     'testing': [
         'coverage[toml]>=5.4',  # Code coverage measurement for Python
-        'pytest>=6.2.5',  # Our tests framework
+        'pytest>=6.1.2',  # Our tests framework (6.1.2 due to python 3.5)
     ],
     # Dependencies that are required to build documentation
     'docs': [
