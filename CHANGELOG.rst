@@ -11,6 +11,7 @@ Added
 +++++
   - Python 3.9, 3.10 and pypy 3.7 are now supported
   - Django 3.1 and 3.2 are now supported
+  - Add missed classifiers to ``setup.py``
 
 Fixed
 +++++
@@ -20,6 +21,8 @@ Changed
 +++++++
   - Refactor tests to use pytest and follow DRY
   - Move CI to GitHub Actions
+  - Restructure project documentation
+  - Build and test package documentation as a part of CI pipeline
 
 
 `v0.5.0`_ - 30-August-2021
