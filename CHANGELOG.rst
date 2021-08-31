@@ -11,19 +11,23 @@ Added
 +++++
   - Python 3.9, 3.10 and pypy 3.7 are now supported
   - Django 3.1 and 3.2 are now supported
-  - Add missed classifiers to ``setup.py``
+  - Added missed classifiers to ``setup.py``
 
 Fixed
 +++++
-  - Fix various code linting errors
+  - Fixed various code linting errors
+  - Fixed typos in the documentation
+  - Added missed files to the package contents
 
 Changed
 +++++++
   - Refactor tests to use pytest and follow DRY
-  - Move CI to GitHub Actions
-  - Restructure project documentation
+  - Moved CI to GitHub Actions
+  - Restructuring of project documentation
   - Build and test package documentation as a part of CI pipeline
-  - Add ``pytest`` and ``coverage[toml]`` to setuptools' ``extras_require``
+  - Build and test package distribution as a part of CI pipeline
+  - Check ``MANIFEST.in`` in a source package for completeness as a part of CI pipeline
+  - Added ``pytest`` and ``coverage[toml]`` to setuptools' ``extras_require``
 
 
 `v0.5.0`_ - 30-August-2021
