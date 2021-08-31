@@ -5,12 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is *inspired* by `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 
-`unreleased`_
---------------------------
+`v0.6.0`_ - 00-Unreleased-0000
+------------------------------
 Added
 +++++
   - Python 3.9, 3.10 and pypy 3.7 are now supported
   - Django 3.1 and 3.2 are now supported
+  - Add missed classifiers to ``setup.py``
 
 Fixed
 +++++
@@ -20,6 +21,8 @@ Changed
 +++++++
   - Refactor tests to use pytest and follow DRY
   - Move CI to GitHub Actions
+  - Restructure project documentation
+  - Build and test package documentation as a part of CI pipeline
 
 
 `v0.5.0`_ - 30-August-2021
@@ -155,7 +158,7 @@ Added
   - Initial release
 
 
-.. _unreleased: https://github.com/joke2k/django-environ/compare/v0.5.0...develop
+.. _v0.6.0: https://github.com/joke2k/django-environ/compare/v0.5.0...develop
 .. _v0.5.0: https://github.com/joke2k/django-environ/compare/v0.4.5...v0.5.0
 .. _v0.4.5: https://github.com/joke2k/django-environ/compare/v0.4.4...v0.4.5
 .. _v0.4.4: https://github.com/joke2k/django-environ/compare/v0.4.3...v0.4.4
