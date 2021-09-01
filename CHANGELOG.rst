@@ -19,6 +19,7 @@ Fixed
   - Fixed various code linting errors
   - Fixed typos in the documentation
   - Added missed files to the package contents
+  - Fixed ``db_url_config`` to work the same for all postgres-like schemes
 
 Changed
 +++++++
