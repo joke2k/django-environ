@@ -122,3 +122,27 @@ It is possible to have multiple env files and select one using environment varia
    env.read_env(env.str('ENV_PATH', '.env'))
 
 Now ``ENV_PATH=other-env ./manage.py runserver`` uses ``other-env`` while ``./manage.py runserver`` uses ``.env``.
+
+Using Path objects when reading env
+===================================
+
+It is possible to use of ``pathlib.Path`` objects when reading environment file from the filesystem:
+
+.. code-block:: python
+
+   import os
+   import pathlib
+
+   import environ
+
+
+   # Build paths inside the project like this: BASE_DIR('subdir').
+   BASE_DIR = environ.Path(__file__) - 3
+
+   env = environ.Env()
+
+   # The four lines below do the same:
+   env.read_env(BASE_DIR('.env'))
+   env.read_env(os.path.join(BASE_DIR, '.env'))
+   env.read_env(pathlib.Path(str(BASE_DIR)).joinpath('.env'))
+   env.read_env(pathlib.Path(str(BASE_DIR)) / '.env')
