@@ -80,6 +80,8 @@ class Env:
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = ParseResult
     DEFAULT_DATABASE_ENV = 'DATABASE_URL'
+
+    POSTGRES_FAMILY = ('postgres', 'postgresql', 'psql', 'pgsql', 'postgis')
     DB_SCHEMES = {
         'postgres': DJANGO_POSTGRES,
         'postgresql': DJANGO_POSTGRES,
@@ -480,7 +482,7 @@ class Env:
             'PORT': _cast_int(url.port) or '',
         })
 
-        if url.scheme == 'postgres' and path.startswith('/'):
+        if url.scheme in cls.POSTGRES_FAMILY and path.startswith('/'):
             config['HOST'], config['NAME'] = path.rsplit('/', 1)
 
         if url.scheme == 'oracle' and path == '':
