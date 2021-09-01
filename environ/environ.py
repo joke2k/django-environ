@@ -81,7 +81,7 @@ class Env:
     URL_CLASS = ParseResult
     DEFAULT_DATABASE_ENV = 'DATABASE_URL'
 
-    POSTGRES_FAMILY = ('postgres', 'postgresql', 'psql', 'pgsql', 'postgis')
+    POSTGRES_FAMILY = ['postgres', 'postgresql', 'psql', 'pgsql', 'postgis']
     DB_SCHEMES = {
         'postgres': DJANGO_POSTGRES,
         'postgresql': DJANGO_POSTGRES,
