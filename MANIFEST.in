@@ -10,7 +10,7 @@
 # or remove some set of files from the sdist.
 
 # Include all files matching any of the listed patterns.
-include AUTHORS.rst CHANGELOG.rst CONTRIBUTING.rst LICENSE.txt README.rst SECURITY.rst *.yml
+include *.rst LICENSE.txt *.yml
 graft .github
 
 # The contents of the directory tree tests will first be added to the sdist.
