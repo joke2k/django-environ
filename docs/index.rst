@@ -37,6 +37,7 @@ Full Table of Contents
    types
    tips
    contributing
+   backers
 
 .. include:: ../README.rst
    :start-after: -project-information-
