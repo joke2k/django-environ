@@ -55,7 +55,7 @@ More information about ``pip`` and PyPI can be found here:
 * `Python Packaging User Guide <https://packaging.python.org/>`_
 
 Usage
------
+=====
 
 Create a ``.env`` file in project root directory. The file format can be understood
 from the example below:
@@ -75,22 +75,61 @@ And use it with ``settings.py`` as follows:
    :start-after: -code-begin-
    :end-before: -overview-
 
-.. warning::
+The ``.env`` file should be specific to the environment and not checked into
+version control, it is best practice documenting the ``.env`` file with an example.
+For example, you can also add ``.env.dist`` with a template of your variables to
+the project repo. This file should describe the mandatory variables for the
+Django application, and it can be committed to version control.  This provides a
+useful reference and speeds up the on-boarding process for new team members, since
+the time to dig through the codebase to find out what has to be set up is reduced.
 
-   Don't forget to add ``.env`` in your ``.gitignore``. You can also add
-   ``.env.dist`` with a template of your variables to the project repo.
+A good ``.env.dist`` could look like this:
+
+.. code-block:: shell
+
+   # SECURITY WARNING: don't run with the debug turned on in production!
+   DEBUG=True
+
+   # Should robots.txt allow everything to be crawled?
+   ALLOW_ROBOTS=False
+
+   # SECURITY WARNING: keep the secret key used in production secret!
+   SECRET_KEY=secret
+
+   # A list of all the people who get code error notifications.
+   ADMINS="John Doe <john@example.com>, Mary <mary@example.com>"
+
+   # A list of all the people who should get broken link notifications.
+   MANAGERS="Blake <blake@cyb.org>, Alice Judge <alice@cyb.org>"
+
+   # By default, Django will send system email from root@localhost.
+   # However, some mail providers reject all email from this address.
+   SERVER_EMAIL=webmaster@example.com
 
 FAQ
----
+===
 
-- **Q:** What(where) is the root part of the project, is it part of the project where are settings?
-- **A:** Where your ``manage.py`` file is (that is your project root directory).
+#. **Can django-environ determine the location of .env file automatically?**
 
-- **Q:** What kind of file should ``.env`` be?
-- **A:** ``.env`` is a plaint text file.
+   ``django-environ`` will try to get and read ``.env`` file from the project
+   root if you haven't specified the path for it when call ``read_env``.
+   However, this is not the recommended way. When it is possible always specify
+   the path tho ``.env`` file.
 
-- **Q:** Should name of the file be simply ``.env`` (or ``something.env``)?
-- **A:** Just ``.env``
+#. **What (where) is the root part of the project, is it part of the project where are settings?**
 
-- **Q:** Is ``.env`` file going to be imported in settings file?
-- **A:** No need to import, ``django-environ`` automatically picks variables from there.
+   Where your ``manage.py`` file is (that is your project root directory).
+
+#. **What kind of file should .env be?**
+
+   ``.env`` is a plaint text file.
+
+#. **Should name of the file be simply .env (or something.env)?**
+
+   Just ``.env``. However, this is not a strict rule, but just a common
+   practice. Formally, you can use any filename.
+
+#. **Is .env file going to be imported in settings file?**
+
+   No need to import, ``django-environ`` automatically picks variables
+   from there.
