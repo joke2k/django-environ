@@ -1,0 +1,37 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+      - 'feature/**'
+      - 'release/**'
+      - 'fix/**'
+
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    name: Build and test package documentation
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2.3.4
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2.2.2
+        with:
+          python-version: '3.8'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox tox-gh-actions
+
+      - name: Build and test package documentation
+        run: tox -e docs

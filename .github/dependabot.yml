@@ -1,0 +1,20 @@
+version: 2
+
+updates:
+
+  - package-ecosystem: pip
+    # setup.py stored in repository root.
+    directory: '/'
+    schedule:
+      interval: daily
+    assignees:
+      - sergeyklay
+
+  - package-ecosystem: github-actions
+    # Workflow files stored in the
+    # default location of `.github/workflows`
+    directory: '/'
+    schedule:
+      interval: daily
+    assignees:
+      - sergeyklay

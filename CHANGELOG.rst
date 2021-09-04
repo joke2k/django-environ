@@ -5,8 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is *inspired* by `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 
-`unreleased`_
---------------------------
+`v0.6.0`_ - 4-September-2021
+----------------------------
+Added
++++++
+  - Python 3.9, 3.10 and pypy 3.7 are now supported
+  - Django 3.1 and 3.2 are now supported
+  - Added missed classifiers to ``setup.py``
+  - Accept Python 3.6 path-like objects for ``read_env``
+
+Fixed
++++++
+  - Fixed various code linting errors
+  - Fixed typos in the documentation
+  - Added missed files to the package contents
+  - Fixed ``db_url_config`` to work the same for all postgres-like schemes
+
+Changed
++++++++
+  - Refactor tests to use pytest and follow DRY
+  - Moved CI to GitHub Actions
+  - Restructuring of project documentation
+  - Build and test package documentation as a part of CI pipeline
+  - Build and test package distribution as a part of CI pipeline
+  - Check ``MANIFEST.in`` in a source package for completeness as a part of CI pipeline
+  - Added ``pytest`` and ``coverage[toml]`` to setuptools' ``extras_require``
+
 
 `v0.5.0`_ - 30-August-2021
 --------------------------
@@ -29,7 +53,7 @@ Changed
 
 
 `v0.4.5`_ - 25-June-2018
---------------------------
+------------------------
 Added
 +++++
   - Support for Django 2.0
@@ -94,19 +118,35 @@ Changed
   - Fix support for Oracle urls
   - Fix support for ``django-redis``
 
-`v0.4.0`_ - 23-September-2015
------------------------------
+`v0.4`_ - 23-September-2015
+---------------------------
 Added
 +++++
   - New email schemes - ``smtp+ssl`` and ``smtp+tls`` (``smtps`` would be deprecated)
   - Add tuple support. Thanks to @anonymouzz
-  - Add LDAP url support for database (django-ldapdb)
+  - Add LDAP url support for database. Thanks to ``django-ldapdb``
 
 Changed
 +++++++
   - Fix non-ascii values (broken in Python 2.x)
-  - redis_cache replaced by ``django_redis``
+  - ``redis_cache`` replaced by ``django_redis``
   - Fix psql/pgsql url
+
+
+`v0.3.1`_ - 19 Sep 2015
+-----------------------
+Added
++++++
+  - Added ``email`` as alias for ``email_url``
+  - Django 1.7 is now supported
+  - Added LDAP scheme support for ``db_url_config``
+
+Fixed
++++++
+  - Fixed typos in the documentation
+  - Fixed ``environ.Path.__add__`` to correctly handle plus operator
+  - Fixed ``environ.Path.__contains__`` to correctly work on Windows
+
 
 `v0.3`_ - 03-June-2014
 ----------------------
@@ -120,35 +160,38 @@ Changed
 +++++++
   - Rewriting README.rst
 
-0.2.1 19-April-2013
--------------------
+v0.2.1 19-April-2013
+--------------------
 Changed
 +++++++
-  - environ/environ.py: ``Env.__call__`` now uses ``Env.get_value`` instance method
+  - ``Env.__call__`` now uses ``Env.get_value`` instance method
 
-0.2 16-April-2013
------------------
-Changed
-+++++++
-  - environ/environ.py, environ/test.py, environ/test_env.txt: add advanced
-    float parsing (comma and dot symbols to separate thousands and decimals)
-  - README.rst, docs/index.rst: fix TYPO in documentation
+v0.2 16-April-2013
+------------------
+Added
++++++
+  - Add advanced float parsing (comma and dot symbols to separate thousands and decimals)
 
-0.1 2-April-2013
+Fixed
++++++
+  - Fixed typos in the documentation
+
+v0.1 2-April-2013
 -----------------
 Added
 +++++
   - Initial release
 
 
-.. _unreleased: https://github.com/joke2k/django-environ/compare/v0.5.0...develop
+.. _v0.6.0: https://github.com/joke2k/django-environ/compare/v0.5.0...develop
 .. _v0.5.0: https://github.com/joke2k/django-environ/compare/v0.4.5...v0.5.0
 .. _v0.4.5: https://github.com/joke2k/django-environ/compare/v0.4.4...v0.4.5
 .. _v0.4.4: https://github.com/joke2k/django-environ/compare/v0.4.3...v0.4.4
 .. _v0.4.3: https://github.com/joke2k/django-environ/compare/v0.4.2...v0.4.3
 .. _v0.4.2: https://github.com/joke2k/django-environ/compare/v0.4.1...v0.4.2
 .. _v0.4.1: https://github.com/joke2k/django-environ/compare/v0.4.0...v0.4.1
-.. _v0.4.0: https://github.com/joke2k/django-environ/compare/v0.3...v0.4.0
+.. _v0.4: https://github.com/joke2k/django-environ/compare/v0.3.1...v0.4
+.. _v0.3.1: https://github.com/joke2k/django-environ/compare/v0.3...v0.3.1
 .. _v0.3: https://github.com/joke2k/django-environ/compare/v0.2.1...v0.3
 .. _`Keep a Changelog`: http://keepachangelog.com/en/1.0.0/
 .. _`Semantic Versioning`: http://semver.org/spec/v2.0.0.html
