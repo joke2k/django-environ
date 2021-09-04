@@ -7,6 +7,11 @@ and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.
 
 `v0.7.0`_ - 00-Unreleased-2021
 ------------------------------
+Added
++++++
+  - Added support for negative float strings
+    (`#160 <https://github.com/joke2k/django-environ/issues/160>`_)
+
 Changed
 +++++++
  - Added 'Funding' and 'Say Thanks!' project urls on pypi.
