@@ -76,7 +76,7 @@ class TestEnv:
         assert self.env('NOT_PRESENT_VAR', cast=int, default=None) is None
 
     @pytest.mark.parametrize(
-        'value,variable,cast',
+        'value,variable',
         [
             (33.3, 'FLOAT_VAR'),
             (33.3, 'FLOAT_COMMA_VAR'),
@@ -85,7 +85,7 @@ class TestEnv:
             (-1.0, 'FLOAT_NEGATIVE_VAR'),
         ]
     )
-    def test_float(self, value, variable, cast):
+    def test_float(self, value, variable):
         assert_type_and_value(float, value, self.env.float(variable))
         assert_type_and_value(float, value, self.env(variable, cast=float))
 
