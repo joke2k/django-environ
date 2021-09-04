@@ -89,15 +89,27 @@ class TestEnv:
         assert_type_and_value(float, value, self.env.float(variable))
         assert_type_and_value(float, value, self.env(variable, cast=float))
 
-    def test_bool_true(self):
-        assert_type_and_value(bool, True, self.env('BOOL_TRUE_VAR', cast=bool))
-        assert_type_and_value(bool, True, self.env('BOOL_TRUE_VAR2', cast=bool))
-        assert_type_and_value(bool, True, self.env.bool('BOOL_TRUE_VAR'))
-
-    def test_bool_false(self):
-        assert_type_and_value(bool, False, self.env('BOOL_FALSE_VAR', cast=bool))
-        assert_type_and_value(bool, False, self.env('BOOL_FALSE_VAR2', cast=bool))
-        assert_type_and_value(bool, False, self.env.bool('BOOL_FALSE_VAR'))
+    @pytest.mark.parametrize(
+        'value,variable',
+        [
+            (True, 'BOOL_TRUE_STRING_LIKE_INT'),
+            (True, 'BOOL_TRUE_STRING_LIKE_BOOL'),
+            (True, 'BOOL_TRUE_INT'),
+            (True, 'BOOL_TRUE_BOOL'),
+            (True, 'BOOL_TRUE_STRING_1'),
+            (True, 'BOOL_TRUE_STRING_2'),
+            (True, 'BOOL_TRUE_STRING_3'),
+            (True, 'BOOL_TRUE_STRING_4'),
+            (True, 'BOOL_TRUE_STRING_5'),
+            (False, 'BOOL_FALSE_STRING_LIKE_INT'),
+            (False, 'BOOL_FALSE_INT'),
+            (False, 'BOOL_FALSE_STRING_LIKE_BOOL'),
+            (False, 'BOOL_FALSE_BOOL'),
+        ]
+    )
+    def test_bool_true(self, value, variable):
+        assert_type_and_value(bool, value, self.env.bool(variable))
+        assert_type_and_value(bool, value, self.env(variable, cast=bool))
 
     def test_proxied_value(self):
         assert self.env('PROXIED_VAR') == 'bar'
@@ -256,8 +268,10 @@ class TestEnv:
 
     def test_smart_cast(self):
         assert self.env.get_value('STR_VAR', default='string') == 'bar'
-        assert self.env.get_value('BOOL_TRUE_VAR', default=True)
-        assert self.env.get_value('BOOL_FALSE_VAR', default=True) is False
+        assert self.env.get_value('BOOL_TRUE_STRING_LIKE_INT', default=True)
+        assert not self.env.get_value(
+            'BOOL_FALSE_STRING_LIKE_INT',
+            default=True)
         assert self.env.get_value('INT_VAR', default=1) == 42
         assert self.env.get_value('FLOAT_VAR', default=1.2) == 33.3
 
