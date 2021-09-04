@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is *inspired* by `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 
+`v0.7.0`_ - 00-Unreleased-2021
+------------------------------
+Changed
++++++++
+ - Added 'Funding' and 'Say Thanks!' project urls on pypi.
+
+
 `v0.6.0`_ - 4-September-2021
 ----------------------------
 Added
@@ -160,14 +167,14 @@ Changed
 +++++++
   - Rewriting README.rst
 
-v0.2.1 19-April-2013
---------------------
+v0.2.1 - 19-April-2013
+----------------------
 Changed
 +++++++
   - ``Env.__call__`` now uses ``Env.get_value`` instance method
 
-v0.2 16-April-2013
-------------------
+v0.2 - 16-April-2013
+--------------------
 Added
 +++++
   - Add advanced float parsing (comma and dot symbols to separate thousands and decimals)
@@ -176,13 +183,14 @@ Fixed
 +++++
   - Fixed typos in the documentation
 
-v0.1 2-April-2013
------------------
+v0.1 - 2-April-2013
+-------------------
 Added
 +++++
   - Initial release
 
 
+.. _v0.7.0: https://github.com/joke2k/django-environ/compare/v0.6.0...develop
 .. _v0.6.0: https://github.com/joke2k/django-environ/compare/v0.5.0...v0.6.0
 .. _v0.5.0: https://github.com/joke2k/django-environ/compare/v0.4.5...v0.5.0
 .. _v0.4.5: https://github.com/joke2k/django-environ/compare/v0.4.4...v0.4.5
