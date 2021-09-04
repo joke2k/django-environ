@@ -6,7 +6,7 @@ The format is *inspired* by `Keep a Changelog <http://keepachangelog.com/en/1.0.
 and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 
 `v0.6.0`_ - 4-September-2021
-------------------------------
+----------------------------
 Added
 +++++
   - Python 3.9, 3.10 and pypy 3.7 are now supported
@@ -53,7 +53,7 @@ Changed
 
 
 `v0.4.5`_ - 25-June-2018
---------------------------
+------------------------
 Added
 +++++
   - Support for Django 2.0
@@ -119,7 +119,7 @@ Changed
   - Fix support for ``django-redis``
 
 `v0.4`_ - 23-September-2015
------------------------------
+---------------------------
 Added
 +++++
   - New email schemes - ``smtp+ssl`` and ``smtp+tls`` (``smtps`` would be deprecated)
@@ -161,13 +161,13 @@ Changed
   - Rewriting README.rst
 
 v0.2.1 19-April-2013
--------------------
+--------------------
 Changed
 +++++++
   - ``Env.__call__`` now uses ``Env.get_value`` instance method
 
 v0.2 16-April-2013
------------------
+------------------
 Added
 +++++
   - Add advanced float parsing (comma and dot symbols to separate thousands and decimals)
@@ -176,7 +176,7 @@ Fixed
 +++++
   - Fixed typos in the documentation
 
-0.1 2-April-2013
+v0.1 2-April-2013
 -----------------
 Added
 +++++
