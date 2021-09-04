@@ -32,7 +32,7 @@ def load_long_description():
     def changes():
         changelog = path.join(PKG_DIR, 'CHANGELOG.rst')
         pattern = (
-            r'(`(v\d+.\d+.\d+)`_( - \d+.-\w+-\d{4}\r?\n-+\r?\n.*?))'
+            r'(`(v\d+.\d+.\d+)`_( - \d{1,2}-\w+-\d{4}\r?\n-+\r?\n.*?))'
             r'\r?\n\r?\n\r?\n`v\d+.\d+.\d+`_'
         )
         result = re.search(pattern, read_file(changelog), re.S)
