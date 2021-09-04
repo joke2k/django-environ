@@ -75,13 +75,19 @@ class TestEnv:
     def test_int_with_none_default(self):
         assert self.env('NOT_PRESENT_VAR', cast=int, default=None) is None
 
-    def test_float(self):
-        assert_type_and_value(float, 33.3, self.env('FLOAT_VAR', cast=float))
-        assert_type_and_value(float, 33.3, self.env.float('FLOAT_VAR'))
-
-        assert_type_and_value(float, 33.3, self.env('FLOAT_COMMA_VAR', cast=float))
-        assert_type_and_value(float, 123420333.3, self.env('FLOAT_STRANGE_VAR1', cast=float))
-        assert_type_and_value(float, 123420333.3, self.env('FLOAT_STRANGE_VAR2', cast=float))
+    @pytest.mark.parametrize(
+        'value,variable',
+        [
+            (33.3, 'FLOAT_VAR'),
+            (33.3, 'FLOAT_COMMA_VAR'),
+            (123420333.3, 'FLOAT_STRANGE_VAR1'),
+            (123420333.3, 'FLOAT_STRANGE_VAR2'),
+            (-1.0, 'FLOAT_NEGATIVE_VAR'),
+        ]
+    )
+    def test_float(self, value, variable):
+        assert_type_and_value(float, value, self.env.float(variable))
+        assert_type_and_value(float, value, self.env(variable, cast=float))
 
     def test_bool_true(self):
         assert_type_and_value(bool, True, self.env('BOOL_TRUE_VAR', cast=bool))

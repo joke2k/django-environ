@@ -36,6 +36,7 @@ class FakeEnv:
                     FLOAT_COMMA_VAR='33,3',
                     FLOAT_STRANGE_VAR1='123,420,333.3',
                     FLOAT_STRANGE_VAR2='123.420.333,3',
+                    FLOAT_NEGATIVE_VAR='-1.0',
                     BOOL_TRUE_VAR='1',
                     BOOL_TRUE_VAR2='True',
                     BOOL_FALSE_VAR='0',
