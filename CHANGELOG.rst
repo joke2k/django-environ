@@ -2,8 +2,8 @@ Changelog
 =========
 All notable changes to this project will be documented in this file.
 
-The format is *inspired* by `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_
-and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
+The format is *inspired* by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
+and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
 `v0.7.0`_ - 00-Unreleased-2021
 ------------------------------
@@ -11,6 +11,10 @@ Added
 +++++
   - Added support for negative float strings
     (`#160 <https://github.com/joke2k/django-environ/issues/160>`_)
+
+Fixed
++++++
+  - Fixed links in the documentation
 
 Changed
 +++++++
@@ -202,9 +206,7 @@ Added
 .. _v0.4.4: https://github.com/joke2k/django-environ/compare/v0.4.3...v0.4.4
 .. _v0.4.3: https://github.com/joke2k/django-environ/compare/v0.4.2...v0.4.3
 .. _v0.4.2: https://github.com/joke2k/django-environ/compare/v0.4.1...v0.4.2
-.. _v0.4.1: https://github.com/joke2k/django-environ/compare/v0.4.0...v0.4.1
+.. _v0.4.1: https://github.com/joke2k/django-environ/compare/v0.4...v0.4.1
 .. _v0.4: https://github.com/joke2k/django-environ/compare/v0.3.1...v0.4
 .. _v0.3.1: https://github.com/joke2k/django-environ/compare/v0.3...v0.3.1
 .. _v0.3: https://github.com/joke2k/django-environ/compare/v0.2.1...v0.3
-.. _`Keep a Changelog`: http://keepachangelog.com/en/1.0.0/
-.. _`Semantic Versioning`: http://semver.org/spec/v2.0.0.html

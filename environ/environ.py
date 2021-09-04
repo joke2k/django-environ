@@ -728,7 +728,7 @@ class Env:
         called read_env.
 
         Refs:
-        - http://www.wellfireinteractive.com/blog/easier-12-factor-django/
+        - https://wellfire.co/learn/easier-12-factor-django
         - https://gist.github.com/bennylope/2999704
         """
         if env_file is None:
