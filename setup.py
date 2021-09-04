@@ -187,7 +187,9 @@ EXTRAS_REQUIRE['develop'] = \
 
 # Project's URLs
 PROJECT_URLS = {
-    'Documentation': 'https://django-environ.readthedocs.io',
+    'Documentation': find_meta('url'),
+    'Funding': 'https://opencollective.com/django-environ',
+    'Say Thanks!': 'https://saythanks.io/to/joke2k',
     'Changelog': '{}/en/latest/changelog.html'.format(find_meta('url')),
     'Bug Tracker': 'https://github.com/joke2k/django-environ/issues',
     'Source Code': 'https://github.com/joke2k/django-environ',
