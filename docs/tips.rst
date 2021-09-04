@@ -65,19 +65,27 @@ file path: ``sqlite:////full/path/to/your/database/file.sqlite``.
 Nested lists
 ============
 
-Some settings such as Django's ``ADMINS`` make use of nested lists. You can use something like this to handle similar cases.
+Some settings such as Django's ``ADMINS`` make use of nested lists.
+You can use something like this to handle similar cases.
 
 .. code-block:: python
 
-   # DJANGO_ADMINS=John:john@admin.com,Jane:jane@admin.com
+   # DJANGO_ADMINS=Blake:blake@cyb.org,Alice:alice@cyb.org
    ADMINS = [x.split(':') for x in env.list('DJANGO_ADMINS')]
 
    # or use more specific function
 
    from email.utils import getaddresses
 
-   # DJANGO_ADMINS=Full Name <email-with-name@example.com>,anotheremailwithoutname@example.com
+   # DJANGO_ADMINS=Alice Judge <alice@cyb.org>,blake@cyb.org
    ADMINS = getaddresses([env('DJANGO_ADMINS')])
+
+   # another option is to use parseaddr from email.utils
+
+   # DJANGO_ADMINS="Blake <blake@cyb.org>, Alice Judge <alice@cyb.org>"
+   from email.utils import parseaddr
+
+   ADMINS = tuple(parseaddr(email) for email in env.list('DJANGO_ADMINS'))
 
 
 Multiline value

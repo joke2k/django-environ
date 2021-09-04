@@ -122,7 +122,7 @@ FAQ
 
 #. **What kind of file should .env be?**
 
-   ``.env`` is a plaint text file.
+   ``.env`` is a plain text file.
 
 #. **Should name of the file be simply .env (or something.env)?**
 
