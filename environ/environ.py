@@ -193,7 +193,10 @@ class Env:
         """
         :rtype: bytes
         """
-        return self.get_value(var, cast=str, default=default).encode(encoding)
+        value = self.get_value(var, cast=str, default=default)
+        if hasattr(value, 'encode'):
+            return value.encode(encoding)
+        return value
 
     def bool(self, var, default=NOTSET):
         """
