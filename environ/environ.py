@@ -363,8 +363,9 @@ class Env:
             value = default
 
         # Resolve any proxied values
-        if hasattr(value, 'startswith') and value.startswith('$'):
-            value = value.lstrip('$')
+        prefix = b'$' if isinstance(value, bytes) else '$'
+        if hasattr(value, 'startswith') and value.startswith(prefix):
+            value = value.lstrip(prefix)
             value = self.get_value(value, cast=cast, default=default)
 
         # Smart casting
