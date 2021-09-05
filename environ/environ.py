@@ -80,7 +80,7 @@ class Env:
     URL_CLASS = ParseResult
 
     POSTGRES_FAMILY = ['postgres', 'postgresql', 'psql', 'pgsql', 'postgis']
-    ELASTICSEARCH_FAMILY = ['elasticsearch' + x for x in ['', '2', '5']]
+    ELASTICSEARCH_FAMILY = ['elasticsearch' + x for x in ['', '2', '5', '7']]
 
     DEFAULT_DATABASE_ENV = 'DATABASE_URL'
     DB_SCHEMES = {
@@ -149,6 +149,8 @@ class Env:
                           "Elasticsearch2SearchEngine",
         "elasticsearch5": "haystack.backends.elasticsearch5_backend."
                           "Elasticsearch5SearchEngine",
+        "elasticsearch7": "haystack.backends.elasticsearch7_backend."
+                          "Elasticsearch7SearchEngine",
         "solr": "haystack.backends.solr_backend.SolrEngine",
         "whoosh": "haystack.backends.whoosh_backend.WhooshEngine",
         "xapian": "haystack.backends.xapian_backend.XapianEngine",
