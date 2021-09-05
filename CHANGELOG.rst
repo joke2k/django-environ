@@ -11,6 +11,8 @@ Added
 +++++
   - Added support for negative float strings
     (`#160 <https://github.com/joke2k/django-environ/issues/160>`_)
+  - Added Elasticsearch5 to search scheme
+    (`#297 <https://github.com/joke2k/django-environ/pull/297>`_)
 
 Fixed
 +++++
