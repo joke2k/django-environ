@@ -65,8 +65,16 @@ class TestEnv:
             assert self.env(var) == val
         assert self.env.str(var, multiline=multiline) == val
 
-    def test_bytes(self):
-        assert_type_and_value(bytes, b'bar', self.env.bytes('STR_VAR'))
+    @pytest.mark.parametrize(
+        'var,val,default',
+        [
+            ('STR_VAR', b'bar', Env.NOTSET),
+            ('NON_EXISTENT_BYTES_VAR', b'some-default', b'some-default'),
+            ('NON_EXISTENT_STR_VAR', b'some-default', 'some-default'),
+        ]
+    )
+    def test_bytes(self, var, val, default):
+        assert_type_and_value(bytes, val, self.env.bytes(var, default=default))
 
     def test_int(self):
         assert_type_and_value(int, 42, self.env('INT_VAR', cast=int))

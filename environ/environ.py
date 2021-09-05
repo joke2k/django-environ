@@ -193,7 +193,10 @@ class Env:
         """
         :rtype: bytes
         """
-        return self.get_value(var, cast=str).encode(encoding)
+        value = self.get_value(var, cast=str, default=default)
+        if hasattr(value, 'encode'):
+            return value.encode(encoding)
+        return value
 
     def bool(self, var, default=NOTSET):
         """
@@ -360,8 +363,9 @@ class Env:
             value = default
 
         # Resolve any proxied values
-        if hasattr(value, 'startswith') and value.startswith('$'):
-            value = value.lstrip('$')
+        prefix = b'$' if isinstance(value, bytes) else '$'
+        if hasattr(value, 'startswith') and value.startswith(prefix):
+            value = value.lstrip(prefix)
             value = self.get_value(value, cast=cast, default=default)
 
         # Smart casting

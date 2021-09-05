@@ -15,11 +15,14 @@ Added
     (`#297 <https://github.com/joke2k/django-environ/pull/297>`_)
   - Added Elasticsearch7 to search scheme
     (`#314 <https://github.com/joke2k/django-environ/pull/314>`_)
+  - Provided ability to use ``bytes`` or ``str`` as a default value for ``Env.bytes()``
 
 
 Fixed
 +++++
   - Fixed links in the documentation
+  - Use default option in ``Env.bytes()``
+    (`#206 <https://github.com/joke2k/django-environ/pull/206>`_)
 
 Changed
 +++++++
@@ -34,6 +37,7 @@ Added
   - Django 3.1 and 3.2 are now supported
   - Added missed classifiers to ``setup.py``
   - Accept Python 3.6 path-like objects for ``read_env``
+    (`#106 <https://github.com/joke2k/django-environ/issues/106>`_, `#286 <https://github.com/joke2k/django-environ/issues/286>`_)
 
 Fixed
 +++++
@@ -41,6 +45,7 @@ Fixed
   - Fixed typos in the documentation
   - Added missed files to the package contents
   - Fixed ``db_url_config`` to work the same for all postgres-like schemes
+    (`#264 <https://github.com/joke2k/django-environ/issues/264>`_, `#268 <https://github.com/joke2k/django-environ/issues/268>`_)
 
 Changed
 +++++++
