@@ -32,14 +32,24 @@ def test_solr_multicore_parsing(solr_url):
     assert 'PATH' not in url
 
 
-def test_elasticsearch_parsing(elasticsearch_url):
+@pytest.mark.parametrize(
+    'url,engine',
+    [
+        ('elasticsearch://127.0.0.1:9200/index',
+         'elasticsearch_backend.ElasticsearchSearchEngine'),
+        ('elasticsearch2://127.0.0.1:9200/index',
+         'elasticsearch2_backend.Elasticsearch2SearchEngine'),
+        ('elasticsearch5://127.0.0.1:9200/index',
+         'elasticsearch5_backend.Elasticsearch5SearchEngine'),
+    ]
+)
+def test_elasticsearch_parsing(url, engine):
+    """Ensure all supported Elasticsearch engines are recognized."""
     timeout = 360
-    url = '{}?TIMEOUT={}'.format(elasticsearch_url, timeout)
+    url = '{}?TIMEOUT={}'.format(url, timeout)
     url = Env.search_url_config(url)
 
-    assert url['ENGINE'] == (
-        'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine'
-    )
+    assert url['ENGINE'] == 'haystack.backends.{}'.format(engine)
     assert 'INDEX_NAME' in url.keys()
     assert url['INDEX_NAME'] == 'index'
     assert 'TIMEOUT' in url.keys()
