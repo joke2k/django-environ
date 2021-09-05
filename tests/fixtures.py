@@ -28,7 +28,7 @@ class FakeEnv:
     EXPORTED = 'exported var'
 
     @classmethod
-    def generateData(cls):
+    def generate_data(cls):
         return dict(STR_VAR='bar',
                     MULTILINE_STR_VAR='foo\\nbar',
                     INT_VAR='42',

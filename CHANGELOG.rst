@@ -13,6 +13,9 @@ Added
     (`#160 <https://github.com/joke2k/django-environ/issues/160>`_)
   - Added Elasticsearch5 to search scheme
     (`#297 <https://github.com/joke2k/django-environ/pull/297>`_)
+  - Added Elasticsearch7 to search scheme
+    (`#314 <https://github.com/joke2k/django-environ/pull/314>`_)
+
 
 Fixed
 +++++

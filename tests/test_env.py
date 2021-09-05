@@ -26,7 +26,7 @@ class TestEnv:
         class.  setup_method is invoked for every test method of a class.
         """
         self.old_environ = os.environ
-        os.environ = Env.ENVIRON = FakeEnv.generateData()
+        os.environ = Env.ENVIRON = FakeEnv.generate_data()
         self.env = Env()
 
     def teardown_method(self, method):
@@ -334,7 +334,7 @@ class TestSubClass(TestEnv):
         """
         super().setup_method(method)
 
-        self.CONFIG = FakeEnv.generateData()
+        self.CONFIG = FakeEnv.generate_data()
 
         class MyEnv(Env):
             ENVIRON = self.CONFIG
