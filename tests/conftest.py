@@ -20,12 +20,6 @@ def solr_url():
 
 
 @pytest.fixture
-def elasticsearch_url():
-    """Return Elasticsearch URL."""
-    return 'elasticsearch://127.0.0.1:9200/index'
-
-
-@pytest.fixture
 def whoosh_url():
     """Return Whoosh URL."""
     return 'whoosh:///home/search/whoosh_index'

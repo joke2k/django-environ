@@ -30,10 +30,10 @@ from .compat import DJANGO_POSTGRES, ImproperlyConfigured, json, REDIS_DRIVER
 
 try:
     from os import PathLike
+
     Openable = (str, PathLike)
 except ImportError:
     Openable = (str,)
-
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,6 @@ class NoValue:
 
 
 class Env:
-
     """Provide scheme-based lookups of environment variables so that each
     caller doesn't have to pass in `cast` and `default` parameters.
 
@@ -79,9 +78,11 @@ class Env:
     NOTSET = NoValue()
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = ParseResult
-    DEFAULT_DATABASE_ENV = 'DATABASE_URL'
 
     POSTGRES_FAMILY = ['postgres', 'postgresql', 'psql', 'pgsql', 'postgis']
+    ELASTICSEARCH_FAMILY = ['elasticsearch' + x for x in ['', '2', '5']]
+
+    DEFAULT_DATABASE_ENV = 'DATABASE_URL'
     DB_SCHEMES = {
         'postgres': DJANGO_POSTGRES,
         'postgresql': DJANGO_POSTGRES,
@@ -146,6 +147,8 @@ class Env:
                          "ElasticsearchSearchEngine",
         "elasticsearch2": "haystack.backends.elasticsearch2_backend."
                           "Elasticsearch2SearchEngine",
+        "elasticsearch5": "haystack.backends.elasticsearch5_backend."
+                          "Elasticsearch5SearchEngine",
         "solr": "haystack.backends.solr_backend.SolrEngine",
         "whoosh": "haystack.backends.whoosh_backend.WhooshEngine",
         "xapian": "haystack.backends.xapian_backend.XapianEngine",
@@ -262,6 +265,7 @@ class Env:
             self.get_value(var, default=default),
             engine=engine
         )
+
     db = db_url
 
     def cache_url(self, var=DEFAULT_CACHE_ENV, default=NOTSET, backend=None):
@@ -275,6 +279,7 @@ class Env:
             self.url(var, default=default),
             backend=backend
         )
+
     cache = cache_url
 
     def email_url(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
@@ -288,6 +293,7 @@ class Env:
             self.url(var, default=default),
             backend=backend
         )
+
     email = email_url
 
     def search_url(self, var=DEFAULT_SEARCH_ENV, default=NOTSET, engine=None):
@@ -492,7 +498,7 @@ class Env:
         if url.scheme == 'oracle':
             # Django oracle/base.py strips port and fails on non-string value
             if not config['PORT']:
-                del(config['PORT'])
+                del (config['PORT'])
             else:
                 config['PORT'] = str(config['PORT'])
 
@@ -646,7 +652,7 @@ class Env:
         config["ENGINE"] = cls.SEARCH_SCHEMES[url.scheme]
 
         # check commons params
-        params = {}
+        params = {}  # type: dict
         if url.query:
             params = parse_qs(url.query)
             if 'EXCLUDED_INDEXES' in params.keys():
@@ -665,7 +671,7 @@ class Env:
 
         if url.scheme == 'simple':
             return config
-        elif url.scheme in ['solr', 'elasticsearch', 'elasticsearch2']:
+        elif url.scheme in ['solr'] + cls.ELASTICSEARCH_FAMILY:
             if 'KWARGS' in params.keys():
                 config['KWARGS'] = params['KWARGS'][0]
 
@@ -681,8 +687,7 @@ class Env:
                 config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
             return config
 
-        if url.scheme in ['elasticsearch', 'elasticsearch2']:
-
+        if url.scheme in cls.ELASTICSEARCH_FAMILY:
             split = path.rsplit("/", 1)
 
             if len(split) > 1:
@@ -776,7 +781,6 @@ class Env:
 
 
 class Path:
-
     """Inspired to Django Two-scoops, handling File Paths in Settings."""
 
     def path(self, *paths, **kwargs):
