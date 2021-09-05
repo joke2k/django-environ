@@ -29,7 +29,7 @@ To disable it use ``env.smart_cast = False``.
 Multiple redis cache locations
 ==============================
 
-For redis cache, `multiple master/slave or shard locations <http://niwinz.github.io/django-redis/latest/#_pluggable_clients>`_ can be configured as follows:
+For redis cache, multiple master/slave or shard locations can be configured as follows:
 
 .. code-block:: shell
 

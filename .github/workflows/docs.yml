@@ -33,5 +33,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install tox tox-gh-actions
 
+      - name: Check external links in the package documentation
+        run: tox -e linkcheck
+
       - name: Build and test package documentation
         run: tox -e docs
+
+      - name: Archive docs artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: docs
+          path: docs
+          # Artifacts are retained for 90 days by default.
+          # In fact, we don't need such long period.
+          retention-days: 60
