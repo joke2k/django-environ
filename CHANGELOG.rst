@@ -26,7 +26,10 @@ Fixed
 
 Changed
 +++++++
- - Added 'Funding' and 'Say Thanks!' project urls on pypi.
+  - Added 'Funding' and 'Say Thanks!' project urls on pypi.
+  - Stop raising ``UserWarning`` if ``.env`` file isn't found. Log a message
+    with ``INFO`` log level instead.
+    (`#243 <https://github.com/joke2k/django-environ/issues/243>`_)
 
 
 `v0.6.0`_ - 4-September-2021
