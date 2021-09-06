@@ -749,7 +749,7 @@ class Env:
                 '.env'
             )
             if not os.path.exists(env_file):
-                warnings.warn(
+                logger.info(
                     "%s doesn't exist - if you're not configuring your "
                     "environment separately, create one." % env_file)
                 return
@@ -762,8 +762,8 @@ class Env:
                 with env_file as f:
                     content = f.read()
         except OSError:
-            warnings.warn(
-                "Error reading %s - if you're not configuring your "
+            logger.info(
+                "%s not found - if you're not configuring your "
                 "environment separately, check this." % env_file)
             return
 
