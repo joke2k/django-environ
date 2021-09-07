@@ -14,7 +14,7 @@ Added
 - Added Elasticsearch5 to search scheme
   `#297 <https://github.com/joke2k/django-environ/pull/297>`_.
 - Added Elasticsearch7 to search scheme
-  `#314 <https://github.com/joke2k/django-environ/pull/314>`_.
+  `#314 <https://github.com/joke2k/django-environ/issues/314>`_.
 - Added the ability to use ``bytes`` or ``str`` as a default value for ``Env.bytes()``.
 
 Fixed

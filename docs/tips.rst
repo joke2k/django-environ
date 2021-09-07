@@ -119,6 +119,8 @@ Values that being with a ``$`` may be interpolated. Pass ``interpolate=True`` to
    FOO
 
 
+.. _multiple-env-files-label:
+
 Multiple env files
 ==================
 
