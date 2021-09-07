@@ -149,3 +149,80 @@ def test_unknown_backend():
 def test_empty_url_is_mapped_to_empty_config():
     assert Env.cache_url_config('') == {}
     assert Env.cache_url_config(None) == {}
+
+
+@pytest.mark.parametrize(
+    'chars',
+    ['!', '$', '&', "'", '(', ')', '*', '+', ';', '=', '-', '.', '-v1.2']
+)
+def test_cache_url_password_using_sub_delims(monkeypatch, chars):
+    """Ensure CACHE_URL passwords may contains some unsafe characters.
+
+    See: https://github.com/joke2k/django-environ/issues/200 for details."""
+    url = 'rediss://enigma:secret{}@ondigitalocean.com:25061/2'.format(chars)
+    monkeypatch.setenv('CACHE_URL', url)
+    env = Env()
+
+    result = env.cache()
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    result = env.cache_url_config(url)
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    url = 'rediss://enigma:sec{}ret@ondigitalocean.com:25061/2'.format(chars)
+    monkeypatch.setenv('CACHE_URL', url)
+    env = Env()
+
+    result = env.cache()
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    result = env.cache_url_config(url)
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    url = 'rediss://enigma:{}secret@ondigitalocean.com:25061/2'.format(chars)
+    monkeypatch.setenv('CACHE_URL', url)
+    env = Env()
+
+    result = env.cache()
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    result = env.cache_url_config(url)
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+
+@pytest.mark.parametrize(
+    'chars', ['%3A', '%2F', '%3F', '%23', '%5B', '%5D', '%40', '%2C']
+)
+def test_cache_url_password_using_gen_delims(monkeypatch, chars):
+    """Ensure CACHE_URL passwords may contains %-encoded characters.
+
+    See: https://github.com/joke2k/django-environ/issues/200 for details."""
+    url = 'rediss://enigma:secret{}@ondigitalocean.com:25061/2'.format(chars)
+    monkeypatch.setenv('CACHE_URL', url)
+    env = Env()
+
+    result = env.cache()
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    url = 'rediss://enigma:sec{}ret@ondigitalocean.com:25061/2'.format(chars)
+    monkeypatch.setenv('CACHE_URL', url)
+    env = Env()
+
+    result = env.cache()
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    url = 'rediss://enigma:{}secret@ondigitalocean.com:25061/2'.format(chars)
+    monkeypatch.setenv('CACHE_URL', url)
+    env = Env()
+
+    result = env.cache()
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
