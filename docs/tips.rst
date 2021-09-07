@@ -131,6 +131,7 @@ It is possible to have multiple env files and select one using environment varia
 
 Now ``ENV_PATH=other-env ./manage.py runserver`` uses ``other-env`` while ``./manage.py runserver`` uses ``.env``.
 
+
 Using Path objects when reading env
 ===================================
 
@@ -154,3 +155,25 @@ It is possible to use of ``pathlib.Path`` objects when reading environment file 
    env.read_env(os.path.join(BASE_DIR, '.env'))
    env.read_env(pathlib.Path(str(BASE_DIR)).joinpath('.env'))
    env.read_env(pathlib.Path(str(BASE_DIR)) / '.env')
+
+
+Using an environment variable to point to a .env file
+=====================================================
+
+Since v0.7.0 there is an ability to set an environment variable ``ENV_FILE``
+to point to the .env file location. It can be convenient in a production
+systems with a different .env file location.
+
+The following example demonstrates the above:
+
+.. code-block:: shell
+
+   # .secret file contents
+   SOME_VAR=3.14
+
+.. code-block:: console
+
+   $ export ENV_FILE=$(pwd)/.secret
+   $ python -c 'from environ.environ import Env; Env.read_env(); print(Env.ENVIRON["SOME_VAR"])'
+   3.14
+
