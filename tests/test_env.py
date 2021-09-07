@@ -351,3 +351,18 @@ class TestSubClass(TestEnv):
 
     def test_singleton_environ(self):
         assert self.CONFIG is self.env.ENVIRON
+
+
+class FileEnvByEnvVarTests(TestEnv):
+
+    def setup_method(self, method):
+        super(FileEnvByEnvVarTests, self).setUp()
+        with open('./tmp/test_env.txt') as env_file:
+            env_file.writeline('VAR=TEST')
+        Env.ENVIRON = {}
+        os.environ['ENV_FILE'] = './tmp/test_env.txt'
+        self.env = Env()
+
+    def test_read_env(self):
+        assert_type_and_value(str, 'TEST', self.env('VAR'))
+
