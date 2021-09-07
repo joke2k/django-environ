@@ -44,7 +44,7 @@ def _cast(value):
     # https://docs.python.org/3/library/ast.html#ast.literal_eval
     try:
         return ast.literal_eval(value)
-    except ValueError:
+    except (ValueError, SyntaxError):
         return value
 
 

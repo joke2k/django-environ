@@ -17,12 +17,13 @@ Added
   `#314 <https://github.com/joke2k/django-environ/pull/314>`_.
 - Provided ability to use ``bytes`` or ``str`` as a default value for ``Env.bytes()``.
 
-
 Fixed
 +++++
-- Fixed links in the documentation
+- Fixed links in the documentation.
 - Use default option in ``Env.bytes()``
   `#206 <https://github.com/joke2k/django-environ/pull/206>`_.
+- Safely evaluate a string containing an invalid Python literal
+  `#200 <https://github.com/joke2k/django-environ/issues/200>`_.
 
 Changed
 +++++++
