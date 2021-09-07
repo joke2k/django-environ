@@ -748,6 +748,7 @@ class Env:
                 os.path.dirname(frame.f_back.f_code.co_filename),
                 '.env'
             )
+            env_file = os.environ.get('ENV_FILE') or env_file
             if not os.path.exists(env_file):
                 logger.info(
                     "%s doesn't exist - if you're not configuring your "
