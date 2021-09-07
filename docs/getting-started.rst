@@ -18,7 +18,7 @@ _________________________
 ``django-environ`` is a Python-only package `hosted on PyPI <https://pypi.org/project/django-environ/>`_.
 The recommended installation method is `pip <https://pip.pypa.io/en/stable/>`_-installing into a virtualenv:
 
-.. code-block:: shell
+.. code-block:: console
 
    $ python -m pip install django-environ
 
@@ -34,7 +34,7 @@ So, you can also install the latest unreleased development version directly from
 ``develop`` branch on GitHub. It is a work-in-progress of a future stable release so the
 experience might be not as smooth.:
 
-.. code-block:: shell
+.. code-block:: console
 
    $ pip install -e git://github.com/joke2k/django-environ.git#egg=django-environ
    # OR
