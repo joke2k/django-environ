@@ -6,6 +6,9 @@ and currently maintained by `Serghei Iakovlev <https://github.com/sergeyklay/>`_
 
 A full list of contributors can be found in `GitHub <https://github.com/joke2k/django-environ/graphs/contributors>`__.
 
+Acknowledgments
+===============
+
 The existence of ``django-environ`` would have been impossible without these
 projects:
 
