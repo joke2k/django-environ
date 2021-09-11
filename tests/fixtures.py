@@ -28,7 +28,7 @@ class FakeEnv:
     EXPORTED = 'exported var'
 
     @classmethod
-    def generateData(cls):
+    def generate_data(cls):
         return dict(STR_VAR='bar',
                     MULTILINE_STR_VAR='foo\\nbar',
                     INT_VAR='42',
@@ -36,10 +36,20 @@ class FakeEnv:
                     FLOAT_COMMA_VAR='33,3',
                     FLOAT_STRANGE_VAR1='123,420,333.3',
                     FLOAT_STRANGE_VAR2='123.420.333,3',
-                    BOOL_TRUE_VAR='1',
-                    BOOL_TRUE_VAR2='True',
-                    BOOL_FALSE_VAR='0',
-                    BOOL_FALSE_VAR2='False',
+                    FLOAT_NEGATIVE_VAR='-1.0',
+                    BOOL_TRUE_STRING_LIKE_INT='1',
+                    BOOL_TRUE_INT=1,
+                    BOOL_TRUE_STRING_LIKE_BOOL='True',
+                    BOOL_TRUE_STRING_1='on',
+                    BOOL_TRUE_STRING_2='ok',
+                    BOOL_TRUE_STRING_3='yes',
+                    BOOL_TRUE_STRING_4='y',
+                    BOOL_TRUE_STRING_5='true',
+                    BOOL_TRUE_BOOL=True,
+                    BOOL_FALSE_STRING_LIKE_INT='0',
+                    BOOL_FALSE_INT=0,
+                    BOOL_FALSE_STRING_LIKE_BOOL='False',
+                    BOOL_FALSE_BOOL=False,
                     PROXIED_VAR='$STR_VAR',
                     INT_LIST='42,33',
                     INT_TUPLE='(42,33)',

@@ -18,7 +18,7 @@ _________________________
 ``django-environ`` is a Python-only package `hosted on PyPI <https://pypi.org/project/django-environ/>`_.
 The recommended installation method is `pip <https://pip.pypa.io/en/stable/>`_-installing into a virtualenv:
 
-.. code-block:: shell
+.. code-block:: console
 
    $ python -m pip install django-environ
 
@@ -34,7 +34,7 @@ So, you can also install the latest unreleased development version directly from
 ``develop`` branch on GitHub. It is a work-in-progress of a future stable release so the
 experience might be not as smooth.:
 
-.. code-block:: shell
+.. code-block:: console
 
    $ pip install -e git://github.com/joke2k/django-environ.git#egg=django-environ
    # OR
@@ -114,7 +114,9 @@ FAQ
    ``django-environ`` will try to get and read ``.env`` file from the project
    root if you haven't specified the path for it when call ``read_env``.
    However, this is not the recommended way. When it is possible always specify
-   the path tho ``.env`` file.
+   the path tho ``.env`` file. Alternatively, you can use a trick with a
+   environment variable pointing to the actual location of .env file.
+   For details see ":ref:`multiple-env-files-label`".
 
 #. **What (where) is the root part of the project, is it part of the project where are settings?**
 

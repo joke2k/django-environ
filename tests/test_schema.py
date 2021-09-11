@@ -19,7 +19,7 @@ def setup_module():
     global _old_environ
 
     _old_environ = os.environ
-    os.environ = Env.ENVIRON = FakeEnv.generateData()
+    os.environ = Env.ENVIRON = FakeEnv.generate_data()
 
 
 def teardown_module():

@@ -29,7 +29,7 @@ To disable it use ``env.smart_cast = False``.
 Multiple redis cache locations
 ==============================
 
-For redis cache, `multiple master/slave or shard locations <http://niwinz.github.io/django-redis/latest/#_pluggable_clients>`_ can be configured as follows:
+For redis cache, multiple master/slave or shard locations can be configured as follows:
 
 .. code-block:: shell
 
@@ -119,17 +119,36 @@ Values that being with a ``$`` may be interpolated. Pass ``interpolate=True`` to
    FOO
 
 
+.. _multiple-env-files-label:
+
 Multiple env files
 ==================
 
-It is possible to have multiple env files and select one using environment variables.
+There is an ability point to the .env file location using an environment
+variable. This feature may be convenient in a production systems with a
+different .env file location.
+
+The following example demonstrates the above:
+
+.. code-block:: shell
+
+   # /etc/environment file contents
+   DEBUG=False
+
+.. code-block:: shell
+
+   # .env file contents
+   DEBUG=True
 
 .. code-block:: python
 
    env = environ.Env()
    env.read_env(env.str('ENV_PATH', '.env'))
 
-Now ``ENV_PATH=other-env ./manage.py runserver`` uses ``other-env`` while ``./manage.py runserver`` uses ``.env``.
+
+Now ``ENV_PATH=/etc/environment ./manage.py runserver`` uses ``/etc/environment``
+while ``./manage.py runserver`` uses ``.env``.
+
 
 Using Path objects when reading env
 ===================================

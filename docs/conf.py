@@ -56,7 +56,7 @@ extensions = [
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
     "sphinx.ext.todo",
-    "notfound.extension"
+    "notfound.extension",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -66,7 +66,9 @@ templates_path = ["_templates"]
 source_suffix = ".rst"
 
 # Allow non-local URIs so we can have images in CHANGELOG etc.
-suppress_warnings = ["image.nonlocal_uri"]
+suppress_warnings = [
+    "image.nonlocal_uri",
+]
 
 # The master toctree document.
 master_doc = "index"

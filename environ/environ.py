@@ -30,10 +30,10 @@ from .compat import DJANGO_POSTGRES, ImproperlyConfigured, json, REDIS_DRIVER
 
 try:
     from os import PathLike
+
     Openable = (str, PathLike)
 except ImportError:
     Openable = (str,)
-
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +44,7 @@ def _cast(value):
     # https://docs.python.org/3/library/ast.html#ast.literal_eval
     try:
         return ast.literal_eval(value)
-    except ValueError:
+    except (ValueError, SyntaxError):
         return value
 
 
@@ -64,7 +64,6 @@ class NoValue:
 
 
 class Env:
-
     """Provide scheme-based lookups of environment variables so that each
     caller doesn't have to pass in `cast` and `default` parameters.
 
@@ -79,9 +78,11 @@ class Env:
     NOTSET = NoValue()
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = ParseResult
-    DEFAULT_DATABASE_ENV = 'DATABASE_URL'
 
     POSTGRES_FAMILY = ['postgres', 'postgresql', 'psql', 'pgsql', 'postgis']
+    ELASTICSEARCH_FAMILY = ['elasticsearch' + x for x in ['', '2', '5', '7']]
+
+    DEFAULT_DATABASE_ENV = 'DATABASE_URL'
     DB_SCHEMES = {
         'postgres': DJANGO_POSTGRES,
         'postgresql': DJANGO_POSTGRES,
@@ -146,6 +147,10 @@ class Env:
                          "ElasticsearchSearchEngine",
         "elasticsearch2": "haystack.backends.elasticsearch2_backend."
                           "Elasticsearch2SearchEngine",
+        "elasticsearch5": "haystack.backends.elasticsearch5_backend."
+                          "Elasticsearch5SearchEngine",
+        "elasticsearch7": "haystack.backends.elasticsearch7_backend."
+                          "Elasticsearch7SearchEngine",
         "solr": "haystack.backends.solr_backend.SolrEngine",
         "whoosh": "haystack.backends.whoosh_backend.WhooshEngine",
         "xapian": "haystack.backends.xapian_backend.XapianEngine",
@@ -188,7 +193,10 @@ class Env:
         """
         :rtype: bytes
         """
-        return self.get_value(var, cast=str).encode(encoding)
+        value = self.get_value(var, cast=str, default=default)
+        if hasattr(value, 'encode'):
+            return value.encode(encoding)
+        return value
 
     def bool(self, var, default=NOTSET):
         """
@@ -262,6 +270,7 @@ class Env:
             self.get_value(var, default=default),
             engine=engine
         )
+
     db = db_url
 
     def cache_url(self, var=DEFAULT_CACHE_ENV, default=NOTSET, backend=None):
@@ -275,6 +284,7 @@ class Env:
             self.url(var, default=default),
             backend=backend
         )
+
     cache = cache_url
 
     def email_url(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
@@ -288,6 +298,7 @@ class Env:
             self.url(var, default=default),
             backend=backend
         )
+
     email = email_url
 
     def search_url(self, var=DEFAULT_SEARCH_ENV, default=NOTSET, engine=None):
@@ -352,8 +363,9 @@ class Env:
             value = default
 
         # Resolve any proxied values
-        if hasattr(value, 'startswith') and value.startswith('$'):
-            value = value.lstrip('$')
+        prefix = b'$' if isinstance(value, bytes) else '$'
+        if hasattr(value, 'startswith') and value.startswith(prefix):
+            value = value.lstrip(prefix)
             value = self.get_value(value, cast=cast, default=default)
 
         # Smart casting
@@ -413,10 +425,10 @@ class Env:
             value = tuple([x for x in val if x])
         elif cast is float:
             # clean string
-            float_str = re.sub(r'[^\d,\.]', '', value)
+            float_str = re.sub(r'[^\d,.-]', '', value)
             # split for avoid thousand separator and different
             # locale comma/dot symbol
-            parts = re.split(r'[,\.]', float_str)
+            parts = re.split(r'[,.]', float_str)
             if len(parts) == 1:
                 float_str = parts[0]
             else:
@@ -492,7 +504,7 @@ class Env:
         if url.scheme == 'oracle':
             # Django oracle/base.py strips port and fails on non-string value
             if not config['PORT']:
-                del(config['PORT'])
+                del (config['PORT'])
             else:
                 config['PORT'] = str(config['PORT'])
 
@@ -646,7 +658,7 @@ class Env:
         config["ENGINE"] = cls.SEARCH_SCHEMES[url.scheme]
 
         # check commons params
-        params = {}
+        params = {}  # type: dict
         if url.query:
             params = parse_qs(url.query)
             if 'EXCLUDED_INDEXES' in params.keys():
@@ -665,7 +677,7 @@ class Env:
 
         if url.scheme == 'simple':
             return config
-        elif url.scheme in ['solr', 'elasticsearch', 'elasticsearch2']:
+        elif url.scheme in ['solr'] + cls.ELASTICSEARCH_FAMILY:
             if 'KWARGS' in params.keys():
                 config['KWARGS'] = params['KWARGS'][0]
 
@@ -681,8 +693,7 @@ class Env:
                 config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
             return config
 
-        if url.scheme in ['elasticsearch', 'elasticsearch2']:
-
+        if url.scheme in cls.ELASTICSEARCH_FAMILY:
             split = path.rsplit("/", 1)
 
             if len(split) > 1:
@@ -728,7 +739,7 @@ class Env:
         called read_env.
 
         Refs:
-        - http://www.wellfireinteractive.com/blog/easier-12-factor-django/
+        - https://wellfire.co/learn/easier-12-factor-django
         - https://gist.github.com/bennylope/2999704
         """
         if env_file is None:
@@ -738,7 +749,7 @@ class Env:
                 '.env'
             )
             if not os.path.exists(env_file):
-                warnings.warn(
+                logger.info(
                     "%s doesn't exist - if you're not configuring your "
                     "environment separately, create one." % env_file)
                 return
@@ -751,8 +762,8 @@ class Env:
                 with env_file as f:
                     content = f.read()
         except OSError:
-            warnings.warn(
-                "Error reading %s - if you're not configuring your "
+            logger.info(
+                "%s not found - if you're not configuring your "
                 "environment separately, check this." % env_file)
             return
 
@@ -776,7 +787,6 @@ class Env:
 
 
 class Path:
-
     """Inspired to Django Two-scoops, handling File Paths in Settings."""
 
     def path(self, *paths, **kwargs):

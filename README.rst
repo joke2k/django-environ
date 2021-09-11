@@ -28,7 +28,7 @@
 .. -teaser-begin-
 
 ``django-environ`` is the Python package that allows you to use
-`Twelve-factor methodology <http://www.12factor.net/>`_ to configure your
+`Twelve-factor methodology <https://www.12factor.net/>`_ to configure your
 Django application with environment variables.
 
 .. -teaser-end-
@@ -92,13 +92,13 @@ environment variables obtained from an environment file and provided by the OS:
 
 The idea of this package is to unify a lot of packages that make the same stuff:
 Take a string from ``os.environ``, parse and cast it to some of useful python
-typed variables. To do that and to use the `12factor <http://www.12factor.net/>`_
+typed variables. To do that and to use the `12factor <https://www.12factor.net/>`_
 approach, some connection strings are expressed as url, so this package can parse
 it and return a ``urllib.parse.ParseResult``. These strings from ``os.environ``
 are loaded from a ``.env`` file and filled in ``os.environ`` with ``setdefault``
 method, to avoid to overwrite the real environ.
-A similar approach is used in `Two Scoops of Django <http://twoscoopspress.org/>`_
-book and explained in `12factor-django <http://www.wellfireinteractive.com/blog/easier-12-factor-django/>`_
+A similar approach is used in `Two Scoops of Django <https://www.feldroy.com/books/two-scoops-of-django-3-x>`_
+book and explained in `12factor-django <https://wellfire.co/learn/easier-12-factor-django>`_
 article.
 
 
@@ -120,7 +120,7 @@ Project Information
 ===================
 
 ``django-environ`` is released under the `MIT / X11 License <https://choosealicense.com/licenses/mit/>`__,
-its documentation lives at `Read the Docs <https://django-environ.readthedocs.io/>`_,
+its documentation lives at `Read the Docs <https://django-environ.readthedocs.io/en/latest/>`_,
 the code on `GitHub <https://github.com/joke2k/django-environ>`_,
 and the latest release on `PyPI <https://pypi.org/project/django-environ/>`_.
 

@@ -26,7 +26,7 @@ class TestEnv:
         class.  setup_method is invoked for every test method of a class.
         """
         self.old_environ = os.environ
-        os.environ = Env.ENVIRON = FakeEnv.generateData()
+        os.environ = Env.ENVIRON = FakeEnv.generate_data()
         self.env = Env()
 
     def teardown_method(self, method):
@@ -65,8 +65,16 @@ class TestEnv:
             assert self.env(var) == val
         assert self.env.str(var, multiline=multiline) == val
 
-    def test_bytes(self):
-        assert_type_and_value(bytes, b'bar', self.env.bytes('STR_VAR'))
+    @pytest.mark.parametrize(
+        'var,val,default',
+        [
+            ('STR_VAR', b'bar', Env.NOTSET),
+            ('NON_EXISTENT_BYTES_VAR', b'some-default', b'some-default'),
+            ('NON_EXISTENT_STR_VAR', b'some-default', 'some-default'),
+        ]
+    )
+    def test_bytes(self, var, val, default):
+        assert_type_and_value(bytes, val, self.env.bytes(var, default=default))
 
     def test_int(self):
         assert_type_and_value(int, 42, self.env('INT_VAR', cast=int))
@@ -75,23 +83,41 @@ class TestEnv:
     def test_int_with_none_default(self):
         assert self.env('NOT_PRESENT_VAR', cast=int, default=None) is None
 
-    def test_float(self):
-        assert_type_and_value(float, 33.3, self.env('FLOAT_VAR', cast=float))
-        assert_type_and_value(float, 33.3, self.env.float('FLOAT_VAR'))
+    @pytest.mark.parametrize(
+        'value,variable',
+        [
+            (33.3, 'FLOAT_VAR'),
+            (33.3, 'FLOAT_COMMA_VAR'),
+            (123420333.3, 'FLOAT_STRANGE_VAR1'),
+            (123420333.3, 'FLOAT_STRANGE_VAR2'),
+            (-1.0, 'FLOAT_NEGATIVE_VAR'),
+        ]
+    )
+    def test_float(self, value, variable):
+        assert_type_and_value(float, value, self.env.float(variable))
+        assert_type_and_value(float, value, self.env(variable, cast=float))
 
-        assert_type_and_value(float, 33.3, self.env('FLOAT_COMMA_VAR', cast=float))
-        assert_type_and_value(float, 123420333.3, self.env('FLOAT_STRANGE_VAR1', cast=float))
-        assert_type_and_value(float, 123420333.3, self.env('FLOAT_STRANGE_VAR2', cast=float))
-
-    def test_bool_true(self):
-        assert_type_and_value(bool, True, self.env('BOOL_TRUE_VAR', cast=bool))
-        assert_type_and_value(bool, True, self.env('BOOL_TRUE_VAR2', cast=bool))
-        assert_type_and_value(bool, True, self.env.bool('BOOL_TRUE_VAR'))
-
-    def test_bool_false(self):
-        assert_type_and_value(bool, False, self.env('BOOL_FALSE_VAR', cast=bool))
-        assert_type_and_value(bool, False, self.env('BOOL_FALSE_VAR2', cast=bool))
-        assert_type_and_value(bool, False, self.env.bool('BOOL_FALSE_VAR'))
+    @pytest.mark.parametrize(
+        'value,variable',
+        [
+            (True, 'BOOL_TRUE_STRING_LIKE_INT'),
+            (True, 'BOOL_TRUE_STRING_LIKE_BOOL'),
+            (True, 'BOOL_TRUE_INT'),
+            (True, 'BOOL_TRUE_BOOL'),
+            (True, 'BOOL_TRUE_STRING_1'),
+            (True, 'BOOL_TRUE_STRING_2'),
+            (True, 'BOOL_TRUE_STRING_3'),
+            (True, 'BOOL_TRUE_STRING_4'),
+            (True, 'BOOL_TRUE_STRING_5'),
+            (False, 'BOOL_FALSE_STRING_LIKE_INT'),
+            (False, 'BOOL_FALSE_INT'),
+            (False, 'BOOL_FALSE_STRING_LIKE_BOOL'),
+            (False, 'BOOL_FALSE_BOOL'),
+        ]
+    )
+    def test_bool_true(self, value, variable):
+        assert_type_and_value(bool, value, self.env.bool(variable))
+        assert_type_and_value(bool, value, self.env(variable, cast=bool))
 
     def test_proxied_value(self):
         assert self.env('PROXIED_VAR') == 'bar'
@@ -250,8 +276,10 @@ class TestEnv:
 
     def test_smart_cast(self):
         assert self.env.get_value('STR_VAR', default='string') == 'bar'
-        assert self.env.get_value('BOOL_TRUE_VAR', default=True)
-        assert self.env.get_value('BOOL_FALSE_VAR', default=True) is False
+        assert self.env.get_value('BOOL_TRUE_STRING_LIKE_INT', default=True)
+        assert not self.env.get_value(
+            'BOOL_FALSE_STRING_LIKE_INT',
+            default=True)
         assert self.env.get_value('INT_VAR', default=1) == 42
         assert self.env.get_value('FLOAT_VAR', default=1.2) == 33.3
 
@@ -314,7 +342,7 @@ class TestSubClass(TestEnv):
         """
         super().setup_method(method)
 
-        self.CONFIG = FakeEnv.generateData()
+        self.CONFIG = FakeEnv.generate_data()
 
         class MyEnv(Env):
             ENVIRON = self.CONFIG

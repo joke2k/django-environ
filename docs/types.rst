@@ -41,6 +41,9 @@ Supported types
 * ``search_url``
 
   * Elasticsearch: ``elasticsearch://``
+  * Elasticsearch2: ``elasticsearch2://``
+  * Elasticsearch5: ``elasticsearch5://``
+  * Elasticsearch7: ``elasticsearch7://``
   * Solr: ``solr://``
   * Whoosh: ``whoosh://``
   * Xapian: ``xapian://``

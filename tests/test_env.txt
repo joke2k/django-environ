@@ -1,5 +1,4 @@
 DICT_VAR=foo=bar,test=on
-BOOL_FALSE_VAR2=False
 DATABASE_MYSQL_URL=mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/heroku_97681?reconnect=true
 DATABASE_MYSQL_GIS_URL=mysqlgis://user:password@127.0.0.1/some_database
 CACHE_URL=memcache://127.0.0.1:11211
@@ -7,16 +6,27 @@ CACHE_REDIS=rediscache://127.0.0.1:6379/1?client_class=django_redis.client.Defau
 EMAIL_URL=smtps://user@domain.com:password@smtp.example.com:587
 URL_VAR=http://www.google.com/
 PATH_VAR=/home/dev
-BOOL_FALSE_VAR=0
-BOOL_TRUE_VAR2=True
+BOOL_TRUE_STRING_LIKE_INT='1'
+BOOL_TRUE_INT=1
+BOOL_TRUE_STRING_LIKE_BOOL='True'
+BOOL_TRUE_STRING_1='on'
+BOOL_TRUE_STRING_2='ok'
+BOOL_TRUE_STRING_3='yes'
+BOOL_TRUE_STRING_4='y'
+BOOL_TRUE_STRING_5='true'
+BOOL_TRUE_BOOL=True
+BOOL_FALSE_STRING_LIKE_INT='0'
+BOOL_FALSE_INT=0
+BOOL_FALSE_STRING_LIKE_BOOL='False'
+BOOL_FALSE_BOOL=False
 DATABASE_SQLITE_URL=sqlite:////full/path/to/your/database/file.sqlite
 JSON_VAR={"three": 33.44, "two": 2, "one": "bar"}
-BOOL_TRUE_VAR=1
 DATABASE_URL=postgres://uf07k1:wegauwhg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722
 FLOAT_VAR=33.3
 FLOAT_COMMA_VAR=33,3
 FLOAT_STRANGE_VAR1=123,420,333.3
 FLOAT_STRANGE_VAR2=123.420.333,3
+FLOAT_NEGATIVE_VAR=-1.0
 PROXIED_VAR=$STR_VAR
 EMPTY_LIST=
 INT_VAR=42
