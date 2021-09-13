@@ -1,31 +1,42 @@
 import os
 import tempfile
+from contextlib import contextmanager
 
 import environ
 import pytest
 
 
-def test_mapping():
-    with tempfile.NamedTemporaryFile(mode="w") as f:
-        f.write("fish")
-        f.flush()
+@contextmanager
+def make_temp_file(text):
+    with tempfile.NamedTemporaryFile("w", delete=False) as f:
+        f.write(text)
+        f.close()
+    try:
+        yield f.name
+    finally:
+        if os.path.exists(f.name):
+            os.unlink(f.name)
 
-        env = environ.FileAwareMapping(env={"ANIMAL_FILE": f.name})
-        assert env["ANIMAL"] == "fish"
+
+@pytest.fixture
+def tmp_f():
+    with make_temp_file(text="fish") as f_name:
+        yield f_name
 
 
-def test_precidence():
-    with tempfile.NamedTemporaryFile(mode="w") as f:
-        f.write("fish")
-        f.flush()
+def test_mapping(tmp_f):
+    env = environ.FileAwareMapping(env={"ANIMAL_FILE": tmp_f})
+    assert env["ANIMAL"] == "fish"
 
-        env = environ.FileAwareMapping(
-            env={
-                "ANIMAL_FILE": f.name,
-                "ANIMAL": "cat",
-            }
-        )
-        assert env["ANIMAL"] == "fish"
+
+def test_precidence(tmp_f):
+    env = environ.FileAwareMapping(
+        env={
+            "ANIMAL_FILE": tmp_f,
+            "ANIMAL": "cat",
+        }
+    )
+    assert env["ANIMAL"] == "fish"
 
 
 def test_missing_file_raises_exception():
@@ -58,53 +69,41 @@ def test_len():
     assert len(env) == 4
 
 
-def test_cache():
-    with tempfile.NamedTemporaryFile(mode="w") as f:
-        f.write("fish")
-        f.flush()
+def test_cache(tmp_f):
+    env = environ.FileAwareMapping(env={"ANIMAL_FILE": tmp_f})
+    assert env["ANIMAL"] == "fish"
 
-        env = environ.FileAwareMapping(env={"ANIMAL_FILE": f.name})
-        assert env["ANIMAL"] == "fish"
-
-        f.seek(0)
+    with open(tmp_f, "w") as f:
         f.write("cat")
-        f.truncate()
-        f.flush()
-        assert env["ANIMAL"] == "fish"
+    assert env["ANIMAL"] == "fish"
+
+    os.unlink(tmp_f)
     assert not os.path.exists(env["ANIMAL_FILE"])
     assert env["ANIMAL"] == "fish"
 
 
-def test_no_cache():
-    with tempfile.NamedTemporaryFile(mode="w") as f:
-        f.write("fish")
-        f.flush()
+def test_no_cache(tmp_f):
+    env = environ.FileAwareMapping(
+        cache=False,
+        env={"ANIMAL_FILE": tmp_f},
+    )
+    assert env["ANIMAL"] == "fish"
 
-        env = environ.FileAwareMapping(
-            cache=False,
-            env={"ANIMAL_FILE": f.name},
-        )
-        assert env["ANIMAL"] == "fish"
-
-        f.seek(0)
+    with open(tmp_f, "w") as f:
         f.write("cat")
-        f.truncate()
-        f.flush()
-        assert env["ANIMAL"] == "cat"
+    assert env["ANIMAL"] == "cat"
 
+    os.unlink(tmp_f)
     assert not os.path.exists(env["ANIMAL_FILE"])
     with pytest.raises(FileNotFoundError):
         assert env["ANIMAL"]
 
 
-def test_setdefault():
-    with tempfile.NamedTemporaryFile(mode="w") as f:
-        f.write("fish")
-        f.flush()
-        env = environ.FileAwareMapping(env={"ANIMAL_FILE": f.name})
-        assert env.setdefault("FRUIT", "apple") == "apple"
-        assert env.setdefault("ANIMAL", "cat") == "fish"
-        assert env.env == {"ANIMAL_FILE": f.name, "FRUIT": "apple"}
+def test_setdefault(tmp_f):
+    env = environ.FileAwareMapping(env={"ANIMAL_FILE": tmp_f})
+    assert env.setdefault("FRUIT", "apple") == "apple"
+    assert env.setdefault("ANIMAL", "cat") == "fish"
+    assert env.env == {"ANIMAL_FILE": tmp_f, "FRUIT": "apple"}
 
 
 class TestDelItem:
@@ -137,23 +136,19 @@ class TestSetItem:
         env["FRUIT"] = "banana"
         assert env["FRUIT"] == "banana"
 
-    def test_cant_override_key_with_file_key(self):
-        with tempfile.NamedTemporaryFile(mode="w") as f:
-            env = environ.FileAwareMapping(
-                env={
-                    "FRUIT": "apple",
-                    "FRUIT_FILE": f.name,
-                }
-            )
+    def test_cant_override_key_with_file_key(self, tmp_f):
+        env = environ.FileAwareMapping(
+            env={
+                "FRUIT": "apple",
+                "FRUIT_FILE": tmp_f,
+            }
+        )
+        with open(tmp_f, "w") as f:
             f.write("banana")
-            f.flush()
-            env["FRUIT"] = "cucumber"
-            assert env["FRUIT"] == "banana"
+        env["FRUIT"] = "cucumber"
+        assert env["FRUIT"] == "banana"
 
-    def test_set_file_key(self):
-        env = environ.FileAwareMapping(env={"FRUIT": "apple"})
-        with tempfile.NamedTemporaryFile(mode="w") as f:
-            f.write("banana")
-            f.flush()
-            env["FRUIT_FILE"] = f.name
-            assert env["FRUIT"] == "banana"
+    def test_set_file_key(self, tmp_f):
+        env = environ.FileAwareMapping(env={"ANIMAL": "cat"})
+        env["ANIMAL_FILE"] = tmp_f
+        assert env["ANIMAL"] == "fish"
