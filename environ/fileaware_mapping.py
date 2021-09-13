@@ -1,8 +1,8 @@
 import os
-from typing import Mapping
+from typing import MutableMapping
 
 
-class FileAwareMapping(Mapping):
+class FileAwareMapping(MutableMapping):
     """
     A mapping that wraps os.environ, first checking for the existance of a key
     appended with ``_FILE`` whenever reading a value. If a matching file key is
@@ -48,9 +48,9 @@ class FileAwareMapping(Mapping):
         for key in self.env:
             yield key
             if key.endswith("_FILE"):
-                file_key = key[:-5]
-                if file_key and file_key not in self.env:
-                    yield file_key
+                no_file_key = key[:-5]
+                if no_file_key and no_file_key not in self.env:
+                    yield no_file_key
 
     def __len__(self):
         """
@@ -58,3 +58,23 @@ class FileAwareMapping(Mapping):
         any ``_FILE`` key found.
         """
         return len(tuple(iter(self)))
+
+    def __setitem__(self, key, value):
+        self.env[key] = value
+        if self.cache and key.endswith("_FILE"):
+            no_file_key = key[:-5]
+            if no_file_key and no_file_key in self.files_cache:
+                del self.files_cache[no_file_key]
+
+    def __delitem__(self, key):
+        file_key = f"{key}_FILE"
+        if file_key in self.env:
+            del self[file_key]
+            if key in self.env:
+                del self.env[key]
+            return
+        if self.cache and key.endswith("_FILE"):
+            no_file_key = key[:-5]
+            if no_file_key and no_file_key in self.files_cache:
+                del self.files_cache[no_file_key]
+        del self.env[key]
