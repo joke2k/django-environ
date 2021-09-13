@@ -1,3 +1,4 @@
+import os
 import tempfile
 
 import environ
@@ -55,6 +56,45 @@ def test_len():
         }
     )
     assert len(env) == 4
+
+
+def test_cache():
+    with tempfile.NamedTemporaryFile(mode="w") as f:
+        f.write("fish")
+        f.flush()
+
+        env = environ.FileAwareMapping(env={"ANIMAL_FILE": f.name})
+        assert env["ANIMAL"] == "fish"
+
+        f.seek(0)
+        f.write("cat")
+        f.truncate()
+        f.flush()
+        assert env["ANIMAL"] == "fish"
+    assert not os.path.exists(env["ANIMAL_FILE"])
+    assert env["ANIMAL"] == "fish"
+
+
+def test_no_cache():
+    with tempfile.NamedTemporaryFile(mode="w") as f:
+        f.write("fish")
+        f.flush()
+
+        env = environ.FileAwareMapping(
+            cache=False,
+            env={"ANIMAL_FILE": f.name},
+        )
+        assert env["ANIMAL"] == "fish"
+
+        f.seek(0)
+        f.write("cat")
+        f.truncate()
+        f.flush()
+        assert env["ANIMAL"] == "cat"
+
+    assert not os.path.exists(env["ANIMAL_FILE"])
+    with pytest.raises(FileNotFoundError):
+        assert env["ANIMAL"]
 
 
 def test_setdefault():
