@@ -27,6 +27,7 @@ from urllib.parse import (
 )
 
 from .compat import DJANGO_POSTGRES, ImproperlyConfigured, json, REDIS_DRIVER
+from .fileaware_mapping import FileAwareMapping
 
 try:
     from os import PathLike
@@ -784,6 +785,10 @@ class Env:
         # set defaults
         for key, value in overrides.items():
             cls.ENVIRON.setdefault(key, value)
+
+
+class FileAwareEnv(Env):
+    ENVIRON = FileAwareMapping()
 
 
 class Path:

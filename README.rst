@@ -88,6 +88,20 @@ environment variables obtained from an environment file and provided by the OS:
        'redis': env.cache_url('REDIS_URL')
    }
 
+To enable Docker-style file based variables (appended with ``_FILE``), use
+``environ.FileAwareEnv``:
+
+.. code-block:: python
+
+    import environ
+
+    env = environ.FileAwareEnv()
+
+    # If a ``SECRET_KEY_FILE`` environment variable exists, its contents will be
+    # read from the file system and used instead of the ``SECRET_KEY``
+    # environment variable.
+    SECRET_KEY = env('SECRET_KEY')
+
 .. -overview-
 
 The idea of this package is to unify a lot of packages that make the same stuff:
@@ -113,6 +127,7 @@ a concrete example on using with a django project.
 - Fill ``os.environ`` with .env file variables
 - Variables casting
 - Url variables exploded to django specific package settings
+- Optional support for Docker-style file based config variables.
 
 .. -project-information-
 
