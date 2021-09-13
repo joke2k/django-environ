@@ -31,7 +31,7 @@ class FileAwareMapping(MutableMapping):
     def __getitem__(self, key):
         if self.cache and key in self.files_cache:
             return self.files_cache[key]
-        key_file = self.env.get(f"{key}_FILE")
+        key_file = self.env.get(key + "_FILE")
         if key_file:
             with open(key_file) as f:
                 value = f.read()
@@ -67,7 +67,7 @@ class FileAwareMapping(MutableMapping):
                 del self.files_cache[no_file_key]
 
     def __delitem__(self, key):
-        file_key = f"{key}_FILE"
+        file_key = key + "_FILE"
         if file_key in self.env:
             del self[file_key]
             if key in self.env:
