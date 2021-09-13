@@ -119,6 +119,14 @@ class TestDelItem:
         with pytest.raises(KeyError):
             env["ANIMAL"]
 
+    def test_del_shadowed_key_with_file_key(self):
+        env = environ.FileAwareMapping(
+            env={"ANIMAL_FILE": "some-file", "ANIMAL": "cat"}
+        )
+        del env["ANIMAL"]
+        with pytest.raises(KeyError):
+            env["ANIMAL"]
+
     def test_del_file_key(self):
         env = environ.FileAwareMapping(
             env={
@@ -128,6 +136,17 @@ class TestDelItem:
         )
         del env["ANIMAL_FILE"]
         assert env["ANIMAL"] == "fish"
+
+    def test_del_file_key_clears_cache(self, tmp_f):
+        env = environ.FileAwareMapping(
+            env={
+                "ANIMAL_FILE": tmp_f,
+                "ANIMAL": "cat",
+            }
+        )
+        assert env["ANIMAL"] == "fish"
+        del env["ANIMAL_FILE"]
+        assert env["ANIMAL"] == "cat"
 
 
 class TestSetItem:
@@ -152,3 +171,10 @@ class TestSetItem:
         env = environ.FileAwareMapping(env={"ANIMAL": "cat"})
         env["ANIMAL_FILE"] = tmp_f
         assert env["ANIMAL"] == "fish"
+
+    def test_change_file_key_clears_cache(self, tmp_f):
+        env = environ.FileAwareMapping(env={"ANIMAL_FILE": tmp_f})
+        assert env["ANIMAL"] == "fish"
+        with make_temp_file(text="cat") as new_tmp_f:
+            env["ANIMAL_FILE"] = new_tmp_f
+            assert env["ANIMAL"] == "cat"
