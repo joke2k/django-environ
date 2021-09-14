@@ -3,6 +3,24 @@ Tips
 ====
 
 
+Docker-style file based variables
+=================================
+
+To enable Docker-style file based variables (appended with ``_FILE``), use
+``environ.FileAwareEnv`` rather than ``environ.Env``:
+
+.. code-block:: python
+
+    import environ
+
+    env = environ.FileAwareEnv()
+
+    # If a ``SECRET_KEY_FILE`` environment variable exists, its contents will be
+    # read from the file system and used instead of the ``SECRET_KEY``
+    # environment variable.
+    SECRET_KEY = env('SECRET_KEY')
+
+
 Using unsafe characters in URLs
 ===============================
 
@@ -13,6 +31,7 @@ In order to use unsafe characters you have to encode with ``urllib.parse.encode`
    DATABASE_URL=mysql://user:%23password@127.0.0.1:3306/dbname
 
 See https://perishablepress.com/stop-using-unsafe-characters-in-urls/ for reference.
+
 
 Smart Casting
 =============
