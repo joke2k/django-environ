@@ -7,6 +7,9 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 `v0.8.0`_ - 00-Unreleased-2021
 ------------------------------
+Fixed
++++++
+- Keep newline/tb escaped in quoted strings
 
 
 `v0.7.0`_ - 11-September-2021
