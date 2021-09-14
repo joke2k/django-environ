@@ -181,7 +181,7 @@ class Env:
         """
         value = self.get_value(var, cast=str, default=default)
         if multiline:
-            return value.replace('\\n', '\n')
+            return re.sub(r'(\\r)?\\n', r'\n', value)
         return value
 
     def unicode(self, var, default=NOTSET):
@@ -770,6 +770,13 @@ class Env:
 
         logger.debug('Read environment variables from: {}'.format(env_file))
 
+        def _keep_escaped_format_characters(match):
+            """Keep escaped newline/tabs in quoted strings"""
+            escaped_char = match.group(1)
+            if escaped_char in 'rnt':
+                return '\\' + escaped_char
+            return escaped_char
+
         for line in content.splitlines():
             m1 = re.match(r'\A(?:export )?([A-Za-z_0-9]+)=(.*)\Z', line)
             if m1:
@@ -779,7 +786,8 @@ class Env:
                     val = m2.group(1)
                 m3 = re.match(r'\A"(.*)"\Z', val)
                 if m3:
-                    val = re.sub(r'\\(.)', r'\1', m3.group(1))
+                    val = re.sub(r'\\(.)', _keep_escaped_format_characters,
+                                 m3.group(1))
                 cls.ENVIRON.setdefault(key, str(val))
 
         # set defaults
