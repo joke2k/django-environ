@@ -7,9 +7,15 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 `v0.8.0`_ - 00-Unreleased-2021
 ------------------------------
+Added
++++++
+- Log invalid lines when parse .env file
+  `#283 <https://github.com/joke2k/django-environ/pull/283>`_.
+
 Fixed
 +++++
-- Keep newline/tb escaped in quoted strings
+- Keep newline/tab escapes in quoted strings
+   `#296 <https://github.com/joke2k/django-environ/pull/296>`_.
 
 
 `v0.7.0`_ - 11-September-2021
