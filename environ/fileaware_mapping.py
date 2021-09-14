@@ -20,9 +20,11 @@ class FileAwareMapping(MutableMapping):
         Initialize the mapping.
 
         :param env:
-            where to read environment variables from (defaults to ``os.environ``)
+            where to read environment variables from (defaults to
+            ``os.environ``)
         :param cache:
-            cache environment variables read from the file system (defaults to ``True``)
+            cache environment variables read from the file system (defaults to
+            ``True``)
         """
         self.env = env if env is not None else os.environ
         self.cache = cache
