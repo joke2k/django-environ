@@ -788,6 +788,20 @@ class Env:
 
 
 class FileAwareEnv(Env):
+    """
+    First look for environment variables with ``_FILE`` appended. If found,
+    their contents will be read from the file system and used instead.
+
+    Use as a drop-in replacement for the standard ``environ.Env``:
+
+    .. code-block:: python
+
+        python env = environ.FileAwareEnv()
+
+    For example, if a ``SECRET_KEY_FILE`` environment variable was set,
+    ``env("SECRET_KEY")`` would find the related variable, returning the file
+    contents rather than ever looking up a ``SECRET_KEY`` environment variable.
+    """
     ENVIRON = FileAwareMapping()
 
 

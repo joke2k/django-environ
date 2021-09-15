@@ -6,19 +6,37 @@ Tips
 Docker-style file based variables
 =================================
 
-To enable Docker-style file based variables (appended with ``_FILE``), use
-``environ.FileAwareEnv`` rather than ``environ.Env``:
+Docker (swarm) and Kubernetes are two widely used platforms that store their
+secrets in tmpfs inside containers as individual files, providing a secure way
+to be able to share configuration data between containers.
+
+Use ``environ.FileAwareEnv`` rather than ``environ.Env`` to first look for
+environment variables with ``_FILE`` appended. If found, their contents will be
+read from the file system and used instead.
+
+For example, given an app with the following in its settings module:
 
 .. code-block:: python
 
-    import environ
+   import environ
 
-    env = environ.FileAwareEnv()
+   env = environ.FileAwareEnv()
+   SECRET_KEY = env("SECRET_KEY")
 
-    # If a ``SECRET_KEY_FILE`` environment variable exists, its contents will be
-    # read from the file system and used instead of the ``SECRET_KEY``
-    # environment variable.
-    SECRET_KEY = env('SECRET_KEY')
+the example ``docker-compose.yml`` for would contain:
+
+.. code-block:: yaml
+
+   secrets:
+      secret_key:
+      external: true
+
+   services:
+      app:
+      secrets:
+         - secret_key
+      environment:
+         - SECRET_KEY_FILE=/run/secrets/secret_key
 
 
 Using unsafe characters in URLs
