@@ -28,14 +28,14 @@ the example ``docker-compose.yml`` for would contain:
 .. code-block:: yaml
 
    secrets:
-      secret_key:
-      external: true
+     secret_key:
+       external: true
 
    services:
-      app:
-      secrets:
+     app:
+       secrets:
          - secret_key
-      environment:
+       environment:
          - SECRET_KEY_FILE=/run/secrets/secret_key
 
 
