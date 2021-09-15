@@ -113,6 +113,8 @@ a concrete example on using with a django project.
 - Fill ``os.environ`` with .env file variables
 - Variables casting
 - Url variables exploded to django specific package settings
+- Optional support for Docker-style file based config variables (use
+  ``environ.FileAwareEnv`` instead of ``environ.Env``)
 
 .. -project-information-
 
