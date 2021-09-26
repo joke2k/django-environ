@@ -152,6 +152,7 @@ class TestEnv:
         [
             ('a=1', dict, {'a': '1'}),
             ('a=1', dict(value=int), {'a': 1}),
+            ('a=1', dict(value=float), {'a': 1.0}),
             ('a=1,2,3', dict(value=[str]), {'a': ['1', '2', '3']}),
             ('a=1,2,3', dict(value=[int]), {'a': [1, 2, 3]}),
             ('a=1;b=1.1,2.2;c=3', dict(value=int, cast=dict(b=[float])),
@@ -163,6 +164,7 @@ class TestEnv:
         ids=[
             'dict',
             'dict_int',
+            'dict_float',
             'dict_str_list',
             'dict_int_list',
             'dict_int_cast',
