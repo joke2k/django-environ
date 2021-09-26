@@ -31,10 +31,10 @@ from .fileaware_mapping import FileAwareMapping
 
 try:
     from os import PathLike
+except ImportError:  # Python 3.5 support
+    from pathlib import PurePath as PathLike
 
-    Openable = (str, PathLike)
-except ImportError:
-    Openable = (str,)
+Openable = (str, PathLike)
 
 logger = logging.getLogger(__name__)
 
@@ -760,7 +760,8 @@ class Env:
 
         try:
             if isinstance(env_file, Openable):
-                with open(env_file) as f:
+                # Python 3.5 support (wrap path with str).
+                with open(str(env_file)) as f:
                     content = f.read()
             else:
                 with env_file as f:
