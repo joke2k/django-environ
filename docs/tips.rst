@@ -195,10 +195,13 @@ Values that being with a ``$`` may be interpolated. Pass ``interpolate=True`` to
    FOO
 
 
+Reading env files
+=================
+
 .. _multiple-env-files-label:
 
 Multiple env files
-==================
+------------------
 
 There is an ability point to the .env file location using an environment
 variable. This feature may be convenient in a production systems with a
@@ -227,7 +230,7 @@ while ``./manage.py runserver`` uses ``.env``.
 
 
 Using Path objects when reading env
-===================================
+-----------------------------------
 
 It is possible to use of ``pathlib.Path`` objects when reading environment file from the filesystem:
 
@@ -249,3 +252,16 @@ It is possible to use of ``pathlib.Path`` objects when reading environment file 
    env.read_env(os.path.join(BASE_DIR, '.env'))
    env.read_env(pathlib.Path(str(BASE_DIR)).joinpath('.env'))
    env.read_env(pathlib.Path(str(BASE_DIR)) / '.env')
+
+
+Overwriting existing environment values from env files
+------------------------------------------------------
+
+If you want variables set within your env files to take higher precidence than
+an existing set environment variable, use the ``overwrite=True`` argument of
+``read_env``. For example:
+
+.. code-block:: python
+
+   env = environ.Env()
+   env.read_env(BASE_DIR('.env'), overwrite=True)

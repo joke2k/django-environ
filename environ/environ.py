@@ -732,12 +732,15 @@ class Env:
         return config
 
     @classmethod
-    def read_env(cls, env_file=None, **overrides):
+    def read_env(cls, env_file=None, overwrite=False, **overrides):
         """Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack
         backtracking to find the dotenv in the same directory as the file that
         called read_env.
+
+        By default, won't overwrite any existing environment variables. You can
+        enable this behaviour by setting ``overwrite=True``.
 
         Refs:
         - https://wellfire.co/learn/easier-12-factor-django
@@ -788,13 +791,18 @@ class Env:
                 if m3:
                     val = re.sub(r'\\(.)', _keep_escaped_format_characters,
                                  m3.group(1))
-                cls.ENVIRON.setdefault(key, str(val))
+                overrides[key] = str(val)
             else:
                 logger.warn('Invalid line: %s', line)
 
-        # set defaults
+        if overwrite:
+            def set_environ(key, value):
+                cls.ENVIRON[key] = value
+        else:
+            set_environ = cls.ENVIRON.setdefault
+
         for key, value in overrides.items():
-            cls.ENVIRON.setdefault(key, value)
+            set_environ(key, value)
 
 
 class FileAwareEnv(Env):
