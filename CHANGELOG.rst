@@ -13,6 +13,10 @@ Added
   `#283 <https://github.com/joke2k/django-environ/pull/283>`_.
 - Added docker-style file variable support
   `#189 <https://github.com/joke2k/django-environ/issues/189>`_.
+- Added option to override existing variables with ``read_env``
+  `#103 <https://github.com/joke2k/django-environ/issues/103>`_,
+  `#249 <https://github.com/joke2k/django-environ/issues/249>`_.
+
 
 Fixed
 +++++

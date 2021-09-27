@@ -739,12 +739,22 @@ class Env:
         backtracking to find the dotenv in the same directory as the file that
         called read_env.
 
-        By default, won't overwrite any existing environment variables. You can
-        enable this behaviour by setting ``overwrite=True``.
+        Existing environment variables take precedent and are NOT overwritten
+        by the file content. ``overwrite=True`` will force an overwrite of
+        existing environment variables.
 
         Refs:
         - https://wellfire.co/learn/easier-12-factor-django
         - https://gist.github.com/bennylope/2999704
+
+        :param env_file: The path to the `.env` file your application should
+            use. If a path is not provided, `read_env` will attempt to import
+            the Django settings module from the Django project root.
+        :param overwrite: ``overwrite=True`` will force an overwrite of
+            existing environment variables.
+        :param **overrides: Any additional keyword arguments provided directly
+            to read_env will be added to the environment. If the key matches an
+            existing environment variable, the value will be overridden.
         """
         if env_file is None:
             frame = sys._getframe()
@@ -794,16 +804,21 @@ class Env:
                                  m3.group(1))
                 overrides[key] = str(val)
             else:
-                logger.warn('Invalid line: %s', line)
+                logger.warning('Invalid line: %s', line)
 
-        if overwrite:
-            def set_environ(key, value):
-                cls.ENVIRON[key] = value
-        else:
-            set_environ = cls.ENVIRON.setdefault
+        def set_environ(envval):
+            """Return lambda to set environ.
+
+             Use setdefault unless overwrite is specified.
+             """
+            if overwrite:
+                return lambda k, v: envval.update({k: str(v)})
+            return lambda k, v: envval.setdefault(k, str(v))
+
+        setenv = set_environ(cls.ENVIRON)
 
         for key, value in overrides.items():
-            set_environ(key, value)
+            setenv(key, value)
 
 
 class FileAwareEnv(Env):
