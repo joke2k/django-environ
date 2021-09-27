@@ -812,8 +812,8 @@ class Env:
              Use setdefault unless overwrite is specified.
              """
             if overwrite:
-                return lambda k,v: envval.update({k: str(v)})
-            return lambda k,v: envval.setdefault(k,str(v))
+                return lambda k, v: envval.update({k: str(v)})
+            return lambda k, v: envval.setdefault(k, str(v))
 
         setenv = set_environ(cls.ENVIRON)
 
