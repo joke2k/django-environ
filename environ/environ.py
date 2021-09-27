@@ -804,7 +804,7 @@ class Env:
                                  m3.group(1))
                 overrides[key] = str(val)
             else:
-                logger.warn('Invalid line: %s', line)
+                logger.warning('Invalid line: %s', line)
 
         def set_environ(envval):
             """Return lambda to set environ.
