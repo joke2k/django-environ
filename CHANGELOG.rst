@@ -16,6 +16,8 @@ Added
 - Added option to override existing variables with ``read_env``
   `#103 <https://github.com/joke2k/django-environ/issues/103>`_,
   `#249 <https://github.com/joke2k/django-environ/issues/249>`_.
+- Added support for empty var with None default value
+  `#209 <https://github.com/joke2k/django-environ/issues/209>`_.
 
 
 Fixed
