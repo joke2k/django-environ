@@ -375,6 +375,8 @@ class Env:
                     not isinstance(default, NoValue):
                 cast = type(default)
 
+        value = None if default is None and value == '' else value
+
         if value != default or (parse_default and value):
             value = self.parse_value(value, cast)
 

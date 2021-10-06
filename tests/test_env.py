@@ -86,6 +86,7 @@ class TestEnv:
 
     def test_int_with_none_default(self):
         assert self.env('NOT_PRESENT_VAR', cast=int, default=None) is None
+        assert self.env('EMPTY_INT_VAR', cast=int, default=None) is None
 
     @pytest.mark.parametrize(
         'value,variable',
