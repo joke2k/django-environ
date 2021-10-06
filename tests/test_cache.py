@@ -226,3 +226,11 @@ def test_cache_url_password_using_gen_delims(monkeypatch, chars):
     result = env.cache()
     assert result['BACKEND'] == 'django_redis.cache.RedisCache'
     assert result['LOCATION'] == url
+
+
+def test_cache_url_env_using_default():
+    env = Env(CACHE_URL=(str, "locmemcache://"))
+    result = env.cache()
+
+    assert result["BACKEND"] == "django.core.cache.backends.locmem.LocMemCache"
+    assert result["LOCATION"] == ""
