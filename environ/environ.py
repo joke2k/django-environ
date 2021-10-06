@@ -160,6 +160,7 @@ class Env:
 
     def __init__(self, **scheme):
         self.smart_cast = True
+        self.escape_proxy = False
         self.scheme = scheme
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
@@ -365,9 +366,13 @@ class Env:
 
         # Resolve any proxied values
         prefix = b'$' if isinstance(value, bytes) else '$'
+        escape = rb'\$' if isinstance(value, bytes) else r'\$'
         if hasattr(value, 'startswith') and value.startswith(prefix):
             value = value.lstrip(prefix)
             value = self.get_value(value, cast=cast, default=default)
+
+        if self.escape_proxy and hasattr(value, 'replace'):
+            value = value.replace(escape, prefix)
 
         # Smart casting
         if self.smart_cast:

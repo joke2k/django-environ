@@ -53,6 +53,7 @@ class FakeEnv:
                     BOOL_FALSE_STRING_LIKE_BOOL='False',
                     BOOL_FALSE_BOOL=False,
                     PROXIED_VAR='$STR_VAR',
+                    ESCAPED_VAR=r'\$baz',
                     INT_LIST='42,33',
                     INT_TUPLE='(42,33)',
                     STR_LIST_WITH_SPACES=' foo,  bar',
