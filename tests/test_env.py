@@ -127,6 +127,14 @@ class TestEnv:
     def test_proxied_value(self):
         assert self.env('PROXIED_VAR') == 'bar'
 
+    def test_escaped_dollar_sign(self):
+        self.env.escape_proxy = True
+        assert self.env('ESCAPED_VAR') == '$baz'
+
+    def test_escaped_dollar_sign_disabled(self):
+        self.env.escape_proxy = False
+        assert self.env('ESCAPED_VAR') == r'\$baz'
+
     def test_int_list(self):
         assert_type_and_value(list, [42, 33], self.env('INT_LIST', cast=[int]))
         assert_type_and_value(list, [42, 33], self.env.list('INT_LIST', int))
