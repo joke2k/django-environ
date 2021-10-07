@@ -195,6 +195,23 @@ Values that being with a ``$`` may be interpolated. Pass ``interpolate=True`` to
    FOO
 
 
+Escape Proxy
+============
+
+If you're having trouble with values starting with dollar sign ($) without the intention of proxying the value to
+another, You should enbale the ``escape_proxy`` and prepend a backslash to it.
+
+.. code-block:: python
+
+    import environ
+
+    env = environ.Env()
+    env.escape_proxy = True
+
+    # ESCAPED_VAR=\$baz
+    env.str('ESCAPED_VAR')  # $baz
+
+
 Reading env files
 =================
 
