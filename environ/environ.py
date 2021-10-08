@@ -157,6 +157,7 @@ class Env:
         "xapian": "haystack.backends.xapian_backend.XapianEngine",
         "simple": "haystack.backends.simple_backend.SimpleEngine",
     }
+    CLOUDSQL = 'cloudsql'
 
     def __init__(self, **scheme):
         self.smart_cast = True
@@ -502,7 +503,10 @@ class Env:
             'PORT': _cast_int(url.port) or '',
         })
 
-        if url.scheme in cls.POSTGRES_FAMILY and path.startswith('/'):
+        if (
+                url.scheme in cls.POSTGRES_FAMILY and path.startswith('/')
+                or cls.CLOUDSQL in path and path.startswith('/')
+        ):
             config['HOST'], config['NAME'] = path.rsplit('/', 1)
 
         if url.scheme == 'oracle' and path == '':
