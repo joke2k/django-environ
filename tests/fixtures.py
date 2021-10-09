@@ -13,6 +13,7 @@ class FakeEnv:
     URL = 'http://www.google.com/'
     POSTGRES = 'postgres://uf07k1:wegauwhg@ec2-107-21-253-135.compute-1.amazonaws.com:5431/d8r82722'
     MYSQL = 'mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/heroku_97681?reconnect=true'
+    MYSQL_CLOUDSQL_URL = 'mysql://djuser:hidden-password@//cloudsql/arvore-codelab:us-central1:mysqlinstance/mydatabase'
     MYSQLGIS = 'mysqlgis://user:password@127.0.0.1/some_database'
     SQLITE = 'sqlite:////full/path/to/your/database/file.sqlite'
     ORACLE_TNS = 'oracle://user:password@sid/'
@@ -67,6 +68,7 @@ class FakeEnv:
                     DATABASE_ORACLE_TNS_URL=cls.ORACLE_TNS,
                     DATABASE_REDSHIFT_URL=cls.REDSHIFT,
                     DATABASE_CUSTOM_BACKEND_URL=cls.CUSTOM_BACKEND,
+                    DATABASE_MYSQL_CLOUDSQL_URL=cls.MYSQL_CLOUDSQL_URL,
                     CACHE_URL=cls.MEMCACHE,
                     CACHE_REDIS=cls.REDIS,
                     EMAIL_URL=cls.EMAIL,

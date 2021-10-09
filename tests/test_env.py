@@ -218,6 +218,8 @@ class TestEnv:
              '/full/path/to/your/database/file.sqlite', '', '', '', ''),
             ('DATABASE_CUSTOM_BACKEND_URL', 'custom.backend', 'database',
              'example.com', 'user', 'password', 5430),
+            ('DATABASE_MYSQL_CLOUDSQL_URL', 'django.db.backends.mysql', 'mydatabase',
+             '/cloudsql/arvore-codelab:us-central1:mysqlinstance', 'djuser', 'hidden-password', ''),
         ],
         ids=[
             'postgres',
@@ -228,6 +230,7 @@ class TestEnv:
             'redshift',
             'sqlite',
             'custom',
+            'cloudsql',
         ],
     )
     def test_db_url_value(self, var, engine, name, host, user, passwd, port):
