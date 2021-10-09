@@ -24,8 +24,10 @@ Fixed
 +++++
 - Keep newline/tab escapes in quoted strings
   `#296 <https://github.com/joke2k/django-environ/pull/296>`_.
-- Handle escaped dolloar sign in values
+- Handle escaped dollar sign in values
   `#271 <https://github.com/joke2k/django-environ/issues/271>`_.
+- Fixed incorrect parsing of ``DATABASES_URL`` for Google Cloud MySQL
+  `#294 <https://github.com/joke2k/django-environ/issues/294>`_.
 
 
 `v0.7.0`_ - 11-September-2021
