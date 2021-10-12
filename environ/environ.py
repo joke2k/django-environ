@@ -26,7 +26,13 @@ from urllib.parse import (
     urlunparse,
 )
 
-from .compat import DJANGO_POSTGRES, ImproperlyConfigured, json, PYMEMCACHE_DRIVER, REDIS_DRIVER
+from .compat import (
+    DJANGO_POSTGRES,
+    ImproperlyConfigured,
+    json,
+    PYMEMCACHE_DRIVER,
+    REDIS_DRIVER,
+)
 from .fileaware_mapping import FileAwareMapping
 
 try:

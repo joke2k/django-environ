@@ -41,9 +41,10 @@ else:
 
 # back compatibility for pymemcache
 def choose_pymemcache_driver():
-    if (DJANGO_VERSION is not None and DJANGO_VERSION < (3, 2)) or not find_loader('pymemcache'):
-        # The original backend choice for the 'pymemcache' scheme is unfortunately
-        # 'pylibmc'.
+    old_django = DJANGO_VERSION is not None and DJANGO_VERSION < (3, 2)
+    if old_django or not find_loader('pymemcache'):
+        # The original backend choice for the 'pymemcache' scheme is
+        # unfortunately 'pylibmc'.
         return 'django.core.cache.backends.memcached.PyLibMCCache'
     return 'django.core.cache.backends.memcached.PyMemcacheCache'
 
