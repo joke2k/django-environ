@@ -26,7 +26,13 @@ from urllib.parse import (
     urlunparse,
 )
 
-from .compat import DJANGO_POSTGRES, ImproperlyConfigured, json, REDIS_DRIVER
+from .compat import (
+    DJANGO_POSTGRES,
+    ImproperlyConfigured,
+    json,
+    PYMEMCACHE_DRIVER,
+    REDIS_DRIVER,
+)
 from .fileaware_mapping import FileAwareMapping
 
 try:
@@ -116,7 +122,8 @@ class Env:
         'filecache': 'django.core.cache.backends.filebased.FileBasedCache',
         'locmemcache': 'django.core.cache.backends.locmem.LocMemCache',
         'memcache': 'django.core.cache.backends.memcached.MemcachedCache',
-        'pymemcache': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'pymemcache': PYMEMCACHE_DRIVER,
+        'pylibmc': 'django.core.cache.backends.memcached.PyLibMCCache',
         'rediscache': REDIS_DRIVER,
         'redis': REDIS_DRIVER,
         'rediss': REDIS_DRIVER,
