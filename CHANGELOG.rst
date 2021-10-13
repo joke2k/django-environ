@@ -18,6 +18,8 @@ Added
   `#249 <https://github.com/joke2k/django-environ/issues/249>`_.
 - Added support for empty var with None default value
   `#209 <https://github.com/joke2k/django-environ/issues/209>`_.
+- Added ``pymemcache`` cache backend for Django 3.2+
+  `#335 <https://github.com/joke2k/django-environ/pull/335>`_.
 
 
 Fixed
