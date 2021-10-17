@@ -57,6 +57,10 @@ class TestEnv:
             ('STR_VAR', 'bar', False),
             ('MULTILINE_STR_VAR', 'foo\\nbar', False),
             ('MULTILINE_STR_VAR', 'foo\nbar', True),
+            ('MULTILINE_QUOTED_STR_VAR', '---BEGIN---\\r\\n---END---', False),
+            ('MULTILINE_QUOTED_STR_VAR', '---BEGIN---\n---END---', True),
+            ('MULTILINE_ESCAPED_STR_VAR', '---BEGIN---\\\\n---END---', False),
+            ('MULTILINE_ESCAPED_STR_VAR', '---BEGIN---\\\n---END---', True),
         ],
     )
     def test_str(self, var, val, multiline):
@@ -82,6 +86,7 @@ class TestEnv:
 
     def test_int_with_none_default(self):
         assert self.env('NOT_PRESENT_VAR', cast=int, default=None) is None
+        assert self.env('EMPTY_INT_VAR', cast=int, default=None) is None
 
     @pytest.mark.parametrize(
         'value,variable',
@@ -122,6 +127,14 @@ class TestEnv:
     def test_proxied_value(self):
         assert self.env('PROXIED_VAR') == 'bar'
 
+    def test_escaped_dollar_sign(self):
+        self.env.escape_proxy = True
+        assert self.env('ESCAPED_VAR') == '$baz'
+
+    def test_escaped_dollar_sign_disabled(self):
+        self.env.escape_proxy = False
+        assert self.env('ESCAPED_VAR') == r'\$baz'
+
     def test_int_list(self):
         assert_type_and_value(list, [42, 33], self.env('INT_LIST', cast=[int]))
         assert_type_and_value(list, [42, 33], self.env.list('INT_LIST', int))
@@ -148,6 +161,7 @@ class TestEnv:
         [
             ('a=1', dict, {'a': '1'}),
             ('a=1', dict(value=int), {'a': 1}),
+            ('a=1', dict(value=float), {'a': 1.0}),
             ('a=1,2,3', dict(value=[str]), {'a': ['1', '2', '3']}),
             ('a=1,2,3', dict(value=[int]), {'a': [1, 2, 3]}),
             ('a=1;b=1.1,2.2;c=3', dict(value=int, cast=dict(b=[float])),
@@ -159,6 +173,7 @@ class TestEnv:
         ids=[
             'dict',
             'dict_int',
+            'dict_float',
             'dict_str_list',
             'dict_int_list',
             'dict_int_cast',
@@ -203,6 +218,8 @@ class TestEnv:
              '/full/path/to/your/database/file.sqlite', '', '', '', ''),
             ('DATABASE_CUSTOM_BACKEND_URL', 'custom.backend', 'database',
              'example.com', 'user', 'password', 5430),
+            ('DATABASE_MYSQL_CLOUDSQL_URL', 'django.db.backends.mysql', 'mydatabase',
+             '/cloudsql/arvore-codelab:us-central1:mysqlinstance', 'djuser', 'hidden-password', ''),
         ],
         ids=[
             'postgres',
@@ -213,6 +230,7 @@ class TestEnv:
             'redshift',
             'sqlite',
             'custom',
+            'cloudsql',
         ],
     )
     def test_db_url_value(self, var, engine, name, host, user, passwd, port):
@@ -303,33 +321,42 @@ class TestFileEnv(TestEnv):
             PATH_VAR=Path(__file__, is_file=True).__root__
         )
 
-    def test_read_env_path_like(self):
+    def create_temp_env_file(self, name):
         import pathlib
         import tempfile
 
-        path_like = (pathlib.Path(tempfile.gettempdir()) / 'test_pathlib.env')
+        env_file_path = (pathlib.Path(tempfile.gettempdir()) / name)
         try:
-            path_like.unlink()
+            env_file_path.unlink()
         except FileNotFoundError:
             pass
 
-        assert not path_like.exists()
+        assert not env_file_path.exists()
+        return env_file_path
+
+    def test_read_env_path_like(self):
+        env_file_path = self.create_temp_env_file('test_pathlib.env')
 
         env_key = 'SECRET'
         env_val = 'enigma'
         env_str = env_key + '=' + env_val
 
         # open() doesn't take path-like on Python < 3.6
-        try:
-            with open(path_like, 'w', encoding='utf-8') as f:
-                f.write(env_str + '\n')
-        except TypeError:
-            return
+        with open(str(env_file_path), 'w', encoding='utf-8') as f:
+            f.write(env_str + '\n')
 
-        assert path_like.exists()
-        self.env.read_env(path_like)
+        self.env.read_env(env_file_path)
         assert env_key in self.env.ENVIRON
         assert self.env.ENVIRON[env_key] == env_val
+
+    @pytest.mark.parametrize("overwrite", [True, False])
+    def test_existing_overwrite(self, overwrite):
+        env_file_path = self.create_temp_env_file('test_existing.env')
+        with open(str(env_file_path), 'w') as f:
+            f.write("EXISTING=b")
+        self.env.ENVIRON['EXISTING'] = "a"
+        self.env.read_env(env_file_path, overwrite=overwrite)
+        assert self.env.ENVIRON["EXISTING"] == ("b" if overwrite else "a")
 
 
 class TestSubClass(TestEnv):

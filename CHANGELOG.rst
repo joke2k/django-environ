@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+`v0.8.0`_ - 17-October-2021
+------------------------------
+Added
++++++
+- Log invalid lines when parse .env file
+  `#283 <https://github.com/joke2k/django-environ/pull/283>`_.
+- Added docker-style file variable support
+  `#189 <https://github.com/joke2k/django-environ/issues/189>`_.
+- Added option to override existing variables with ``read_env``
+  `#103 <https://github.com/joke2k/django-environ/issues/103>`_,
+  `#249 <https://github.com/joke2k/django-environ/issues/249>`_.
+- Added support for empty var with None default value
+  `#209 <https://github.com/joke2k/django-environ/issues/209>`_.
+- Added ``pymemcache`` cache backend for Django 3.2+
+  `#335 <https://github.com/joke2k/django-environ/pull/335>`_.
+
+
+Fixed
++++++
+- Keep newline/tab escapes in quoted strings
+  `#296 <https://github.com/joke2k/django-environ/pull/296>`_.
+- Handle escaped dollar sign in values
+  `#271 <https://github.com/joke2k/django-environ/issues/271>`_.
+- Fixed incorrect parsing of ``DATABASES_URL`` for Google Cloud MySQL
+  `#294 <https://github.com/joke2k/django-environ/issues/294>`_.
+
+
 `v0.7.0`_ - 11-September-2021
 ------------------------------
 Added
@@ -219,6 +246,7 @@ Added
 - Initial release.
 
 
+.. _v0.8.0: https://github.com/joke2k/django-environ/compare/v0.7.0...v0.8.0
 .. _v0.7.0: https://github.com/joke2k/django-environ/compare/v0.6.0...v0.7.0
 .. _v0.6.0: https://github.com/joke2k/django-environ/compare/v0.5.0...v0.6.0
 .. _v0.5.0: https://github.com/joke2k/django-environ/compare/v0.4.5...v0.5.0

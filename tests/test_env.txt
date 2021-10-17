@@ -1,5 +1,6 @@
 DICT_VAR=foo=bar,test=on
 DATABASE_MYSQL_URL=mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/heroku_97681?reconnect=true
+DATABASE_MYSQL_CLOUDSQL_URL=mysql://djuser:hidden-password@//cloudsql/arvore-codelab:us-central1:mysqlinstance/mydatabase
 DATABASE_MYSQL_GIS_URL=mysqlgis://user:password@127.0.0.1/some_database
 CACHE_URL=memcache://127.0.0.1:11211
 CACHE_REDIS=rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=secret
@@ -28,11 +29,15 @@ FLOAT_STRANGE_VAR1=123,420,333.3
 FLOAT_STRANGE_VAR2=123.420.333,3
 FLOAT_NEGATIVE_VAR=-1.0
 PROXIED_VAR=$STR_VAR
+ESCAPED_VAR=\$baz
 EMPTY_LIST=
+EMPTY_INT_VAR=
 INT_VAR=42
 STR_LIST_WITH_SPACES= foo,  bar
 STR_VAR=bar
 MULTILINE_STR_VAR=foo\nbar
+MULTILINE_QUOTED_STR_VAR="---BEGIN---\r\n---END---"
+MULTILINE_ESCAPED_STR_VAR=---BEGIN---\\n---END---
 INT_LIST=42,33
 CYRILLIC_VAR=фуубар
 INT_TUPLE=(42,33)

@@ -26,15 +26,21 @@ from urllib.parse import (
     urlunparse,
 )
 
-from .compat import DJANGO_POSTGRES, ImproperlyConfigured, json, REDIS_DRIVER
+from .compat import (
+    DJANGO_POSTGRES,
+    ImproperlyConfigured,
+    json,
+    PYMEMCACHE_DRIVER,
+    REDIS_DRIVER,
+)
 from .fileaware_mapping import FileAwareMapping
 
 try:
     from os import PathLike
+except ImportError:  # Python 3.5 support
+    from pathlib import PurePath as PathLike
 
-    Openable = (str, PathLike)
-except ImportError:
-    Openable = (str,)
+Openable = (str, PathLike)
 
 logger = logging.getLogger(__name__)
 
@@ -116,7 +122,8 @@ class Env:
         'filecache': 'django.core.cache.backends.filebased.FileBasedCache',
         'locmemcache': 'django.core.cache.backends.locmem.LocMemCache',
         'memcache': 'django.core.cache.backends.memcached.MemcachedCache',
-        'pymemcache': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'pymemcache': PYMEMCACHE_DRIVER,
+        'pylibmc': 'django.core.cache.backends.memcached.PyLibMCCache',
         'rediscache': REDIS_DRIVER,
         'redis': REDIS_DRIVER,
         'rediss': REDIS_DRIVER,
@@ -157,9 +164,11 @@ class Env:
         "xapian": "haystack.backends.xapian_backend.XapianEngine",
         "simple": "haystack.backends.simple_backend.SimpleEngine",
     }
+    CLOUDSQL = 'cloudsql'
 
     def __init__(self, **scheme):
         self.smart_cast = True
+        self.escape_proxy = False
         self.scheme = scheme
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
@@ -181,7 +190,7 @@ class Env:
         """
         value = self.get_value(var, cast=str, default=default)
         if multiline:
-            return value.replace('\\n', '\n')
+            return re.sub(r'(\\r)?\\n', r'\n', value)
         return value
 
     def unicode(self, var, default=NOTSET):
@@ -365,15 +374,21 @@ class Env:
 
         # Resolve any proxied values
         prefix = b'$' if isinstance(value, bytes) else '$'
+        escape = rb'\$' if isinstance(value, bytes) else r'\$'
         if hasattr(value, 'startswith') and value.startswith(prefix):
             value = value.lstrip(prefix)
             value = self.get_value(value, cast=cast, default=default)
+
+        if self.escape_proxy and hasattr(value, 'replace'):
+            value = value.replace(escape, prefix)
 
         # Smart casting
         if self.smart_cast:
             if cast is None and default is not None and \
                     not isinstance(default, NoValue):
                 cast = type(default)
+
+        value = None if default is None and value == '' else value
 
         if value != default or (parse_default and value):
             value = self.parse_value(value, cast)
@@ -495,7 +510,10 @@ class Env:
             'PORT': _cast_int(url.port) or '',
         })
 
-        if url.scheme in cls.POSTGRES_FAMILY and path.startswith('/'):
+        if (
+                url.scheme in cls.POSTGRES_FAMILY and path.startswith('/')
+                or cls.CLOUDSQL in path and path.startswith('/')
+        ):
             config['HOST'], config['NAME'] = path.rsplit('/', 1)
 
         if url.scheme == 'oracle' and path == '':
@@ -732,16 +750,29 @@ class Env:
         return config
 
     @classmethod
-    def read_env(cls, env_file=None, **overrides):
+    def read_env(cls, env_file=None, overwrite=False, **overrides):
         """Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack
         backtracking to find the dotenv in the same directory as the file that
         called read_env.
 
+        Existing environment variables take precedent and are NOT overwritten
+        by the file content. ``overwrite=True`` will force an overwrite of
+        existing environment variables.
+
         Refs:
         - https://wellfire.co/learn/easier-12-factor-django
         - https://gist.github.com/bennylope/2999704
+
+        :param env_file: The path to the `.env` file your application should
+            use. If a path is not provided, `read_env` will attempt to import
+            the Django settings module from the Django project root.
+        :param overwrite: ``overwrite=True`` will force an overwrite of
+            existing environment variables.
+        :param **overrides: Any additional keyword arguments provided directly
+            to read_env will be added to the environment. If the key matches an
+            existing environment variable, the value will be overridden.
         """
         if env_file is None:
             frame = sys._getframe()
@@ -757,7 +788,8 @@ class Env:
 
         try:
             if isinstance(env_file, Openable):
-                with open(env_file) as f:
+                # Python 3.5 support (wrap path with str).
+                with open(str(env_file)) as f:
                     content = f.read()
             else:
                 with env_file as f:
@@ -770,6 +802,13 @@ class Env:
 
         logger.debug('Read environment variables from: {}'.format(env_file))
 
+        def _keep_escaped_format_characters(match):
+            """Keep escaped newline/tabs in quoted strings"""
+            escaped_char = match.group(1)
+            if escaped_char in 'rnt':
+                return '\\' + escaped_char
+            return escaped_char
+
         for line in content.splitlines():
             m1 = re.match(r'\A(?:export )?([A-Za-z_0-9]+)=(.*)\Z', line)
             if m1:
@@ -779,12 +818,25 @@ class Env:
                     val = m2.group(1)
                 m3 = re.match(r'\A"(.*)"\Z', val)
                 if m3:
-                    val = re.sub(r'\\(.)', r'\1', m3.group(1))
-                cls.ENVIRON.setdefault(key, str(val))
+                    val = re.sub(r'\\(.)', _keep_escaped_format_characters,
+                                 m3.group(1))
+                overrides[key] = str(val)
+            else:
+                logger.warning('Invalid line: %s', line)
 
-        # set defaults
+        def set_environ(envval):
+            """Return lambda to set environ.
+
+             Use setdefault unless overwrite is specified.
+             """
+            if overwrite:
+                return lambda k, v: envval.update({k: str(v)})
+            return lambda k, v: envval.setdefault(k, str(v))
+
+        setenv = set_environ(cls.ENVIRON)
+
         for key, value in overrides.items():
-            cls.ENVIRON.setdefault(key, value)
+            setenv(key, value)
 
 
 class FileAwareEnv(Env):

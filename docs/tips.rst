@@ -128,15 +128,54 @@ You can use something like this to handle similar cases.
 Multiline value
 ===============
 
-You can set a multiline variable value:
+To get multiline value pass ``multiline=True`` to ```str()```.
+
+.. note::
+
+   You shouldn't escape newline/tab characters yourself if you want to preserve
+   the formatting.
+
+The following example demonstrates the above:
+
+**.env file**:
+
+.. code-block:: shell
+
+   # .env file contents
+   UNQUOTED_CERT=---BEGIN---\r\n---END---
+   QUOTED_CERT="---BEGIN---\r\n---END---"
+   ESCAPED_CERT=---BEGIN---\\n---END---
+
+**settings.py file**:
 
 .. code-block:: python
 
-   # MULTILINE_TEXT=Hello\\nWorld
-   >>> print env.str('MULTILINE_TEXT', multiline=True)
-   Hello
-   World
+   # settings.py file contents
+   import environ
 
+
+   env = environ.Env()
+
+   print(env.str('UNQUOTED_CERT', multiline=True))
+   # ---BEGIN---
+   # ---END---
+
+   print(env.str('UNQUOTED_CERT', multiline=False))
+   # ---BEGIN---\r\n---END---
+
+   print(env.str('QUOTED_CERT', multiline=True))
+   # ---BEGIN---
+   # ---END---
+
+   print(env.str('QUOTED_CERT', multiline=False))
+   # ---BEGIN---\r\n---END---
+
+   print(env.str('ESCAPED_CERT', multiline=True))
+   # ---BEGIN---\
+   # ---END---
+
+   print(env.str('ESCAPED_CERT', multiline=False))
+   # ---BEGIN---\\n---END---
 
 Proxy value
 ===========
@@ -156,10 +195,30 @@ Values that being with a ``$`` may be interpolated. Pass ``interpolate=True`` to
    FOO
 
 
+Escape Proxy
+============
+
+If you're having trouble with values starting with dollar sign ($) without the intention of proxying the value to
+another, You should enbale the ``escape_proxy`` and prepend a backslash to it.
+
+.. code-block:: python
+
+    import environ
+
+    env = environ.Env()
+    env.escape_proxy = True
+
+    # ESCAPED_VAR=\$baz
+    env.str('ESCAPED_VAR')  # $baz
+
+
+Reading env files
+=================
+
 .. _multiple-env-files-label:
 
 Multiple env files
-==================
+------------------
 
 There is an ability point to the .env file location using an environment
 variable. This feature may be convenient in a production systems with a
@@ -188,7 +247,7 @@ while ``./manage.py runserver`` uses ``.env``.
 
 
 Using Path objects when reading env
-===================================
+-----------------------------------
 
 It is possible to use of ``pathlib.Path`` objects when reading environment file from the filesystem:
 
@@ -210,3 +269,16 @@ It is possible to use of ``pathlib.Path`` objects when reading environment file 
    env.read_env(os.path.join(BASE_DIR, '.env'))
    env.read_env(pathlib.Path(str(BASE_DIR)).joinpath('.env'))
    env.read_env(pathlib.Path(str(BASE_DIR)) / '.env')
+
+
+Overwriting existing environment values from env files
+------------------------------------------------------
+
+If you want variables set within your env files to take higher precidence than
+an existing set environment variable, use the ``overwrite=True`` argument of
+``read_env``. For example:
+
+.. code-block:: python
+
+   env = environ.Env()
+   env.read_env(BASE_DIR('.env'), overwrite=True)

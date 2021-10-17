@@ -6,10 +6,13 @@
 # For the full copyright and license information, please view
 # the LICENSE.txt file that was distributed with this source code.
 
+from unittest import mock
+
 import pytest
 
+import environ.compat
 from environ import Env
-from environ.compat import REDIS_DRIVER, ImproperlyConfigured
+from environ.compat import PYMEMCACHE_DRIVER, REDIS_DRIVER, ImproperlyConfigured
 
 
 def test_base_options_parsing():
@@ -63,7 +66,7 @@ def test_base_options_parsing():
          'django.core.cache.backends.memcached.MemcachedCache',
          '127.0.0.1:11211'),
         ('pymemcache://127.0.0.1:11211',
-         'django.core.cache.backends.memcached.PyLibMCCache',
+         PYMEMCACHE_DRIVER,
          '127.0.0.1:11211'),
     ],
     ids=[
@@ -88,6 +91,21 @@ def test_cache_parsing(url, backend, location):
 
     assert url['BACKEND'] == backend
     assert url['LOCATION'] == location
+
+
+@pytest.mark.parametrize('django_version', ((3, 2), (3, 1), None))
+@pytest.mark.parametrize('pymemcache_installed', (True, False))
+def test_pymemcache_compat(django_version, pymemcache_installed):
+    old = 'django.core.cache.backends.memcached.PyLibMCCache'
+    new = 'django.core.cache.backends.memcached.PyMemcacheCache'
+    with mock.patch.object(environ.compat, 'DJANGO_VERSION', django_version):
+        with mock.patch('environ.compat.find_loader') as mock_find_loader:
+            mock_find_loader.return_value = pymemcache_installed
+            driver = environ.compat.choose_pymemcache_driver()
+            if django_version and django_version < (3, 2):
+                assert driver == old
+            else:
+                assert driver == new if pymemcache_installed else old
 
 
 def test_redis_parsing():
