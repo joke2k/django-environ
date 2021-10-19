@@ -68,6 +68,9 @@ def test_base_options_parsing():
         ('pymemcache://127.0.0.1:11211',
          PYMEMCACHE_DRIVER,
          '127.0.0.1:11211'),
+        ('pymemcache://memcached:11211/?key_prefix=ci',
+         PYMEMCACHE_DRIVER,
+         'memcached:11211'),
     ],
     ids=[
         'dbcache',
@@ -84,6 +87,7 @@ def test_base_options_parsing():
         'memcached_multiple',
         'memcached',
         'pylibmccache',
+        'pylibmccache_trailing_slash',
     ],
 )
 def test_cache_parsing(url, backend, location):
