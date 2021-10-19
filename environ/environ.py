@@ -584,7 +584,15 @@ class Env:
                 'LOCATION': url.netloc + url.path,
             })
 
-        if url.path and url.scheme in ['memcache', 'pymemcache']:
+        # urlparse('pymemcache://127.0.0.1:11211')
+        # => netloc='127.0.0.1:11211', path=''
+        #
+        # urlparse('pymemcache://127.0.0.1:11211')
+        # => netloc='memcached:11211', path='/'
+        #
+        # urlparse('memcache:///tmp/memcached.sock')
+        # => netloc='', path='/tmp/memcached.sock'
+        if not url.netloc and url.scheme in ['memcache', 'pymemcache']:
             config.update({
                 'LOCATION': 'unix:' + url.path,
             })
