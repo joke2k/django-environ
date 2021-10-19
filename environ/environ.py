@@ -587,7 +587,7 @@ class Env:
         # urlparse('pymemcache://127.0.0.1:11211')
         # => netloc='127.0.0.1:11211', path=''
         #
-        # urlparse('pymemcache://127.0.0.1:11211')
+        # urlparse('pymemcache://memcached:11211/?key_prefix=ci')
         # => netloc='memcached:11211', path='/'
         #
         # urlparse('memcache:///tmp/memcached.sock')
