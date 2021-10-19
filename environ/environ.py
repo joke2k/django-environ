@@ -821,6 +821,9 @@ class Env:
                     val = re.sub(r'\\(.)', _keep_escaped_format_characters,
                                  m3.group(1))
                 overrides[key] = str(val)
+            elif not line or line.startswith('#'):
+                # ignore warnings for empty line-breaks or comments
+                pass
             else:
                 logger.warning('Invalid line: %s', line)
 

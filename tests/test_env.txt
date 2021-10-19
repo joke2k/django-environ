@@ -1,10 +1,18 @@
 DICT_VAR=foo=bar,test=on
+
+# Database variables
 DATABASE_MYSQL_URL=mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/heroku_97681?reconnect=true
 DATABASE_MYSQL_CLOUDSQL_URL=mysql://djuser:hidden-password@//cloudsql/arvore-codelab:us-central1:mysqlinstance/mydatabase
 DATABASE_MYSQL_GIS_URL=mysqlgis://user:password@127.0.0.1/some_database
+
+# Cache variables
 CACHE_URL=memcache://127.0.0.1:11211
 CACHE_REDIS=rediscache://127.0.0.1:6379/1?client_class=django_redis.client.DefaultClient&password=secret
+
+# Email variables
 EMAIL_URL=smtps://user@domain.com:password@smtp.example.com:587
+
+# Others
 URL_VAR=http://www.google.com/
 PATH_VAR=/home/dev
 BOOL_TRUE_STRING_LIKE_INT='1'
@@ -45,4 +53,6 @@ DATABASE_ORACLE_TNS_URL=oracle://user:password@sid
 DATABASE_ORACLE_URL=oracle://user:password@host:1521/sid
 DATABASE_REDSHIFT_URL=redshift://user:password@examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev
 DATABASE_CUSTOM_BACKEND_URL=custom.backend://user:password@example.com:5430/database
+
+# Exports
 export EXPORTED_VAR="exported var"
