@@ -11,6 +11,8 @@ Fixed
 +++++
 - Fixed "Invalid line" spam logs on blank lines in env file
   `#340 <https://github.com/joke2k/django-environ/issues/340>`_.
+- Fixed ``memcache``/``pymemcache`` URL parsing for correct identification of
+  connection type `#337 <https://github.com/joke2k/django-environ/issues/337>`_.
 
 
 `v0.8.0`_ - 17-October-2021
