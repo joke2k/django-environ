@@ -262,6 +262,7 @@ Added
 - Initial release.
 
 
+.. _v0.9.0: https://github.com/joke2k/django-environ/compare/v0.8.1...develop
 .. _v0.8.1: https://github.com/joke2k/django-environ/compare/v0.8.0...v0.8.1
 .. _v0.8.0: https://github.com/joke2k/django-environ/compare/v0.7.0...v0.8.0
 .. _v0.7.0: https://github.com/joke2k/django-environ/compare/v0.6.0...v0.7.0
