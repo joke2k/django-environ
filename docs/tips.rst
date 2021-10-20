@@ -125,6 +125,48 @@ You can use something like this to handle similar cases.
    ADMINS = tuple(parseaddr(email) for email in env.list('DJANGO_ADMINS'))
 
 
+Complex format for dicts
+========================
+
+Sometimes we need to get a bit more complex dict type than usual. For example,
+consider Djangosaml2's ``SAML_ATTRIBUTE_MAPPING``:
+
+.. code-block:: python
+
+   SAML_ATTRIBUTE_MAPPING = {
+       'uid': ('username', ),
+       'mail': ('email', ),
+       'cn': ('first_name', ),
+       'sn': ('last_name', ),
+   }
+
+A dict of this format can be obtained as shown below:
+
+**.env file**:
+
+.. code-block:: shell
+
+   # .env file contents
+   SAML_ATTRIBUTE_MAPPING="uid=username;mail=email;cn=first_name;sn=last_name;"
+
+**settings.py file**:
+
+.. code-block:: python
+
+   # settings.py file contents
+   import environ
+
+
+   env = environ.Env()
+
+   # {'uid': ('username',), 'mail': ('email',), 'cn': ('first_name',), 'sn': ('last_name',)}
+   SAML_ATTRIBUTE_MAPPING = env.dict(
+       'SAML_ATTRIBUTE_MAPPING',
+       cast={"value": tuple},
+       default={}
+   )
+
+
 Multiline value
 ===============
 

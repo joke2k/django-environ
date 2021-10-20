@@ -27,6 +27,12 @@ class FakeEnv:
     DICT = dict(foo='bar', test='on')
     PATH = '/home/dev'
     EXPORTED = 'exported var'
+    SAML_ATTRIBUTE_MAPPING = dict(
+        uid=('username', ),
+        mail=('email', ),
+        cn=('first_name', ),
+        sn=('last_name', )
+    )
 
     @classmethod
     def generate_data(cls):
@@ -75,4 +81,5 @@ class FakeEnv:
                     URL_VAR=cls.URL,
                     JSON_VAR=json.dumps(cls.JSON),
                     PATH_VAR=cls.PATH,
-                    EXPORTED_VAR=cls.EXPORTED)
+                    EXPORTED_VAR=cls.EXPORTED,
+                    SAML_ATTRIBUTE_MAPPING='uid=username;mail=email;cn=first_name;sn=last_name;')
