@@ -43,6 +43,12 @@ def test_solr_multicore_parsing(solr_url):
          'elasticsearch5_backend.Elasticsearch5SearchEngine'),
         ('elasticsearch7://127.0.0.1:9200/index',
          'elasticsearch7_backend.Elasticsearch7SearchEngine'),
+    ],
+    ids=[
+        'elasticsearch',
+        'elasticsearch2',
+        'elasticsearch5',
+        'elasticsearch7',
     ]
 )
 def test_elasticsearch_parsing(url, engine):
