@@ -23,10 +23,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2.3.5
 
-      - name: Set up Python 3.9
+      - name: Set up Python 3.10
         uses: actions/setup-python@v2.2.2
         with:
-          python-version: '3.9'
+          python-version: '3.10'
 
       - name: Install dependencies
         run: |
