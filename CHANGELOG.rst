@@ -5,8 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-`v0.8.1`_ - 20-October-2021
+`v0.9.0`_ - 00-Unreleased-2021
+------------------------------
 
+- WIP
+
+
+`v0.8.1`_ - 20-October-2021
+---------------------------
 Fixed
 +++++
 - Fixed "Invalid line" spam logs on blank lines in env file
@@ -16,7 +22,7 @@ Fixed
 
 
 `v0.8.0`_ - 17-October-2021
-------------------------------
+---------------------------
 Added
 +++++
 - Log invalid lines when parse .env file
