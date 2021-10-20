@@ -6,13 +6,18 @@
 # For the full copyright and license information, please view
 # the LICENSE.txt file that was distributed with this source code.
 
+# Read the Docs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+
 ---
 version: 2
-python:
-  # Keep version in sync with tox.ini (testenv:docs) and
-  # docs.yml (GitHub Action Workflow).
-  version: '3.8'
 
+build:
+  os: ubuntu-20.04
+  tools:
+    python: '3.10'
+
+python:
   install:
     - method: pip
       path: .
