@@ -26,7 +26,7 @@ class TestEnv:
         class.  setup_method is invoked for every test method of a class.
         """
         self.old_environ = os.environ
-        os.environ = Env.ENVIRON = FakeEnv.generateData()
+        os.environ = Env.ENVIRON = FakeEnv.generate_data()
         self.env = Env()
 
     def teardown_method(self, method):
@@ -57,6 +57,10 @@ class TestEnv:
             ('STR_VAR', 'bar', False),
             ('MULTILINE_STR_VAR', 'foo\\nbar', False),
             ('MULTILINE_STR_VAR', 'foo\nbar', True),
+            ('MULTILINE_QUOTED_STR_VAR', '---BEGIN---\\r\\n---END---', False),
+            ('MULTILINE_QUOTED_STR_VAR', '---BEGIN---\n---END---', True),
+            ('MULTILINE_ESCAPED_STR_VAR', '---BEGIN---\\\\n---END---', False),
+            ('MULTILINE_ESCAPED_STR_VAR', '---BEGIN---\\\n---END---', True),
         ],
     )
     def test_str(self, var, val, multiline):
@@ -65,8 +69,16 @@ class TestEnv:
             assert self.env(var) == val
         assert self.env.str(var, multiline=multiline) == val
 
-    def test_bytes(self):
-        assert_type_and_value(bytes, b'bar', self.env.bytes('STR_VAR'))
+    @pytest.mark.parametrize(
+        'var,val,default',
+        [
+            ('STR_VAR', b'bar', Env.NOTSET),
+            ('NON_EXISTENT_BYTES_VAR', b'some-default', b'some-default'),
+            ('NON_EXISTENT_STR_VAR', b'some-default', 'some-default'),
+        ]
+    )
+    def test_bytes(self, var, val, default):
+        assert_type_and_value(bytes, val, self.env.bytes(var, default=default))
 
     def test_int(self):
         assert_type_and_value(int, 42, self.env('INT_VAR', cast=int))
@@ -74,27 +86,54 @@ class TestEnv:
 
     def test_int_with_none_default(self):
         assert self.env('NOT_PRESENT_VAR', cast=int, default=None) is None
+        assert self.env('EMPTY_INT_VAR', cast=int, default=None) is None
 
-    def test_float(self):
-        assert_type_and_value(float, 33.3, self.env('FLOAT_VAR', cast=float))
-        assert_type_and_value(float, 33.3, self.env.float('FLOAT_VAR'))
+    @pytest.mark.parametrize(
+        'value,variable',
+        [
+            (33.3, 'FLOAT_VAR'),
+            (33.3, 'FLOAT_COMMA_VAR'),
+            (123420333.3, 'FLOAT_STRANGE_VAR1'),
+            (123420333.3, 'FLOAT_STRANGE_VAR2'),
+            (-1.0, 'FLOAT_NEGATIVE_VAR'),
+        ]
+    )
+    def test_float(self, value, variable):
+        assert_type_and_value(float, value, self.env.float(variable))
+        assert_type_and_value(float, value, self.env(variable, cast=float))
 
-        assert_type_and_value(float, 33.3, self.env('FLOAT_COMMA_VAR', cast=float))
-        assert_type_and_value(float, 123420333.3, self.env('FLOAT_STRANGE_VAR1', cast=float))
-        assert_type_and_value(float, 123420333.3, self.env('FLOAT_STRANGE_VAR2', cast=float))
-
-    def test_bool_true(self):
-        assert_type_and_value(bool, True, self.env('BOOL_TRUE_VAR', cast=bool))
-        assert_type_and_value(bool, True, self.env('BOOL_TRUE_VAR2', cast=bool))
-        assert_type_and_value(bool, True, self.env.bool('BOOL_TRUE_VAR'))
-
-    def test_bool_false(self):
-        assert_type_and_value(bool, False, self.env('BOOL_FALSE_VAR', cast=bool))
-        assert_type_and_value(bool, False, self.env('BOOL_FALSE_VAR2', cast=bool))
-        assert_type_and_value(bool, False, self.env.bool('BOOL_FALSE_VAR'))
+    @pytest.mark.parametrize(
+        'value,variable',
+        [
+            (True, 'BOOL_TRUE_STRING_LIKE_INT'),
+            (True, 'BOOL_TRUE_STRING_LIKE_BOOL'),
+            (True, 'BOOL_TRUE_INT'),
+            (True, 'BOOL_TRUE_BOOL'),
+            (True, 'BOOL_TRUE_STRING_1'),
+            (True, 'BOOL_TRUE_STRING_2'),
+            (True, 'BOOL_TRUE_STRING_3'),
+            (True, 'BOOL_TRUE_STRING_4'),
+            (True, 'BOOL_TRUE_STRING_5'),
+            (False, 'BOOL_FALSE_STRING_LIKE_INT'),
+            (False, 'BOOL_FALSE_INT'),
+            (False, 'BOOL_FALSE_STRING_LIKE_BOOL'),
+            (False, 'BOOL_FALSE_BOOL'),
+        ]
+    )
+    def test_bool_true(self, value, variable):
+        assert_type_and_value(bool, value, self.env.bool(variable))
+        assert_type_and_value(bool, value, self.env(variable, cast=bool))
 
     def test_proxied_value(self):
         assert self.env('PROXIED_VAR') == 'bar'
+
+    def test_escaped_dollar_sign(self):
+        self.env.escape_proxy = True
+        assert self.env('ESCAPED_VAR') == '$baz'
+
+    def test_escaped_dollar_sign_disabled(self):
+        self.env.escape_proxy = False
+        assert self.env('ESCAPED_VAR') == r'\$baz'
 
     def test_int_list(self):
         assert_type_and_value(list, [42, 33], self.env('INT_LIST', cast=[int]))
@@ -122,6 +161,7 @@ class TestEnv:
         [
             ('a=1', dict, {'a': '1'}),
             ('a=1', dict(value=int), {'a': 1}),
+            ('a=1', dict(value=float), {'a': 1.0}),
             ('a=1,2,3', dict(value=[str]), {'a': ['1', '2', '3']}),
             ('a=1,2,3', dict(value=[int]), {'a': [1, 2, 3]}),
             ('a=1;b=1.1,2.2;c=3', dict(value=int, cast=dict(b=[float])),
@@ -133,6 +173,7 @@ class TestEnv:
         ids=[
             'dict',
             'dict_int',
+            'dict_float',
             'dict_str_list',
             'dict_int_list',
             'dict_int_cast',
@@ -177,6 +218,8 @@ class TestEnv:
              '/full/path/to/your/database/file.sqlite', '', '', '', ''),
             ('DATABASE_CUSTOM_BACKEND_URL', 'custom.backend', 'database',
              'example.com', 'user', 'password', 5430),
+            ('DATABASE_MYSQL_CLOUDSQL_URL', 'django.db.backends.mysql', 'mydatabase',
+             '/cloudsql/arvore-codelab:us-central1:mysqlinstance', 'djuser', 'hidden-password', ''),
         ],
         ids=[
             'postgres',
@@ -187,6 +230,7 @@ class TestEnv:
             'redshift',
             'sqlite',
             'custom',
+            'cloudsql',
         ],
     )
     def test_db_url_value(self, var, engine, name, host, user, passwd, port):
@@ -250,8 +294,10 @@ class TestEnv:
 
     def test_smart_cast(self):
         assert self.env.get_value('STR_VAR', default='string') == 'bar'
-        assert self.env.get_value('BOOL_TRUE_VAR', default=True)
-        assert self.env.get_value('BOOL_FALSE_VAR', default=True) is False
+        assert self.env.get_value('BOOL_TRUE_STRING_LIKE_INT', default=True)
+        assert not self.env.get_value(
+            'BOOL_FALSE_STRING_LIKE_INT',
+            default=True)
         assert self.env.get_value('INT_VAR', default=1) == 42
         assert self.env.get_value('FLOAT_VAR', default=1.2) == 33.3
 
@@ -275,33 +321,42 @@ class TestFileEnv(TestEnv):
             PATH_VAR=Path(__file__, is_file=True).__root__
         )
 
-    def test_read_env_path_like(self):
+    def create_temp_env_file(self, name):
         import pathlib
         import tempfile
 
-        path_like = (pathlib.Path(tempfile.gettempdir()) / 'test_pathlib.env')
+        env_file_path = (pathlib.Path(tempfile.gettempdir()) / name)
         try:
-            path_like.unlink()
+            env_file_path.unlink()
         except FileNotFoundError:
             pass
 
-        assert not path_like.exists()
+        assert not env_file_path.exists()
+        return env_file_path
+
+    def test_read_env_path_like(self):
+        env_file_path = self.create_temp_env_file('test_pathlib.env')
 
         env_key = 'SECRET'
         env_val = 'enigma'
         env_str = env_key + '=' + env_val
 
         # open() doesn't take path-like on Python < 3.6
-        try:
-            with open(path_like, 'w', encoding='utf-8') as f:
-                f.write(env_str + '\n')
-        except TypeError:
-            return
+        with open(str(env_file_path), 'w', encoding='utf-8') as f:
+            f.write(env_str + '\n')
 
-        assert path_like.exists()
-        self.env.read_env(path_like)
+        self.env.read_env(env_file_path)
         assert env_key in self.env.ENVIRON
         assert self.env.ENVIRON[env_key] == env_val
+
+    @pytest.mark.parametrize("overwrite", [True, False])
+    def test_existing_overwrite(self, overwrite):
+        env_file_path = self.create_temp_env_file('test_existing.env')
+        with open(str(env_file_path), 'w') as f:
+            f.write("EXISTING=b")
+        self.env.ENVIRON['EXISTING'] = "a"
+        self.env.read_env(env_file_path, overwrite=overwrite)
+        assert self.env.ENVIRON["EXISTING"] == ("b" if overwrite else "a")
 
 
 class TestSubClass(TestEnv):
@@ -314,7 +369,7 @@ class TestSubClass(TestEnv):
         """
         super().setup_method(method)
 
-        self.CONFIG = FakeEnv.generateData()
+        self.CONFIG = FakeEnv.generate_data()
 
         class MyEnv(Env):
             ENVIRON = self.CONFIG

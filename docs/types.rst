@@ -34,13 +34,18 @@ Supported types
   * Dummy: ``dummycache://``
   * File: ``filecache://``
   * Memory: ``locmemcache://``
-  * Memcached: ``memcache://``
-  * Python memory: ``pymemcache://``
+  * Memcached:
+    * ``memcache://`` (uses ``python-memcached`` backend, deprecated in Django 3.2)
+    * ``pymemcache://`` (uses ``pymemcache`` backend if Django >=3.2 and package is installed, otherwise will use ``pylibmc`` backend to keep config backwards compatibility)
+    * ``pylibmc://``
   * Redis: ``rediscache://``, ``redis://``, or ``rediss://``
 
 * ``search_url``
 
   * Elasticsearch: ``elasticsearch://``
+  * Elasticsearch2: ``elasticsearch2://``
+  * Elasticsearch5: ``elasticsearch5://``
+  * Elasticsearch7: ``elasticsearch7://``
   * Solr: ``solr://``
   * Whoosh: ``whoosh://``
   * Xapian: ``xapian://``

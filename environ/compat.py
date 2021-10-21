@@ -8,15 +8,15 @@
 
 """This module handles import compatibility issues."""
 
-import pkgutil
+from pkgutil import find_loader
 
 
-if pkgutil.find_loader('simplejson'):
+if find_loader('simplejson'):
     import simplejson as json
 else:
     import json
 
-if pkgutil.find_loader('django'):
+if find_loader('django'):
     from django import VERSION as DJANGO_VERSION
     from django.core.exceptions import ImproperlyConfigured
 else:
@@ -33,7 +33,20 @@ else:
     DJANGO_POSTGRES = 'django.db.backends.postgresql'
 
 # back compatibility with redis_cache package
-if pkgutil.find_loader('redis_cache'):
+if find_loader('redis_cache'):
     REDIS_DRIVER = 'redis_cache.RedisCache'
 else:
     REDIS_DRIVER = 'django_redis.cache.RedisCache'
+
+
+# back compatibility for pymemcache
+def choose_pymemcache_driver():
+    old_django = DJANGO_VERSION is not None and DJANGO_VERSION < (3, 2)
+    if old_django or not find_loader('pymemcache'):
+        # The original backend choice for the 'pymemcache' scheme is
+        # unfortunately 'pylibmc'.
+        return 'django.core.cache.backends.memcached.PyLibMCCache'
+    return 'django.core.cache.backends.memcached.PyMemcacheCache'
+
+
+PYMEMCACHE_DRIVER = choose_pymemcache_driver()

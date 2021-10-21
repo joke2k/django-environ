@@ -26,14 +26,21 @@ from urllib.parse import (
     urlunparse,
 )
 
-from .compat import DJANGO_POSTGRES, ImproperlyConfigured, json, REDIS_DRIVER
+from .compat import (
+    DJANGO_POSTGRES,
+    ImproperlyConfigured,
+    json,
+    PYMEMCACHE_DRIVER,
+    REDIS_DRIVER,
+)
+from .fileaware_mapping import FileAwareMapping
 
 try:
     from os import PathLike
-    Openable = (str, PathLike)
-except ImportError:
-    Openable = (str,)
+except ImportError:  # Python 3.5 support
+    from pathlib import PurePath as PathLike
 
+Openable = (str, PathLike)
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +51,7 @@ def _cast(value):
     # https://docs.python.org/3/library/ast.html#ast.literal_eval
     try:
         return ast.literal_eval(value)
-    except ValueError:
+    except (ValueError, SyntaxError):
         return value
 
 
@@ -64,7 +71,6 @@ class NoValue:
 
 
 class Env:
-
     """Provide scheme-based lookups of environment variables so that each
     caller doesn't have to pass in `cast` and `default` parameters.
 
@@ -79,9 +85,11 @@ class Env:
     NOTSET = NoValue()
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = ParseResult
-    DEFAULT_DATABASE_ENV = 'DATABASE_URL'
 
     POSTGRES_FAMILY = ['postgres', 'postgresql', 'psql', 'pgsql', 'postgis']
+    ELASTICSEARCH_FAMILY = ['elasticsearch' + x for x in ['', '2', '5', '7']]
+
+    DEFAULT_DATABASE_ENV = 'DATABASE_URL'
     DB_SCHEMES = {
         'postgres': DJANGO_POSTGRES,
         'postgresql': DJANGO_POSTGRES,
@@ -114,7 +122,8 @@ class Env:
         'filecache': 'django.core.cache.backends.filebased.FileBasedCache',
         'locmemcache': 'django.core.cache.backends.locmem.LocMemCache',
         'memcache': 'django.core.cache.backends.memcached.MemcachedCache',
-        'pymemcache': 'django.core.cache.backends.memcached.PyLibMCCache',
+        'pymemcache': PYMEMCACHE_DRIVER,
+        'pylibmc': 'django.core.cache.backends.memcached.PyLibMCCache',
         'rediscache': REDIS_DRIVER,
         'redis': REDIS_DRIVER,
         'rediss': REDIS_DRIVER,
@@ -146,14 +155,20 @@ class Env:
                          "ElasticsearchSearchEngine",
         "elasticsearch2": "haystack.backends.elasticsearch2_backend."
                           "Elasticsearch2SearchEngine",
+        "elasticsearch5": "haystack.backends.elasticsearch5_backend."
+                          "Elasticsearch5SearchEngine",
+        "elasticsearch7": "haystack.backends.elasticsearch7_backend."
+                          "Elasticsearch7SearchEngine",
         "solr": "haystack.backends.solr_backend.SolrEngine",
         "whoosh": "haystack.backends.whoosh_backend.WhooshEngine",
         "xapian": "haystack.backends.xapian_backend.XapianEngine",
         "simple": "haystack.backends.simple_backend.SimpleEngine",
     }
+    CLOUDSQL = 'cloudsql'
 
     def __init__(self, **scheme):
         self.smart_cast = True
+        self.escape_proxy = False
         self.scheme = scheme
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
@@ -175,7 +190,7 @@ class Env:
         """
         value = self.get_value(var, cast=str, default=default)
         if multiline:
-            return value.replace('\\n', '\n')
+            return re.sub(r'(\\r)?\\n', r'\n', value)
         return value
 
     def unicode(self, var, default=NOTSET):
@@ -188,7 +203,10 @@ class Env:
         """
         :rtype: bytes
         """
-        return self.get_value(var, cast=str).encode(encoding)
+        value = self.get_value(var, cast=str, default=default)
+        if hasattr(value, 'encode'):
+            return value.encode(encoding)
+        return value
 
     def bool(self, var, default=NOTSET):
         """
@@ -262,6 +280,7 @@ class Env:
             self.get_value(var, default=default),
             engine=engine
         )
+
     db = db_url
 
     def cache_url(self, var=DEFAULT_CACHE_ENV, default=NOTSET, backend=None):
@@ -275,6 +294,7 @@ class Env:
             self.url(var, default=default),
             backend=backend
         )
+
     cache = cache_url
 
     def email_url(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
@@ -288,6 +308,7 @@ class Env:
             self.url(var, default=default),
             backend=backend
         )
+
     email = email_url
 
     def search_url(self, var=DEFAULT_SEARCH_ENV, default=NOTSET, engine=None):
@@ -352,15 +373,22 @@ class Env:
             value = default
 
         # Resolve any proxied values
-        if hasattr(value, 'startswith') and value.startswith('$'):
-            value = value.lstrip('$')
+        prefix = b'$' if isinstance(value, bytes) else '$'
+        escape = rb'\$' if isinstance(value, bytes) else r'\$'
+        if hasattr(value, 'startswith') and value.startswith(prefix):
+            value = value.lstrip(prefix)
             value = self.get_value(value, cast=cast, default=default)
+
+        if self.escape_proxy and hasattr(value, 'replace'):
+            value = value.replace(escape, prefix)
 
         # Smart casting
         if self.smart_cast:
             if cast is None and default is not None and \
                     not isinstance(default, NoValue):
                 cast = type(default)
+
+        value = None if default is None and value == '' else value
 
         if value != default or (parse_default and value):
             value = self.parse_value(value, cast)
@@ -413,10 +441,10 @@ class Env:
             value = tuple([x for x in val if x])
         elif cast is float:
             # clean string
-            float_str = re.sub(r'[^\d,\.]', '', value)
+            float_str = re.sub(r'[^\d,.-]', '', value)
             # split for avoid thousand separator and different
             # locale comma/dot symbol
-            parts = re.split(r'[,\.]', float_str)
+            parts = re.split(r'[,.]', float_str)
             if len(parts) == 1:
                 float_str = parts[0]
             else:
@@ -486,7 +514,10 @@ class Env:
             'PORT': _cast_int(url.port) or '',
         })
 
-        if url.scheme in cls.POSTGRES_FAMILY and path.startswith('/'):
+        if (
+                url.scheme in cls.POSTGRES_FAMILY and path.startswith('/')
+                or cls.CLOUDSQL in path and path.startswith('/')
+        ):
             config['HOST'], config['NAME'] = path.rsplit('/', 1)
 
         if url.scheme == 'oracle' and path == '':
@@ -496,7 +527,7 @@ class Env:
         if url.scheme == 'oracle':
             # Django oracle/base.py strips port and fails on non-string value
             if not config['PORT']:
-                del(config['PORT'])
+                del (config['PORT'])
             else:
                 config['PORT'] = str(config['PORT'])
 
@@ -557,7 +588,15 @@ class Env:
                 'LOCATION': url.netloc + url.path,
             })
 
-        if url.path and url.scheme in ['memcache', 'pymemcache']:
+        # urlparse('pymemcache://127.0.0.1:11211')
+        # => netloc='127.0.0.1:11211', path=''
+        #
+        # urlparse('pymemcache://memcached:11211/?key_prefix=ci')
+        # => netloc='memcached:11211', path='/'
+        #
+        # urlparse('memcache:///tmp/memcached.sock')
+        # => netloc='', path='/tmp/memcached.sock'
+        if not url.netloc and url.scheme in ['memcache', 'pymemcache']:
             config.update({
                 'LOCATION': 'unix:' + url.path,
             })
@@ -658,7 +697,7 @@ class Env:
         config["ENGINE"] = cls.SEARCH_SCHEMES[url.scheme]
 
         # check commons params
-        params = {}
+        params = {}  # type: dict
         if url.query:
             params = parse_qs(url.query)
             if 'EXCLUDED_INDEXES' in params.keys():
@@ -677,7 +716,7 @@ class Env:
 
         if url.scheme == 'simple':
             return config
-        elif url.scheme in ['solr', 'elasticsearch', 'elasticsearch2']:
+        elif url.scheme in ['solr'] + cls.ELASTICSEARCH_FAMILY:
             if 'KWARGS' in params.keys():
                 config['KWARGS'] = params['KWARGS'][0]
 
@@ -693,8 +732,7 @@ class Env:
                 config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
             return config
 
-        if url.scheme in ['elasticsearch', 'elasticsearch2']:
-
+        if url.scheme in cls.ELASTICSEARCH_FAMILY:
             split = path.rsplit("/", 1)
 
             if len(split) > 1:
@@ -732,16 +770,29 @@ class Env:
         return config
 
     @classmethod
-    def read_env(cls, env_file=None, **overrides):
+    def read_env(cls, env_file=None, overwrite=False, **overrides):
         """Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack
         backtracking to find the dotenv in the same directory as the file that
         called read_env.
 
+        Existing environment variables take precedent and are NOT overwritten
+        by the file content. ``overwrite=True`` will force an overwrite of
+        existing environment variables.
+
         Refs:
-        - http://www.wellfireinteractive.com/blog/easier-12-factor-django/
+        - https://wellfire.co/learn/easier-12-factor-django
         - https://gist.github.com/bennylope/2999704
+
+        :param env_file: The path to the `.env` file your application should
+            use. If a path is not provided, `read_env` will attempt to import
+            the Django settings module from the Django project root.
+        :param overwrite: ``overwrite=True`` will force an overwrite of
+            existing environment variables.
+        :param **overrides: Any additional keyword arguments provided directly
+            to read_env will be added to the environment. If the key matches an
+            existing environment variable, the value will be overridden.
         """
         if env_file is None:
             frame = sys._getframe()
@@ -750,25 +801,33 @@ class Env:
                 '.env'
             )
             if not os.path.exists(env_file):
-                warnings.warn(
+                logger.info(
                     "%s doesn't exist - if you're not configuring your "
                     "environment separately, create one." % env_file)
                 return
 
         try:
             if isinstance(env_file, Openable):
-                with open(env_file) as f:
+                # Python 3.5 support (wrap path with str).
+                with open(str(env_file)) as f:
                     content = f.read()
             else:
                 with env_file as f:
                     content = f.read()
         except OSError:
-            warnings.warn(
-                "Error reading %s - if you're not configuring your "
+            logger.info(
+                "%s not found - if you're not configuring your "
                 "environment separately, check this." % env_file)
             return
 
         logger.debug('Read environment variables from: {}'.format(env_file))
+
+        def _keep_escaped_format_characters(match):
+            """Keep escaped newline/tabs in quoted strings"""
+            escaped_char = match.group(1)
+            if escaped_char in 'rnt':
+                return '\\' + escaped_char
+            return escaped_char
 
         for line in content.splitlines():
             m1 = re.match(r'\A(?:export )?([A-Za-z_0-9]+)=(.*)\Z', line)
@@ -779,16 +838,49 @@ class Env:
                     val = m2.group(1)
                 m3 = re.match(r'\A"(.*)"\Z', val)
                 if m3:
-                    val = re.sub(r'\\(.)', r'\1', m3.group(1))
-                cls.ENVIRON.setdefault(key, str(val))
+                    val = re.sub(r'\\(.)', _keep_escaped_format_characters,
+                                 m3.group(1))
+                overrides[key] = str(val)
+            elif not line or line.startswith('#'):
+                # ignore warnings for empty line-breaks or comments
+                pass
+            else:
+                logger.warning('Invalid line: %s', line)
 
-        # set defaults
+        def set_environ(envval):
+            """Return lambda to set environ.
+
+             Use setdefault unless overwrite is specified.
+             """
+            if overwrite:
+                return lambda k, v: envval.update({k: str(v)})
+            return lambda k, v: envval.setdefault(k, str(v))
+
+        setenv = set_environ(cls.ENVIRON)
+
         for key, value in overrides.items():
-            cls.ENVIRON.setdefault(key, value)
+            setenv(key, value)
+
+
+class FileAwareEnv(Env):
+    """
+    First look for environment variables with ``_FILE`` appended. If found,
+    their contents will be read from the file system and used instead.
+
+    Use as a drop-in replacement for the standard ``environ.Env``:
+
+    .. code-block:: python
+
+        python env = environ.FileAwareEnv()
+
+    For example, if a ``SECRET_KEY_FILE`` environment variable was set,
+    ``env("SECRET_KEY")`` would find the related variable, returning the file
+    contents rather than ever looking up a ``SECRET_KEY`` environment variable.
+    """
+    ENVIRON = FileAwareMapping()
 
 
 class Path:
-
     """Inspired to Django Two-scoops, handling File Paths in Settings."""
 
     def path(self, *paths, **kwargs):

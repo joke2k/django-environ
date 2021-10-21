@@ -6,10 +6,13 @@
 # For the full copyright and license information, please view
 # the LICENSE.txt file that was distributed with this source code.
 
+from unittest import mock
+
 import pytest
 
+import environ.compat
 from environ import Env
-from environ.compat import REDIS_DRIVER, ImproperlyConfigured
+from environ.compat import PYMEMCACHE_DRIVER, REDIS_DRIVER, ImproperlyConfigured
 
 
 def test_base_options_parsing():
@@ -63,8 +66,11 @@ def test_base_options_parsing():
          'django.core.cache.backends.memcached.MemcachedCache',
          '127.0.0.1:11211'),
         ('pymemcache://127.0.0.1:11211',
-         'django.core.cache.backends.memcached.PyLibMCCache',
+         PYMEMCACHE_DRIVER,
          '127.0.0.1:11211'),
+        ('pymemcache://memcached:11211/?key_prefix=ci',
+         PYMEMCACHE_DRIVER,
+         'memcached:11211'),
     ],
     ids=[
         'dbcache',
@@ -81,6 +87,7 @@ def test_base_options_parsing():
         'memcached_multiple',
         'memcached',
         'pylibmccache',
+        'pylibmccache_trailing_slash',
     ],
 )
 def test_cache_parsing(url, backend, location):
@@ -88,6 +95,21 @@ def test_cache_parsing(url, backend, location):
 
     assert url['BACKEND'] == backend
     assert url['LOCATION'] == location
+
+
+@pytest.mark.parametrize('django_version', ((3, 2), (3, 1), None))
+@pytest.mark.parametrize('pymemcache_installed', (True, False))
+def test_pymemcache_compat(django_version, pymemcache_installed):
+    old = 'django.core.cache.backends.memcached.PyLibMCCache'
+    new = 'django.core.cache.backends.memcached.PyMemcacheCache'
+    with mock.patch.object(environ.compat, 'DJANGO_VERSION', django_version):
+        with mock.patch('environ.compat.find_loader') as mock_find_loader:
+            mock_find_loader.return_value = pymemcache_installed
+            driver = environ.compat.choose_pymemcache_driver()
+            if django_version and django_version < (3, 2):
+                assert driver == old
+            else:
+                assert driver == new if pymemcache_installed else old
 
 
 def test_redis_parsing():
@@ -149,3 +171,88 @@ def test_unknown_backend():
 def test_empty_url_is_mapped_to_empty_config():
     assert Env.cache_url_config('') == {}
     assert Env.cache_url_config(None) == {}
+
+
+@pytest.mark.parametrize(
+    'chars',
+    ['!', '$', '&', "'", '(', ')', '*', '+', ';', '=', '-', '.', '-v1.2']
+)
+def test_cache_url_password_using_sub_delims(monkeypatch, chars):
+    """Ensure CACHE_URL passwords may contains some unsafe characters.
+
+    See: https://github.com/joke2k/django-environ/issues/200 for details."""
+    url = 'rediss://enigma:secret{}@ondigitalocean.com:25061/2'.format(chars)
+    monkeypatch.setenv('CACHE_URL', url)
+    env = Env()
+
+    result = env.cache()
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    result = env.cache_url_config(url)
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    url = 'rediss://enigma:sec{}ret@ondigitalocean.com:25061/2'.format(chars)
+    monkeypatch.setenv('CACHE_URL', url)
+    env = Env()
+
+    result = env.cache()
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    result = env.cache_url_config(url)
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    url = 'rediss://enigma:{}secret@ondigitalocean.com:25061/2'.format(chars)
+    monkeypatch.setenv('CACHE_URL', url)
+    env = Env()
+
+    result = env.cache()
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    result = env.cache_url_config(url)
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+
+@pytest.mark.parametrize(
+    'chars', ['%3A', '%2F', '%3F', '%23', '%5B', '%5D', '%40', '%2C']
+)
+def test_cache_url_password_using_gen_delims(monkeypatch, chars):
+    """Ensure CACHE_URL passwords may contains %-encoded characters.
+
+    See: https://github.com/joke2k/django-environ/issues/200 for details."""
+    url = 'rediss://enigma:secret{}@ondigitalocean.com:25061/2'.format(chars)
+    monkeypatch.setenv('CACHE_URL', url)
+    env = Env()
+
+    result = env.cache()
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    url = 'rediss://enigma:sec{}ret@ondigitalocean.com:25061/2'.format(chars)
+    monkeypatch.setenv('CACHE_URL', url)
+    env = Env()
+
+    result = env.cache()
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+    url = 'rediss://enigma:{}secret@ondigitalocean.com:25061/2'.format(chars)
+    monkeypatch.setenv('CACHE_URL', url)
+    env = Env()
+
+    result = env.cache()
+    assert result['BACKEND'] == 'django_redis.cache.RedisCache'
+    assert result['LOCATION'] == url
+
+
+def test_cache_url_env_using_default():
+    env = Env(CACHE_URL=(str, "locmemcache://"))
+    result = env.cache()
+
+    assert result["BACKEND"] == "django.core.cache.backends.locmem.LocMemCache"
+    assert result["LOCATION"] == ""
