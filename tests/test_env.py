@@ -156,6 +156,13 @@ class TestEnv:
     def test_dict_value(self):
         assert_type_and_value(dict, FakeEnv.DICT, self.env.dict('DICT_VAR'))
 
+    def test_complex_dict_value(self):
+        assert_type_and_value(
+            dict,
+            FakeEnv.SAML_ATTRIBUTE_MAPPING,
+            self.env.dict('SAML_ATTRIBUTE_MAPPING', cast={'value': tuple})
+        )
+
     @pytest.mark.parametrize(
         'value,cast,expected',
         [
