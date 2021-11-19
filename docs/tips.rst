@@ -199,7 +199,7 @@ Escape Proxy
 ============
 
 If you're having trouble with values starting with dollar sign ($) without the intention of proxying the value to
-another, You should enbale the ``escape_proxy`` and prepend a backslash to it.
+another, You should enable the ``escape_proxy`` and prepend a backslash to it.
 
 .. code-block:: python
 
