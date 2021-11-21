@@ -125,8 +125,8 @@ You can use something like this to handle similar cases.
    ADMINS = tuple(parseaddr(email) for email in env.list('DJANGO_ADMINS'))
 
 
-Complex format for dicts
-========================
+Complex dict format
+===================
 
 Sometimes we need to get a bit more complex dict type than usual. For example,
 consider Djangosaml2's ``SAML_ATTRIBUTE_MAPPING``:
@@ -162,7 +162,7 @@ A dict of this format can be obtained as shown below:
    # {'uid': ('username',), 'mail': ('email',), 'cn': ('first_name',), 'sn': ('last_name',)}
    SAML_ATTRIBUTE_MAPPING = env.dict(
        'SAML_ATTRIBUTE_MAPPING',
-       cast={"value": tuple},
+       cast={'value': tuple},
        default={}
    )
 
