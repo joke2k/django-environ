@@ -33,7 +33,7 @@ def test_cast_urlstr(quoted_url_str, expected_unquoted_str):
     """Make sure that a url str that contains plus sign literals does not get unquoted incorrectly
     Plus signs should not be converted to spaces, since spaces are encoded with %20 in URIs
 
-    see https://github.com/joke2k/django-environ/issues/200 for details.
+    see https://github.com/joke2k/django-environ/issues/357 for details.
     related to https://github.com/joke2k/django-environ/pull/69"""
 
     assert _cast_urlstr(quoted_url_str) == expected_unquoted_str
