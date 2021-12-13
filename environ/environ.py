@@ -22,6 +22,7 @@ from urllib.parse import (
     parse_qs,
     ParseResult,
     unquote_plus,
+    unquote,
     urlparse,
     urlunparse,
 )
@@ -61,7 +62,7 @@ def _cast_int(v):
 
 
 def _cast_urlstr(v):
-    return unquote_plus(v) if isinstance(v, str) else v
+    return unquote(v) if isinstance(v, str) else v
 
 
 class NoValue:
