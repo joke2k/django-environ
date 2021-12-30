@@ -365,10 +365,10 @@ class Env:
 
         try:
             value = self.ENVIRON[var]
-        except KeyError:
+        except KeyError as exc:
             if default is self.NOTSET:
                 error_msg = "Set the {} environment variable".format(var)
-                raise ImproperlyConfigured(error_msg)
+                raise ImproperlyConfigured(error_msg) from exc
 
             value = default
 
