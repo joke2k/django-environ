@@ -505,7 +505,7 @@ class Env:
         user_host = url.netloc.rsplit('@', 1)
         if url.scheme in cls.POSTGRES_FAMILY and ',' in user_host[-1]:
             # Parsing postgres cluster dsn
-            hostinfo = list(
+            hinfo = list(
                 itertools.zip_longest(
                     *(
                         host.rsplit(':', 1)
@@ -513,8 +513,8 @@ class Env:
                     )
                 )
             )
-            hostname = ','.join(hostinfo[0])
-            port = ','.join(filter(None, hostinfo[1])) if len(hostinfo) == 2 else ''
+            hostname = ','.join(hinfo[0])
+            port = ','.join(filter(None, hinfo[1])) if len(hinfo) == 2 else ''
         else:
             hostname = url.hostname
             port = url.port
