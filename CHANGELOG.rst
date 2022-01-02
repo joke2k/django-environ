@@ -7,8 +7,22 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 `v0.9.0`_ - 00-Unreleased-2021
 ------------------------------
+Added
++++++
+- Added support for Postgresql cluster URI
+  `#355 <https://github.com/joke2k/django-environ/pull/355>`.
 
-- WIP
+
+Fixed
++++++
+- Fix ``_cast_urlstr`` unquoting
+  `#357 <https://github.com/joke2k/django-environ/issues/357>`.
+
+
+Changed
++++++++
+- Attach cause to ``ImproperlyConfigured`` exception
+  `#360 <https://github.com/joke2k/django-environ/issues/360>`.
 
 
 `v0.8.1`_ - 20-October-2021
