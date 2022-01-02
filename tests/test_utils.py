@@ -7,7 +7,7 @@
 # the LICENSE.txt file that was distributed with this source code.
 
 import pytest
-from environ.environ import _cast
+from environ.environ import _cast, _cast_urlstr
 
 
 @pytest.mark.parametrize(
@@ -20,3 +20,20 @@ def test_cast(literal):
 
     See https://github.com/joke2k/django-environ/issues/200 for details."""
     assert _cast(literal) == literal
+
+@pytest.mark.parametrize(
+    "quoted_url_str,expected_unquoted_str",
+    [
+        ("Le-%7BFsIaYnaQw%7Da2B%2F%5BV8bS+", "Le-{FsIaYnaQw}a2B/[V8bS+"),
+        ("my_test-string+", "my_test-string+"),
+        ("my%20test%20string+", "my test string+")
+    ]
+)
+def test_cast_urlstr(quoted_url_str, expected_unquoted_str):
+    """Make sure that a url str that contains plus sign literals does not get unquoted incorrectly
+    Plus signs should not be converted to spaces, since spaces are encoded with %20 in URIs
+
+    see https://github.com/joke2k/django-environ/issues/357 for details.
+    related to https://github.com/joke2k/django-environ/pull/69"""
+
+    assert _cast_urlstr(quoted_url_str) == expected_unquoted_str
