@@ -12,6 +12,7 @@ variables to configure your Django application.
 """
 
 import ast
+import itertools
 import logging
 import os
 import re
@@ -502,13 +503,30 @@ class Env:
             if url.port:
                 path += ':{port}'.format(port=url.port)
 
+        user_host = url.netloc.rsplit('@', 1)
+        if url.scheme in cls.POSTGRES_FAMILY and ',' in user_host[-1]:
+            # Parsing postgres cluster dsn
+            hinfo = list(
+                itertools.zip_longest(
+                    *(
+                        host.rsplit(':', 1)
+                        for host in user_host[-1].split(',')
+                    )
+                )
+            )
+            hostname = ','.join(hinfo[0])
+            port = ','.join(filter(None, hinfo[1])) if len(hinfo) == 2 else ''
+        else:
+            hostname = url.hostname
+            port = url.port
+
         # Update with environment configuration.
         config.update({
             'NAME': path or '',
             'USER': _cast_urlstr(url.username) or '',
             'PASSWORD': _cast_urlstr(url.password) or '',
-            'HOST': url.hostname or '',
-            'PORT': _cast_int(url.port) or '',
+            'HOST': hostname or '',
+            'PORT': _cast_int(port) or '',
         })
 
         if (
