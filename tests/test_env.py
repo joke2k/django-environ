@@ -45,6 +45,7 @@ class TestEnv:
         with pytest.raises(ImproperlyConfigured) as excinfo:
             self.env('not_present')
         assert str(excinfo.value) == 'Set the not_present environment variable'
+        assert excinfo.value.__cause__ is not None
 
     def test_contains(self):
         assert 'STR_VAR' in self.env
