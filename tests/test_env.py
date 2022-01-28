@@ -312,6 +312,10 @@ class TestEnv:
     def test_exported(self):
         assert self.env('EXPORTED_VAR') == FakeEnv.EXPORTED
 
+    def test_prefix(self):
+        self.env.prefix = 'PREFIX_'
+        assert self.env('TEST') == 'foo'
+
 
 class TestFileEnv(TestEnv):
     def setup_method(self, method):

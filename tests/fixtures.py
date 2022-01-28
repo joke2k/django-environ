@@ -28,10 +28,10 @@ class FakeEnv:
     PATH = '/home/dev'
     EXPORTED = 'exported var'
     SAML_ATTRIBUTE_MAPPING = dict(
-        uid=('username', ),
-        mail=('email', ),
-        cn=('first_name', ),
-        sn=('last_name', )
+        uid=('username',),
+        mail=('email',),
+        cn=('first_name',),
+        sn=('last_name',)
     )
 
     @classmethod
@@ -82,4 +82,6 @@ class FakeEnv:
                     JSON_VAR=json.dumps(cls.JSON),
                     PATH_VAR=cls.PATH,
                     EXPORTED_VAR=cls.EXPORTED,
-                    SAML_ATTRIBUTE_MAPPING='uid=username;mail=email;cn=first_name;sn=last_name;')
+                    SAML_ATTRIBUTE_MAPPING='uid=username;mail=email;cn=first_name;sn=last_name;',
+                    PREFIX_TEST='foo',
+                    )
