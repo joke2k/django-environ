@@ -47,7 +47,7 @@ jobs:
 
       - name: Archive build artifacts
         if: success()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           # To ensure that jobs don't overwrite existing artifacts,
           # use a different name per job.
