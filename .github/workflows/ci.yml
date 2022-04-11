@@ -62,7 +62,7 @@ jobs:
           fetch-depth: 5
 
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v3.1.2
         with:
           python-version: ${{ matrix.python }}
 
