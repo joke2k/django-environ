@@ -42,7 +42,7 @@ the example ``docker-compose.yml`` for would contain:
 Using unsafe characters in URLs
 ===============================
 
-In order to use unsafe characters you have to encode with ``urllib.parse.encode`` before you set into ``.env`` file.
+In order to use unsafe characters you have to encode with ``urllib.parse.quote`` before you set into ``.env`` file.
 
 .. code-block:: shell
 
