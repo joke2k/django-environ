@@ -142,6 +142,7 @@ class Env:
         'smtps': 'django.core.mail.backends.smtp.EmailBackend',
         'smtp+tls': 'django.core.mail.backends.smtp.EmailBackend',
         'smtp+ssl': 'django.core.mail.backends.smtp.EmailBackend',
+        'djangomailer': 'mailer.backend.DbBackend',
         'consolemail': 'django.core.mail.backends.console.EmailBackend',
         'filemail': 'django.core.mail.backends.filebased.EmailBackend',
         'memorymail': 'django.core.mail.backends.locmem.EmailBackend',
