@@ -56,6 +56,9 @@ Supported types
   * SMTP: ``smtp://``
   * SMTP+SSL: ``smtp+ssl://``
   * SMTP+TLS: ``smtp+tls://``
+  * django-mailer: ``djangomailer://``
+  * django-mailer+SSL: ``djangomailer+ssl://``
+  * django-mailer+TLS: ``djangomailer+tls://``
   * Console mail: ``consolemail://``
   * File mail: ``filemail://``
   * LocMem mail: ``memorymail://``
