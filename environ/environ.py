@@ -143,6 +143,8 @@ class Env:
         'smtp+tls': 'django.core.mail.backends.smtp.EmailBackend',
         'smtp+ssl': 'django.core.mail.backends.smtp.EmailBackend',
         'djangomailer': 'mailer.backend.DbBackend',
+        'djangomailer+tls': 'mailer.backend.DbBackend',
+        'djangomailer+ssl': 'mailer.backend.DbBackend',
         'consolemail': 'django.core.mail.backends.console.EmailBackend',
         'filemail': 'django.core.mail.backends.filebased.EmailBackend',
         'memorymail': 'django.core.mail.backends.locmem.EmailBackend',
@@ -652,9 +654,9 @@ class Env:
         elif url.scheme in cls.EMAIL_SCHEMES:
             config['EMAIL_BACKEND'] = cls.EMAIL_SCHEMES[url.scheme]
 
-        if url.scheme in ('smtps', 'smtp+tls'):
+        if url.scheme in ('smtps', 'smtp+tls', 'djangomailer+tls'):
             config['EMAIL_USE_TLS'] = True
-        elif url.scheme == 'smtp+ssl':
+        elif url.scheme in ('smtp+ssl', 'djangomailer+ssl'):
             config['EMAIL_USE_SSL'] = True
 
         if url.query:
