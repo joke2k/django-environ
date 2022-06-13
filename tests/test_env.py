@@ -140,10 +140,15 @@ class TestEnv:
         assert_type_and_value(list, [42, 33], self.env('INT_LIST', cast=[int]))
         assert_type_and_value(list, [42, 33], self.env.list('INT_LIST', int))
 
-    def test_int_tuple(self):
+    def test_int_list_cast_tuple(self):
         assert_type_and_value(tuple, (42, 33), self.env('INT_LIST', cast=(int,)))
         assert_type_and_value(tuple, (42, 33), self.env.tuple('INT_LIST', int))
         assert_type_and_value(tuple, ('42', '33'), self.env.tuple('INT_LIST'))
+
+    def test_int_tuple(self):
+        assert_type_and_value(tuple, (42, 33), self.env('INT_TUPLE', cast=(int,)))
+        assert_type_and_value(tuple, (42, 33), self.env.tuple('INT_TUPLE', int))
+        assert_type_and_value(tuple, ('42', '33'), self.env.tuple('INT_TUPLE'))
 
     def test_str_list_with_spaces(self):
         assert_type_and_value(list, [' foo', '  bar'],
