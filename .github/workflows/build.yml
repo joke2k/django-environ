@@ -27,17 +27,17 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.0.2
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v2.3.0
+        uses: actions/setup-python@v4.0.0
         with:
           python-version: '3.10'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip --use-feature=in-tree-build install tox tox-gh-actions
+          pip install tox tox-gh-actions
 
       - name: Check MANIFEST.in for completeness
         run: tox -e manifest
@@ -47,7 +47,7 @@ jobs:
 
       - name: Archive build artifacts
         if: success()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           # To ensure that jobs don't overwrite existing artifacts,
           # use a different name per job.
@@ -67,10 +67,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.0.2
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v2.2.2
+        uses: actions/setup-python@v4.0.0
         with:
           python-version: '3.10'
 

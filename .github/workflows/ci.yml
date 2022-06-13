@@ -57,12 +57,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.0.2
         with:
           fetch-depth: 5
 
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v2.3.0
+        uses: actions/setup-python@v4.0.0
         with:
           python-version: ${{ matrix.python }}
 

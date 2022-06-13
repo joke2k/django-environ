@@ -21,10 +21,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v3.0.2
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v2.3.0
+        uses: actions/setup-python@v4.0.0
         with:
           python-version: '3.10'
 
@@ -41,7 +41,7 @@ jobs:
 
       - name: Archive docs artifacts
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: docs
           path: docs
