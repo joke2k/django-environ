@@ -11,12 +11,16 @@ Added
 +++++
 - Added support for Postgresql cluster URI
   `#355 <https://github.com/joke2k/django-environ/pull/355>`_.
+- Added support for Django 4.0
+  `#376 <https://github.com/joke2k/django-environ/pull/376>`_.
 
 
 Fixed
 +++++
 - Fix ``_cast_urlstr`` unquoting
   `#357 <https://github.com/joke2k/django-environ/issues/357>`_.
+- Fix documentation regarding unsafe characters in URLs
+  `#220 <https://github.com/joke2k/django-environ/issues/220>`_.
 
 
 Changed
