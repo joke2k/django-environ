@@ -12,7 +12,7 @@ Added
 - Added support for Postgresql cluster URI
   `#355 <https://github.com/joke2k/django-environ/pull/355>`_.
 - Added support for Django 4.0
-  `#376 <https://github.com/joke2k/django-environ/pull/376>`_.
+  `#371 <https://github.com/joke2k/django-environ/issues/371>`_.
 - Added support for prefixed variables
   `#362 <https://github.com/joke2k/django-environ/issues/362>`_.
 
