@@ -171,6 +171,7 @@ class Env:
     def __init__(self, **scheme):
         self.smart_cast = True
         self.escape_proxy = False
+        self.prefix = ""
         self.scheme = scheme
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
@@ -344,8 +345,9 @@ class Env:
             var, cast, default
         ))
 
-        if var in self.scheme:
-            var_info = self.scheme[var]
+        var_name = "{}{}".format(self.prefix, var)
+        if var_name in self.scheme:
+            var_info = self.scheme[var_name]
 
             try:
                 has_default = len(var_info) == 2
@@ -366,7 +368,7 @@ class Env:
                     cast = var_info
 
         try:
-            value = self.ENVIRON[var]
+            value = self.ENVIRON[var_name]
         except KeyError as exc:
             if default is self.NOTSET:
                 error_msg = "Set the {} environment variable".format(var)
