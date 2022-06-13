@@ -317,7 +317,7 @@ It is possible to use of ``pathlib.Path`` objects when reading environment file 
 Overwriting existing environment values from env files
 ------------------------------------------------------
 
-If you want variables set within your env files to take higher precidence than
+If you want variables set within your env files to take higher precedence than
 an existing set environment variable, use the ``overwrite=True`` argument of
 ``read_env``. For example:
 
@@ -325,3 +325,32 @@ an existing set environment variable, use the ``overwrite=True`` argument of
 
    env = environ.Env()
    env.read_env(BASE_DIR('.env'), overwrite=True)
+
+
+Handling prefixes
+=================
+
+Sometimes it is desirable to be able to prefix all environment variables. For
+example, if you are using Django, you may want to prefix all environment
+variables with ``DJANGO_``. This can be done by setting the ``prefix``
+to desired prefix. For example:
+
+**.env file**:
+
+.. code-block:: shell
+
+   # .env file contents
+   DJANGO_TEST="foo"
+
+**settings.py file**:
+
+.. code-block:: python
+
+   # settings.py file contents
+   import environ
+
+
+   env = environ.Env()
+   env.prefix = 'DJANGO_'
+
+   env.str('TEST')  # foo
