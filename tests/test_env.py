@@ -1,6 +1,6 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -149,6 +149,15 @@ class TestEnv:
         assert_type_and_value(tuple, (42, 33), self.env('INT_TUPLE', cast=(int,)))
         assert_type_and_value(tuple, (42, 33), self.env.tuple('INT_TUPLE', int))
         assert_type_and_value(tuple, ('42', '33'), self.env.tuple('INT_TUPLE'))
+
+    def test_mix_tuple_issue_387(self):
+        """Cast a tuple of mixed types.
+        
+        Casts a string like "(42,Test)" to a tuple like  (42, 'Test').
+        See: https://github.com/joke2k/django-environ/issues/387 for details."""
+        caster = lambda v: int(v) if v.isdigit() else v.strip()
+        cast = lambda t: tuple(map(caster, [c for c in t.strip('()').split(',')]))
+        assert_type_and_value(tuple, (42, 'Test'), self.env( 'MIX_TUPLE', default=(0, ''), cast=cast))
 
     def test_str_list_with_spaces(self):
         assert_type_and_value(list, [' foo', '  bar'],
