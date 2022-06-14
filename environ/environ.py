@@ -74,13 +74,30 @@ class NoValue:
 
 class Env:
     """Provide scheme-based lookups of environment variables so that each
-    caller doesn't have to pass in `cast` and `default` parameters.
+    caller doesn't have to pass in ``cast`` and ``default`` parameters.
 
     Usage:::
 
-        env = Env(MAIL_ENABLED=bool, SMTP_LOGIN=(str, 'DEFAULT'))
-        if env('MAIL_ENABLED'):
-            ...
+        import environ
+        import os
+
+        env = environ.Env(
+            # set casting, default value
+            MAIL_ENABLED=(bool, False),
+            SMTP_LOGIN=(str, 'DEFAULT')
+        )
+
+        # Set the project base directory
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+        # Take environment variables from .env file
+        environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+        # False if not in os.environ due to casting above
+        MAIL_ENABLED = env('MAIL_ENABLED')
+
+        # 'DEFAULT' if not in os.environ due to casting above
+        SMTP_LOGIN = env('SMTP_LOGIN')
     """
 
     ENVIRON = os.environ

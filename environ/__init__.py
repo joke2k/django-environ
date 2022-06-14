@@ -11,18 +11,6 @@
 This module tracks the version of the package as well as the base
 package info used by various functions within django-environ.
 
-Misc variables:
-
-* ``__copyright__``: The copyright notice of the package.
-* ``__version__``: The version of the package.
-* ``__license__``: The license of the package.
-* ``__author__``: The author of the package.
-* ``__author_email__``: The email of the author of the package.
-* ``__maintainer__``: The maintainer of the package.
-* ``__maintainer_email__``: The email of the maintainer of the package.
-* ``__url__``: The URL of the package.
-* ``__description__``: The description of the package.
-
 Refer to the `documentation <https://django-environ.readthedocs.io/en/latest/>`_
 for details on the use of this package.
 """  # noqa: E501
@@ -31,11 +19,28 @@ from .environ import *
 
 
 __copyright__ = 'Copyright (C) 2021 Daniele Faraglia'
+"""The copyright notice of the package."""
+
 __version__ = '0.9.0'
+"""The version of the package."""
+
 __license__ = 'MIT'
+"""The license of the package."""
+
 __author__ = 'Daniele Faraglia'
+"""The author of the package."""
+
 __author_email__ = 'daniele.faraglia@gmail.com'
+"""The email of the author of the package."""
+
 __maintainer__ = 'Serghei Iakovlev'
+"""The maintainer of the package."""
+
 __maintainer_email__ = 'egrep@protonmail.ch'
+"""The email of the maintainer of the package."""
+
 __url__ = 'https://django-environ.readthedocs.org'
+"""The URL of the package."""
+
 __description__ = 'A package that allows you to utilize 12factor inspired environment variables to configure your Django application.'  # noqa: E501
+"""The description of the package."""

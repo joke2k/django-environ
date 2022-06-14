@@ -7,13 +7,15 @@
 # the LICENSE.txt file that was distributed with this source code.
 
 #
-# -- Utils -----------------------------------------------------
+# -- Utils ---------------------------------------------------------
 #
 
 import codecs
 import os
 import sys
 import re
+
+from datetime import date
 
 
 PROJECT_DIR = os.path.abspath('..')
@@ -38,7 +40,7 @@ def find_version(meta_file):
     if meta_match:
         return meta_match.group(1)
     raise RuntimeError(
-        'Unable to find __version__ string in package meta file')
+        "Unable to find __version__ string in package meta file")
 
 
 #
@@ -46,9 +48,9 @@ def find_version(meta_file):
 #
 
 # General information about the project.
-project = 'django-environ'
-copyright = '2013-2021, Daniele Faraglia and other contributors'
-author = u"Daniele Faraglia"
+project = "django-environ"
+copyright = f'2013-{date.today().year}, Daniele Faraglia and other contributors'
+author = u"Daniele Faraglia \\and Serghei Iakovlev"
 
 #
 # -- General configuration ---------------------------------------------------
@@ -79,7 +81,7 @@ master_doc = "index"
 
 # The version info
 # The short X.Y version.
-release = find_version('environ/__init__.py')
+release = find_version(os.path.join("environ", "__init__.py"))
 version = release.rsplit(u".", 1)[0]
 # The full version, including alpha/beta/rc tags.
 
@@ -89,13 +91,13 @@ exclude_patterns = ["_build"]
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
-# default_role = None
+default_role = "any"
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
 
 #
-# -- Options for linkcheck ----------------------------------------------------
+# -- Options for linkcheck ---------------------------------------------------
 #
 
 linkcheck_ignore = [
@@ -104,7 +106,7 @@ linkcheck_ignore = [
 ]
 
 #
-# -- Options for nitpick ----------------------------------------------------
+# -- Options for nitpick -----------------------------------------------------
 #
 
 # In nitpick mode (-n), still ignore any of the following "broken" references
@@ -115,6 +117,7 @@ nitpick_ignore = [
 #
 # -- Options for extlinks ----------------------------------------------------
 #
+
 extlinks = {
     "pypi": ("https://pypi.org/project/%s/", ""),
 }
@@ -122,6 +125,7 @@ extlinks = {
 #
 # -- Options for intersphinx -------------------------------------------------
 #
+
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
     "sphinx": ("https://www.sphinx-doc.org/en/master", None),
@@ -130,14 +134,15 @@ intersphinx_mapping = {
 #
 # -- Options for TODOs -------------------------------------------------------
 #
+
 todo_include_todos = True
 
-# -- Options for HTML output ----------------------------------------------
+# -- Options for HTML output -------------------------------------------------
 
 # html_favicon = None
 
 html_theme = "furo"
-html_title = "django-environ"
+html_title = project
 
 html_theme_options = {}
 
@@ -173,7 +178,7 @@ html_show_copyright = True
 htmlhelp_basename = "django-environ-doc"
 
 #
-# -- Options for manual page output ---------------------------------------
+# -- Options for manual page output ------------------------------------------
 #
 
 # One entry per manual page. List of tuples
@@ -183,7 +188,7 @@ man_pages = [
 ]
 
 #
-# -- Options for Texinfo output -------------------------------------------
+# -- Options for Texinfo output ----------------------------------------------
 #
 
 # Grouping the document tree into Texinfo files. List of tuples
