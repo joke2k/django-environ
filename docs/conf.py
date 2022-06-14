@@ -107,13 +107,9 @@ linkcheck_ignore = [
 # -- Options for nitpick ----------------------------------------------------
 #
 
-nitpicky = True
-
 # In nitpick mode (-n), still ignore any of the following "broken" references
 # to non-types.
 nitpick_ignore = [
-    ('py:class', 'file'),
-    ('py:class', 'urlparse.ParseResult'),
 ]
 
 #

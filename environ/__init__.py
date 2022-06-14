@@ -13,15 +13,15 @@ package info used by various functions within django-environ.
 
 Misc variables:
 
-    __copyright__
-    __version__
-    __license__
-    __author__
-    __author_email__
-    __maintainer__
-    __maintainer_email__
-    __url__
-    __description__
+* ``__copyright__``: The copyright notice of the package.
+* ``__version__``: The version of the package.
+* ``__license__``: The license of the package.
+* ``__author__``: The author of the package.
+* ``__author_email__``: The email of the author of the package.
+* ``__maintainer__``: The maintainer of the package.
+* ``__maintainer_email__``: The email of the maintainer of the package.
+* ``__url__``: The URL of the package.
+* ``__description__``: The description of the package.
 
 Refer to the `documentation <https://django-environ.readthedocs.io/en/latest/>`_
 for details on the use of this package.

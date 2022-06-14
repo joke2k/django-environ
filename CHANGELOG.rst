@@ -19,8 +19,8 @@ Added
 
 Deprecated
 ++++++++++
-- ``Env.unicode()`` is deprecated and will be removed in future,
-  use ``Env.str()`` instead.
+- ``Env.unicode()`` is deprecated and will be removed in the next
+  major release. Use ``Env.str()`` instead.
 
 
 Changed

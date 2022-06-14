@@ -272,7 +272,7 @@ class Env:
 
     def url(self, var, default=NOTSET):
         """
-        :rtype: urlparse.ParseResult
+        :rtype: urllib.parse.ParseResult
         """
         return self.get_value(
             var,
@@ -911,13 +911,12 @@ class Path:
         return self.__class__(self.__root__, *paths, **kwargs)
 
     def file(self, name, *args, **kwargs):
-        """Open a file.
+        r"""Open a file.
 
-        :param name: Filename appended to self.root
-        :param args: passed to open()
-        :param kwargs: passed to open()
-
-        :rtype: file
+        :param str name: Filename appended to :py:attr:`~root`
+        :param \*args: ``*args`` passed to :py:func:`open`
+        :param \**kwargs: ``**kwargs`` passed to :py:func:`open`
+        :rtype: typing.IO[typing.Any]
         """
         return open(self(name), *args, **kwargs)
 
