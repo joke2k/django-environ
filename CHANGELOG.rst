@@ -15,6 +15,7 @@ Added
   `#371 <https://github.com/joke2k/django-environ/issues/371>`_.
 - Added support for prefixed variables
   `#362 <https://github.com/joke2k/django-environ/issues/362>`_.
+- Amended documentation.
 
 
 Deprecated

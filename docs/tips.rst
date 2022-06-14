@@ -126,6 +126,8 @@ You can use something like this to handle similar cases.
    ADMINS = tuple(parseaddr(email) for email in env.list('DJANGO_ADMINS'))
 
 
+.. _complex_dict_format:
+
 Complex dict format
 ===================
 
