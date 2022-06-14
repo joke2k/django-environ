@@ -62,6 +62,10 @@ def test_comparison():
     assert Path('/home/foo/').__fspath__() == str(Path('/home/foo/'))
     assert ~Path('/home') == Path('/')
 
+    assert Path('/home') == '/home'
+    assert '/home' == Path('/home')
+    assert Path('/home') != '/usr'
+
 
 def test_sum():
     """Make sure Path correct handle __add__."""
