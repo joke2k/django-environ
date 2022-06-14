@@ -25,8 +25,8 @@ The following are all type-casting methods of :py:class:`.environ.Env`.
 ``environ.Env.dict``
 ======================
 
-:py:class:`.environ.Env` may parse complex variables like ``BAR=key=val,foo=bar``
-with the following type-casting ``BAR=(dict, {})``. For example:
+:py:class:`.environ.Env` may parse complex variables like with the complex type-casting.
+For example:
 
 .. code-block:: python
 
@@ -52,20 +52,81 @@ For more detailed example see ":ref:`complex_dict_format`".
 ``environ.Env.db_url``
 ======================
 
-:py:meth:`~.environ.Env.db_url` supports the following schemes:
+:py:meth:`~.environ.Env.db_url` supports the following URL schemas:
 
-* PostgreSQL: ``postgres://``, ``pgsql://``, ``psql://`` or ``postgresql://``
-* PostGIS: ``postgis://``
-* MySQL: ``mysql://`` or ``mysql2://``
-* MySQL for GeoDjango: ``mysqlgis://``
-* MySQL Connector Python from Oracle: ``mysql-connector://``
-* SQLite: ``sqlite://``
-* SQLite with SpatiaLite for GeoDjango: ``spatialite://``
-* Oracle: ``oracle://``
-* Microsoft SQL Server: ``mssql://``
-* PyODBC: ``pyodbc://``
-* Amazon Redshift: ``redshift://``
-* LDAP: ``ldap://``
+.. glossary::
+
+    Amazon Redshift
+      **Database Backend:** ``django_redshift_backend``
+
+      **URL schema:** ``redshift://``
+
+    LDAP
+      **Database Backend:** ``ldapdb.backends.ldap``
+
+      **URL schema:** ``ldap://host:port/dn?attrs?scope?filter?exts``
+
+    MSSQL
+      **Database Backend:** ``sql_server.pyodbc``
+
+      **URL schema:** ``mssql://user:password@host:port/dbname``
+
+      With MySQL you can use the following schemas: ``mysql``, ``mysql2``.
+
+    MySQL (GIS)
+      **Database Backend:** ``django.contrib.gis.db.backends.mysql``
+
+      **URL schema:** ``mysqlgis://user:password@host:port/dbname``
+
+    MySQL
+      **Database Backend:** ``django.db.backends.mysql``
+
+      **URL schema:** ``mysql://user:password@host:port/dbname``
+
+    MySQL Connector Python from Oracle
+      **Database Backend:** ``mysql.connector.django``
+
+      **URL schema:** ``mysql-connector://``
+
+    Oracle
+      **Database Backend:** ``django.db.backends.oracle``
+
+      **URL schema:** ``oracle://user:password@host:port/dbname``
+
+    PostgreSQL
+      **Database Backend:** ``django.db.backends.postgresql``
+
+      **URL schema:** ``postgres://user:password@host:port/dbname``
+
+      With PostgreSQL you can use the following schemas: ``postgres``, ``postgresql``, ``psql``, ``pgsql``, ``postgis``.
+      You can also use UNIX domain sockets path instead of hostname. For example: ``postgres://path/dbname``.
+      The ``django.db.backends.postgresql_psycopg2`` will be used if the Django version is less than ``2.0``.
+
+    PostGIS
+      **Database Backend:** ``django.contrib.gis.db.backends.postgis``
+
+      **URL schema:** ``postgis://user:password@host:port/dbname``
+
+    PyODBC
+      **Database Backend:** ``sql_server.pyodbc``
+
+      **URL schema:** ``pyodbc://``
+
+    SQLite
+      **Database Backend:** ``django.db.backends.sqlite3``
+
+      **URL schema:** ``sqlite:////absolute/path/to/db/file``
+
+      SQLite connects to file based databases. URL schemas ``sqlite://`` or
+      ``sqlite://:memory:`` means the database is in the memory (not a file on disk).
+
+    SpatiaLite
+      **Database Backend:** ``django.contrib.gis.db.backends.spatialite``
+
+      **URL schema:** ``spatialite:///PATH``
+
+      SQLite connects to file based databases. URL schemas ``sqlite://`` or
+      ``sqlite://:memory:`` means the database is in the memory (not a file on disk).
 
 
 .. _environ-env-cache-url:
@@ -73,7 +134,7 @@ For more detailed example see ":ref:`complex_dict_format`".
 ``environ.Env.cache_url``
 =========================
 
-:py:meth:`~.environ.Env.cache_url` supports the following schemes:
+:py:meth:`~.environ.Env.cache_url` supports the following URL schemas:
 
 * Database: ``dbcache://``
 * Dummy: ``dummycache://``
@@ -93,7 +154,7 @@ For more detailed example see ":ref:`complex_dict_format`".
 ``environ.Env.search_url``
 ==========================
 
-:py:meth:`~.environ.Env.search_url` supports the following schemes:
+:py:meth:`~.environ.Env.search_url` supports the following URL schemas:
 
 * Elasticsearch: ``elasticsearch://``
 * Elasticsearch2: ``elasticsearch2://``
@@ -110,7 +171,7 @@ For more detailed example see ":ref:`complex_dict_format`".
 ``environ.Env.email_url``
 ==========================
 
-:py:meth:`~.environ.Env.email_url` supports the following schemes:
+:py:meth:`~.environ.Env.email_url` supports the following URL schemas:
 
 * SMTP: ``smtp://``
 * SMTP+SSL: ``smtp+ssl://``

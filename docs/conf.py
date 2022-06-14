@@ -97,6 +97,18 @@ default_role = "any"
 add_function_parentheses = True
 
 #
+# -- Options for autodoc ---------------------------------------------------
+#
+
+# This value selects if automatically documented members are sorted alphabetical
+# (value 'alphabetical'), by member type (value 'groupwise') or by source order
+# (value 'bysource'). The default is alphabetical.
+#
+# Note that for source order, the module must be a Python module with the
+# source code available.
+autodoc_member_order = 'bysource'
+
+#
 # -- Options for linkcheck ---------------------------------------------------
 #
 

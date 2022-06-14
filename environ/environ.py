@@ -492,7 +492,7 @@ class Env:
 
         Supports the following URL schemas:
 
-        * PostgreSQL: ``postgres://``, ``pgsql://``, ``psql://`` or ``postgresql://``
+        * PostgreSQL: ``postgres[ql]?://`` or ``p[g]?sql://``
         * PostGIS: ``postgis://``
         * MySQL: ``mysql://`` or ``mysql2://``
         * MySQL (GIS): ``mysqlgis://``
@@ -691,7 +691,15 @@ class Env:
 
     @classmethod
     def email_url_config(cls, url, backend=None):
-        """Parses an email URL."""
+        """Parse an arbitrary email URL.
+
+        :param urllib.parse.ParseResult or str url:
+            Email URL to parse.
+        :param str or None backend:
+            If None, the backend is evaluates from the ``url``.
+        :return: Parsed email URL.
+        :rtype: dict
+        """
 
         config = {}
 
@@ -736,6 +744,16 @@ class Env:
 
     @classmethod
     def search_url_config(cls, url, engine=None):
+        """Parse an arbitrary search URL.
+
+        :param urllib.parse.ParseResult or str url:
+            Search URL to parse.
+        :param str or None engine:
+            If None, the engine is evaluates from the ``url``.
+        :return: Parsed search URL.
+        :rtype: dict
+        """
+
         config = {}
 
         url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
@@ -829,15 +847,15 @@ class Env:
 
         If not given a path to a dotenv path, does filthy magic stack
         backtracking to find the dotenv in the same directory as the file that
-        called read_env.
+        called ``read_env``.
 
         Existing environment variables take precedent and are NOT overwritten
         by the file content. ``overwrite=True`` will force an overwrite of
         existing environment variables.
 
         Refs:
-        - https://wellfire.co/learn/easier-12-factor-django
-        - https://gist.github.com/bennylope/2999704
+
+        * https://wellfire.co/learn/easier-12-factor-django
 
         :param env_file: The path to the ``.env`` file your application should
             use. If a path is not provided, `read_env` will attempt to import

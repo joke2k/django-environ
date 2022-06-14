@@ -77,7 +77,7 @@ For redis cache, multiple master/slave or shard locations can be configured as f
 Email settings
 ==============
 
-In order to set email configuration for django you can use this code:
+In order to set email configuration for Django you can use this code:
 
 .. code-block:: python
 
