@@ -8,6 +8,7 @@
 
 import os
 from urllib.parse import quote
+from warnings import catch_warnings
 
 import pytest
 
@@ -69,6 +70,18 @@ class TestEnv:
         if not multiline:
             assert self.env(var) == val
         assert self.env.str(var, multiline=multiline) == val
+
+    def test_unicode(self, recwarn):
+        assert self.env.unicode('CYRILLIC_VAR', default='фуубар') == 'фуубар'
+        assert len(recwarn) == 1
+        w = recwarn.pop(DeprecationWarning)
+        assert issubclass(w.category, DeprecationWarning)
+        assert str(w.message) == '`%s.unicode` is deprecated, use `%s.str` instead' %(
+            self.env.__class__.__name__,
+            self.env.__class__.__name__,
+        )
+        assert w.filename
+        assert w.lineno
 
     @pytest.mark.parametrize(
         'var,val,default',

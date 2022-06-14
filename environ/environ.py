@@ -200,6 +200,15 @@ class Env:
         """Helper for python2
         :rtype: unicode
         """
+        warnings.warn(
+            '`%s.unicode` is deprecated, use `%s.str` instead' % (
+                self.__class__.__name__,
+                self.__class__.__name__,
+            ),
+            DeprecationWarning,
+            stacklevel=2
+        )
+
         return self.get_value(var, cast=str, default=default)
 
     def bytes(self, var, default=NOTSET, encoding='utf8'):
@@ -780,7 +789,7 @@ class Env:
 
     @classmethod
     def read_env(cls, env_file=None, overwrite=False, **overrides):
-        """Read a .env file into os.environ.
+        r"""Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack
         backtracking to find the dotenv in the same directory as the file that
@@ -794,12 +803,12 @@ class Env:
         - https://wellfire.co/learn/easier-12-factor-django
         - https://gist.github.com/bennylope/2999704
 
-        :param env_file: The path to the `.env` file your application should
+        :param env_file: The path to the ``.env`` file your application should
             use. If a path is not provided, `read_env` will attempt to import
             the Django settings module from the Django project root.
         :param overwrite: ``overwrite=True`` will force an overwrite of
             existing environment variables.
-        :param **overrides: Any additional keyword arguments provided directly
+        :param \**overrides: Any additional keyword arguments provided directly
             to read_env will be added to the environment. If the key matches an
             existing environment variable, the value will be overridden.
         """

@@ -17,18 +17,24 @@ Added
   `#362 <https://github.com/joke2k/django-environ/issues/362>`_.
 
 
-Fixed
-+++++
-- Fix ``_cast_urlstr`` unquoting
-  `#357 <https://github.com/joke2k/django-environ/issues/357>`_.
-- Fix documentation regarding unsafe characters in URLs
-  `#220 <https://github.com/joke2k/django-environ/issues/220>`_.
+Deprecated
+++++++++++
+- ``Env.unicode()`` is deprecated and will be removed in future,
+  use ``Env.str()`` instead.
 
 
 Changed
 +++++++
 - Attach cause to ``ImproperlyConfigured`` exception
   `#360 <https://github.com/joke2k/django-environ/issues/360>`_.
+
+
+Fixed
++++++
+- Fix ``_cast_urlstr`` unquoting
+  `#357 <https://github.com/joke2k/django-environ/issues/357>`_.
+- Fix documentation regarding unsafe characters in URLs
+  `#220 <https://github.com/joke2k/django-environ/issues/220>`_.
 
 
 `v0.8.1`_ - 20-October-2021
