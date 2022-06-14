@@ -10,7 +10,7 @@ Docker (swarm) and Kubernetes are two widely used platforms that store their
 secrets in tmpfs inside containers as individual files, providing a secure way
 to be able to share configuration data between containers.
 
-Use ``environ.FileAwareEnv`` rather than ``environ.Env`` to first look for
+Use :class:`.environ.FileAwareEnv` rather than :class:`.environ.Env` to first look for
 environment variables with ``_FILE`` appended. If found, their contents will be
 read from the file system and used instead.
 
@@ -42,8 +42,8 @@ the example ``docker-compose.yml`` for would contain:
 Using unsafe characters in URLs
 ===============================
 
-In order to use unsafe characters you have to encode with ``urllib.parse.quote`` before you set into ``.env`` file.
-Encode only the value (i.e. the password) not the whole url.
+In order to use unsafe characters you have to encode with :py:func:`urllib.parse.quote`
+before you set into ``.env`` file. Encode only the value (i.e. the password) not the whole url.
 
 .. code-block:: shell
 
@@ -292,7 +292,8 @@ while ``./manage.py runserver`` uses ``.env``.
 Using Path objects when reading env
 -----------------------------------
 
-It is possible to use of ``pathlib.Path`` objects when reading environment file from the filesystem:
+It is possible to use of :py:class:`pathlib.Path` objects when reading environment
+file from the filesystem:
 
 .. code-block:: python
 
@@ -319,7 +320,7 @@ Overwriting existing environment values from env files
 
 If you want variables set within your env files to take higher precedence than
 an existing set environment variable, use the ``overwrite=True`` argument of
-``read_env``. For example:
+:meth:`.environ.Env.read_env`. For example:
 
 .. code-block:: python
 

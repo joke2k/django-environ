@@ -104,8 +104,8 @@ article.
 
 Using ``django-environ`` you can stop to make a lot of unversioned
 ``settings_*.py`` to configure your app.
-See `cookiecutter-django <https://github.com/pydanny/cookiecutter-django>`_ for
-a concrete example on using with a django project.
+See `cookiecutter-django <https://github.com/cookiecutter/cookiecutter-django>`_
+for a concrete example on using with a django project.
 
 **Feature Support**
 

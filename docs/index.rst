@@ -1,3 +1,5 @@
+.. module:: environ
+
 =======================================
 Welcome to django-environ documentation
 =======================================
@@ -38,6 +40,7 @@ Full Table of Contents
    tips
    contributing
    backers
+   api
 
 .. include:: ../README.rst
    :start-after: -project-information-
@@ -47,4 +50,5 @@ Full Table of Contents
    :maxdepth: 1
 
    license
+   deprecations
    changelog

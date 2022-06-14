@@ -1,6 +1,6 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -12,7 +12,12 @@
 
 import codecs
 import os
+import sys
 import re
+
+
+PROJECT_DIR = os.path.abspath('..')
+sys.path.insert(0, PROJECT_DIR)
 
 
 def read_file(filepath):
@@ -23,9 +28,7 @@ def read_file(filepath):
 
 def find_version(meta_file):
     """Extract ``__version__`` from meta_file."""
-    here = os.path.abspath(os.path.dirname(__file__))
-    contents = read_file(os.path.join(here, meta_file))
-
+    contents = read_file(os.path.join(PROJECT_DIR, meta_file))
     meta_match = re.search(
         r"^__version__\s+=\s+['\"]([^'\"]*)['\"]",
         contents,
@@ -56,6 +59,7 @@ extensions = [
     "sphinx.ext.doctest",
     "sphinx.ext.intersphinx",
     "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
     "notfound.extension",
 ]
 
@@ -75,7 +79,7 @@ master_doc = "index"
 
 # The version info
 # The short X.Y version.
-release = find_version('../environ/__init__.py')
+release = find_version('environ/__init__.py')
 version = release.rsplit(u".", 1)[0]
 # The full version, including alpha/beta/rc tags.
 
@@ -85,10 +89,32 @@ exclude_patterns = ["_build"]
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
-default_role = "any"
+# default_role = None
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
+
+#
+# -- Options for linkcheck ----------------------------------------------------
+#
+
+linkcheck_ignore = [
+    # We run into GitHub's rate limits.
+    r"https://github.com/.*/(issues|pull)/\d+",
+]
+
+#
+# -- Options for nitpick ----------------------------------------------------
+#
+
+nitpicky = True
+
+# In nitpick mode (-n), still ignore any of the following "broken" references
+# to non-types.
+nitpick_ignore = [
+    ('py:class', 'file'),
+    ('py:class', 'urlparse.ParseResult'),
+]
 
 #
 # -- Options for extlinks ----------------------------------------------------

@@ -1,6 +1,6 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -23,9 +23,9 @@ Misc variables:
     __url__
     __description__
 
-Refer to the `documentation <https://django-environ.readthedocs.org/>`_
+Refer to the `documentation <https://django-environ.readthedocs.io/en/latest/>`_
 for details on the use of this package.
-"""
+"""  # noqa: E501
 
 from .environ import *
 

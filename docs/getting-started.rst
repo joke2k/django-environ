@@ -10,7 +10,7 @@ Requirements
 ------------
 
 * `Django <https://www.djangoproject.com/>`_ >= 1.11
-* `Python <https://www.python.org/>`_ >= 3.4
+* `Python <https://www.python.org/>`_ >= 3.5
 
 Installing django-environ
 _________________________
@@ -52,7 +52,7 @@ it to your system.
 More information about ``pip`` and PyPI can be found here:
 
 * `Install pip <https://pip.pypa.io/en/latest/installing/>`_
-* `Python Packaging User Guide <https://packaging.python.org/>`_
+* `Python Packaging User Guide <https://packaging.python.org/en/latest/>`_
 
 Usage
 =====
@@ -112,7 +112,7 @@ FAQ
 #. **Can django-environ determine the location of .env file automatically?**
 
    ``django-environ`` will try to get and read ``.env`` file from the project
-   root if you haven't specified the path for it when call ``read_env``.
+   root if you haven't specified the path for it when call :meth:`.environ.Env.read_env`.
    However, this is not the recommended way. When it is possible always specify
    the path tho ``.env`` file. Alternatively, you can use a trick with a
    environment variable pointing to the actual location of .env file.
