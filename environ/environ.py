@@ -488,15 +488,29 @@ class Env:
 
     @classmethod
     def db_url_config(cls, url, engine=None):
-        """Pulled from DJ-Database-URL, parse an arbitrary Database URL.
+        """Parse an arbitrary database URL.
 
-        Support currently exists for PostgreSQL, PostGIS, MySQL, Oracle and
-        SQLite.
+        Supports the following URL schemas:
 
-        SQLite connects to file based databases. The same URL format is used,
-        omitting the hostname, and using the "file" portion as the filename of
-        the database. This has the effect of four slashes being present for an
-        absolute file path.
+        * PostgreSQL: ``postgres://``, ``pgsql://``, ``psql://`` or ``postgresql://``
+        * PostGIS: ``postgis://``
+        * MySQL: ``mysql://`` or ``mysql2://``
+        * MySQL (GIS): ``mysqlgis://``
+        * MySQL Connector Python from Oracle: ``mysql-connector://``
+        * SQLite: ``sqlite://``
+        * SQLite with SpatiaLite for GeoDjango: ``spatialite://``
+        * Oracle: ``oracle://``
+        * Microsoft SQL Server: ``mssql://``
+        * PyODBC: ``pyodbc://``
+        * Amazon Redshift: ``redshift://``
+        * LDAP: ``ldap://``
+
+        :param urllib.parse.ParseResult or str url:
+            Database URL to parse.
+        :param str or None engine:
+            If None, the database engine is evaluates from the ``url``.
+        :return: Parsed database URL.
+        :rtype: dict
         """
         if not isinstance(url, cls.URL_CLASS):
             if url == 'sqlite://:memory:':
@@ -601,11 +615,14 @@ class Env:
 
     @classmethod
     def cache_url_config(cls, url, backend=None):
-        """Pulled from DJ-Cache-URL, parse an arbitrary Cache URL.
+        """Parse an arbitrary cache URL.
 
-        :param url:
-        :param backend:
-        :return:
+        :param urllib.parse.ParseResult or str url:
+            Cache URL to parse.
+        :param str or None backend:
+            If None, the backend is evaluates from the ``url``.
+        :return: Parsed cache URL.
+        :rtype: dict
         """
         if not isinstance(url, cls.URL_CLASS):
             if not url:
