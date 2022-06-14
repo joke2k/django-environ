@@ -72,7 +72,10 @@ class TestEnv:
         assert self.env.str(var, multiline=multiline) == val
 
     def test_unicode(self, recwarn):
-        assert self.env.unicode('CYRILLIC_VAR', default='фуубар') == 'фуубар'
+        actual = self.env.unicode('CYRILLIC_VAR', default='фуубар')
+        expected = self.env.str('CYRILLIC_VAR', default='фуубар')
+
+        assert actual == expected
         assert len(recwarn) == 1
         w = recwarn.pop(DeprecationWarning)
         assert issubclass(w.category, DeprecationWarning)
