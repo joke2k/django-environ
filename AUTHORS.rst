@@ -13,7 +13,7 @@ The existence of ``django-environ`` would have been impossible without these
 projects:
 
 - `rconradharris/envparse <https://github.com/rconradharris/envparse>`_
-- `jacobian/dj-database-url <https://github.com/jacobian/dj-database-url>`_
+- `jazzband/dj-database-url <https://github.com/jazzband/dj-database-url>`_
 - `migonzalvar/dj-email-url <https://github.com/migonzalvar/dj-email-url>`_
 - `ghickman/django-cache-url <https://github.com/ghickman/django-cache-url>`_
 - `dstufft/dj-search-url <https://github.com/dstufft/dj-search-url>`_

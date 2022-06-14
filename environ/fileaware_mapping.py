@@ -1,6 +1,6 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -14,14 +14,14 @@ from collections.abc import MutableMapping
 
 class FileAwareMapping(MutableMapping):
     """
-    A mapping that wraps os.environ, first checking for the existance of a key
+    A mapping that wraps os.environ, first checking for the existence of a key
     appended with ``_FILE`` whenever reading a value. If a matching file key is
     found then the value is instead read from the file system at this location.
 
     By default, values read from the file system are cached so future lookups
     do not hit the disk again.
 
-    A ``_FILE`` key has higher precidence than a value is set directly in the
+    A ``_FILE`` key has higher precedence than a value is set directly in the
     environment, and an exception is raised if the file can not be found.
     """
 

@@ -10,13 +10,14 @@ Requirements
 ------------
 
 * `Django <https://www.djangoproject.com/>`_ >= 1.11
-* `Python <https://www.python.org/>`_ >= 3.4
+* `Python <https://www.python.org/>`_ >= 3.5
 
 Installing django-environ
 _________________________
 
-``django-environ`` is a Python-only package `hosted on PyPI <https://pypi.org/project/django-environ/>`_.
-The recommended installation method is `pip <https://pip.pypa.io/en/stable/>`_-installing into a virtualenv:
+``django-environ`` is a Python-only package `hosted_on_pypi`_.
+The recommended installation method is `pip`_-installing into a
+:mod:`virtualenv <python:venv>`:
 
 .. code-block:: console
 
@@ -26,13 +27,18 @@ The recommended installation method is `pip <https://pip.pypa.io/en/stable/>`_-i
 
    After installing ``django-environ``, no need to add it to ``INSTALLED_APPS``.
 
+
+.. _hosted_on_pypi: https://pypi.org/project/django-environ/
+.. _pip: https://pip.pypa.io/en/stable/
+
+
 Unstable version
 ________________
 
 The master of all the material is the Git repository at https://github.com/joke2k/django-environ.
 So, you can also install the latest unreleased development version directly from the
 ``develop`` branch on GitHub. It is a work-in-progress of a future stable release so the
-experience might be not as smooth.:
+experience might be not as smooth:
 
 .. code-block:: console
 
@@ -52,7 +58,7 @@ it to your system.
 More information about ``pip`` and PyPI can be found here:
 
 * `Install pip <https://pip.pypa.io/en/latest/installing/>`_
-* `Python Packaging User Guide <https://packaging.python.org/>`_
+* `Python Packaging User Guide <https://packaging.python.org/en/latest/>`_
 
 Usage
 =====
@@ -112,10 +118,10 @@ FAQ
 #. **Can django-environ determine the location of .env file automatically?**
 
    ``django-environ`` will try to get and read ``.env`` file from the project
-   root if you haven't specified the path for it when call ``read_env``.
+   root if you haven't specified the path for it when call :meth:`.environ.Env.read_env`.
    However, this is not the recommended way. When it is possible always specify
    the path tho ``.env`` file. Alternatively, you can use a trick with a
-   environment variable pointing to the actual location of .env file.
+   environment variable pointing to the actual location of ``.env`` file.
    For details see ":ref:`multiple-env-files-label`".
 
 #. **What (where) is the root part of the project, is it part of the project where are settings?**

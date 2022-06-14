@@ -1,6 +1,6 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -200,6 +200,15 @@ class Env:
         """Helper for python2
         :rtype: unicode
         """
+        warnings.warn(
+            '`%s.unicode` is deprecated, use `%s.str` instead' % (
+                self.__class__.__name__,
+                self.__class__.__name__,
+            ),
+            DeprecationWarning,
+            stacklevel=2
+        )
+
         return self.get_value(var, cast=str, default=default)
 
     def bytes(self, var, default=NOTSET, encoding='utf8'):
@@ -263,7 +272,7 @@ class Env:
 
     def url(self, var, default=NOTSET):
         """
-        :rtype: urlparse.ParseResult
+        :rtype: urllib.parse.ParseResult
         """
         return self.get_value(
             var,
@@ -780,7 +789,7 @@ class Env:
 
     @classmethod
     def read_env(cls, env_file=None, overwrite=False, **overrides):
-        """Read a .env file into os.environ.
+        r"""Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack
         backtracking to find the dotenv in the same directory as the file that
@@ -794,12 +803,12 @@ class Env:
         - https://wellfire.co/learn/easier-12-factor-django
         - https://gist.github.com/bennylope/2999704
 
-        :param env_file: The path to the `.env` file your application should
+        :param env_file: The path to the ``.env`` file your application should
             use. If a path is not provided, `read_env` will attempt to import
             the Django settings module from the Django project root.
         :param overwrite: ``overwrite=True`` will force an overwrite of
             existing environment variables.
-        :param **overrides: Any additional keyword arguments provided directly
+        :param \**overrides: Any additional keyword arguments provided directly
             to read_env will be added to the environment. If the key matches an
             existing environment variable, the value will be overridden.
         """
@@ -902,13 +911,12 @@ class Path:
         return self.__class__(self.__root__, *paths, **kwargs)
 
     def file(self, name, *args, **kwargs):
-        """Open a file.
+        r"""Open a file.
 
-        :param name: Filename appended to self.root
-        :param args: passed to open()
-        :param kwargs: passed to open()
-
-        :rtype: file
+        :param str name: Filename appended to :py:attr:`~root`
+        :param \*args: ``*args`` passed to :py:func:`open`
+        :param \**kwargs: ``**kwargs`` passed to :py:func:`open`
+        :rtype: typing.IO[typing.Any]
         """
         return open(self(name), *args, **kwargs)
 
