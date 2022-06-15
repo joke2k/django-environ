@@ -115,6 +115,8 @@ autodoc_member_order = 'bysource'
 linkcheck_ignore = [
     # We run into GitHub's rate limits.
     r"https://github.com/.*/(issues|pull)/\d+",
+    # Do not check links to compare tags.
+    r"https://github.com/joke2k/django-environ/compare/.*",
 ]
 
 #
