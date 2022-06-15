@@ -25,18 +25,15 @@ Added
   `#362 <https://github.com/joke2k/django-environ/issues/362>`_.
 - Amended documentation.
 
-
 Deprecated
 ++++++++++
 - ``Env.unicode()`` is deprecated and will be removed in the next
   major release. Use ``Env.str()`` instead.
 
-
 Changed
 +++++++
 - Attach cause to ``ImproperlyConfigured`` exception
   `#360 <https://github.com/joke2k/django-environ/issues/360>`_.
-
 
 Fixed
 +++++
@@ -74,7 +71,6 @@ Added
   `#209 <https://github.com/joke2k/django-environ/issues/209>`_.
 - Added ``pymemcache`` cache backend for Django 3.2+
   `#335 <https://github.com/joke2k/django-environ/pull/335>`_.
-
 
 Fixed
 +++++
@@ -199,12 +195,12 @@ Fixed
 +++++
 - Fix Path subtracting.
 
-
 `v0.4.3`_ - 21-August-2017
 --------------------------
 Changed
 +++++++
 - Rollback the default Environ to ``os.environ``.
+
 
 `v0.4.2`_ - 13-April-2017
 -------------------------
@@ -220,6 +216,7 @@ Changed
 - Update support for ``django-redis`` urls
   `#109 <https://github.com/joke2k/django-environ/pull/109>`_.
 
+
 `v0.4.1`_ - 13-November-2016
 ----------------------------
 Added
@@ -233,6 +230,7 @@ Changed
   Thanks to `@nickcatal <https://github.com/nickcatal>`_.
 - Fixed support for Oracle urls.
 - Fixed support for ``django-redis``.
+
 
 `v0.4`_ - 23-September-2015
 ---------------------------
@@ -277,11 +275,13 @@ Changed
 +++++++
 - Rewriting README.rst.
 
+
 v0.2.1 - 19-April-2013
 ----------------------
 Changed
 +++++++
 - ``Env.__call__`` now uses ``Env.get_value`` instance method.
+
 
 v0.2 - 16-April-2013
 --------------------
@@ -292,6 +292,7 @@ Added
 Fixed
 +++++
 - Fixed typos in the documentation.
+
 
 v0.1 - 2-April-2013
 -------------------
