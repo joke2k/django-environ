@@ -1,6 +1,6 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -8,6 +8,7 @@
 
 import os
 from urllib.parse import quote
+from warnings import catch_warnings
 
 import pytest
 
@@ -45,6 +46,7 @@ class TestEnv:
         with pytest.raises(ImproperlyConfigured) as excinfo:
             self.env('not_present')
         assert str(excinfo.value) == 'Set the not_present environment variable'
+        assert excinfo.value.__cause__ is not None
 
     def test_contains(self):
         assert 'STR_VAR' in self.env
@@ -68,6 +70,21 @@ class TestEnv:
         if not multiline:
             assert self.env(var) == val
         assert self.env.str(var, multiline=multiline) == val
+
+    def test_unicode(self, recwarn):
+        actual = self.env.unicode('CYRILLIC_VAR', default='фуубар')
+        expected = self.env.str('CYRILLIC_VAR', default='фуубар')
+
+        assert actual == expected
+        assert len(recwarn) == 1
+        w = recwarn.pop(DeprecationWarning)
+        assert issubclass(w.category, DeprecationWarning)
+        assert str(w.message) == '`%s.unicode` is deprecated, use `%s.str` instead' %(
+            self.env.__class__.__name__,
+            self.env.__class__.__name__,
+        )
+        assert w.filename
+        assert w.lineno
 
     @pytest.mark.parametrize(
         'var,val,default',
@@ -139,10 +156,24 @@ class TestEnv:
         assert_type_and_value(list, [42, 33], self.env('INT_LIST', cast=[int]))
         assert_type_and_value(list, [42, 33], self.env.list('INT_LIST', int))
 
-    def test_int_tuple(self):
+    def test_int_list_cast_tuple(self):
         assert_type_and_value(tuple, (42, 33), self.env('INT_LIST', cast=(int,)))
         assert_type_and_value(tuple, (42, 33), self.env.tuple('INT_LIST', int))
         assert_type_and_value(tuple, ('42', '33'), self.env.tuple('INT_LIST'))
+
+    def test_int_tuple(self):
+        assert_type_and_value(tuple, (42, 33), self.env('INT_TUPLE', cast=(int,)))
+        assert_type_and_value(tuple, (42, 33), self.env.tuple('INT_TUPLE', int))
+        assert_type_and_value(tuple, ('42', '33'), self.env.tuple('INT_TUPLE'))
+
+    def test_mix_tuple_issue_387(self):
+        """Cast a tuple of mixed types.
+        
+        Casts a string like "(42,Test)" to a tuple like  (42, 'Test').
+        See: https://github.com/joke2k/django-environ/issues/387 for details."""
+        caster = lambda v: int(v) if v.isdigit() else v.strip()
+        cast = lambda t: tuple(map(caster, [c for c in t.strip('()').split(',')]))
+        assert_type_and_value(tuple, (42, 'Test'), self.env( 'MIX_TUPLE', default=(0, ''), cast=cast))
 
     def test_str_list_with_spaces(self):
         assert_type_and_value(list, [' foo', '  bar'],
@@ -155,6 +186,13 @@ class TestEnv:
 
     def test_dict_value(self):
         assert_type_and_value(dict, FakeEnv.DICT, self.env.dict('DICT_VAR'))
+
+    def test_complex_dict_value(self):
+        assert_type_and_value(
+            dict,
+            FakeEnv.SAML_ATTRIBUTE_MAPPING,
+            self.env.dict('SAML_ATTRIBUTE_MAPPING', cast={'value': tuple})
+        )
 
     @pytest.mark.parametrize(
         'value,cast,expected',
@@ -303,6 +341,10 @@ class TestEnv:
 
     def test_exported(self):
         assert self.env('EXPORTED_VAR') == FakeEnv.EXPORTED
+
+    def test_prefix(self):
+        self.env.prefix = 'PREFIX_'
+        assert self.env('TEST') == 'foo'
 
 
 class TestFileEnv(TestEnv):

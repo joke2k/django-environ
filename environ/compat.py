@@ -1,6 +1,6 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -39,8 +39,8 @@ else:
     REDIS_DRIVER = 'django_redis.cache.RedisCache'
 
 
-# back compatibility for pymemcache
 def choose_pymemcache_driver():
+    """Backward compatibility for pymemcache."""
     old_django = DJANGO_VERSION is not None and DJANGO_VERSION < (3, 2)
     if old_django or not find_loader('pymemcache'):
         # The original backend choice for the 'pymemcache' scheme is

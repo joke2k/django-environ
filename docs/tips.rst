@@ -10,7 +10,7 @@ Docker (swarm) and Kubernetes are two widely used platforms that store their
 secrets in tmpfs inside containers as individual files, providing a secure way
 to be able to share configuration data between containers.
 
-Use ``environ.FileAwareEnv`` rather than ``environ.Env`` to first look for
+Use :class:`.environ.FileAwareEnv` rather than :class:`.environ.Env` to first look for
 environment variables with ``_FILE`` appended. If found, their contents will be
 read from the file system and used instead.
 
@@ -42,7 +42,8 @@ the example ``docker-compose.yml`` for would contain:
 Using unsafe characters in URLs
 ===============================
 
-In order to use unsafe characters you have to encode with ``urllib.parse.encode`` before you set into ``.env`` file.
+In order to use unsafe characters you have to encode with :py:func:`urllib.parse.quote`
+before you set into ``.env`` file. Encode only the value (i.e. the password) not the whole url.
 
 .. code-block:: shell
 
@@ -76,7 +77,7 @@ For redis cache, multiple master/slave or shard locations can be configured as f
 Email settings
 ==============
 
-In order to set email configuration for django you can use this code:
+In order to set email configuration for Django you can use this code:
 
 .. code-block:: python
 
@@ -123,6 +124,50 @@ You can use something like this to handle similar cases.
    from email.utils import parseaddr
 
    ADMINS = tuple(parseaddr(email) for email in env.list('DJANGO_ADMINS'))
+
+
+.. _complex_dict_format:
+
+Complex dict format
+===================
+
+Sometimes we need to get a bit more complex dict type than usual. For example,
+consider Djangosaml2's ``SAML_ATTRIBUTE_MAPPING``:
+
+.. code-block:: python
+
+   SAML_ATTRIBUTE_MAPPING = {
+       'uid': ('username', ),
+       'mail': ('email', ),
+       'cn': ('first_name', ),
+       'sn': ('last_name', ),
+   }
+
+A dict of this format can be obtained as shown below:
+
+**.env file**:
+
+.. code-block:: shell
+
+   # .env file contents
+   SAML_ATTRIBUTE_MAPPING="uid=username;mail=email;cn=first_name;sn=last_name;"
+
+**settings.py file**:
+
+.. code-block:: python
+
+   # settings.py file contents
+   import environ
+
+
+   env = environ.Env()
+
+   # {'uid': ('username',), 'mail': ('email',), 'cn': ('first_name',), 'sn': ('last_name',)}
+   SAML_ATTRIBUTE_MAPPING = env.dict(
+       'SAML_ATTRIBUTE_MAPPING',
+       cast={'value': tuple},
+       default={}
+   )
 
 
 Multiline value
@@ -199,7 +244,7 @@ Escape Proxy
 ============
 
 If you're having trouble with values starting with dollar sign ($) without the intention of proxying the value to
-another, You should enbale the ``escape_proxy`` and prepend a backslash to it.
+another, You should enable the ``escape_proxy`` and prepend a backslash to it.
 
 .. code-block:: python
 
@@ -249,7 +294,8 @@ while ``./manage.py runserver`` uses ``.env``.
 Using Path objects when reading env
 -----------------------------------
 
-It is possible to use of ``pathlib.Path`` objects when reading environment file from the filesystem:
+It is possible to use of :py:class:`pathlib.Path` objects when reading environment
+file from the filesystem:
 
 .. code-block:: python
 
@@ -274,11 +320,40 @@ It is possible to use of ``pathlib.Path`` objects when reading environment file 
 Overwriting existing environment values from env files
 ------------------------------------------------------
 
-If you want variables set within your env files to take higher precidence than
+If you want variables set within your env files to take higher precedence than
 an existing set environment variable, use the ``overwrite=True`` argument of
-``read_env``. For example:
+:meth:`.environ.Env.read_env`. For example:
 
 .. code-block:: python
 
    env = environ.Env()
    env.read_env(BASE_DIR('.env'), overwrite=True)
+
+
+Handling prefixes
+=================
+
+Sometimes it is desirable to be able to prefix all environment variables. For
+example, if you are using Django, you may want to prefix all environment
+variables with ``DJANGO_``. This can be done by setting the ``prefix``
+to desired prefix. For example:
+
+**.env file**:
+
+.. code-block:: shell
+
+   # .env file contents
+   DJANGO_TEST="foo"
+
+**settings.py file**:
+
+.. code-block:: python
+
+   # settings.py file contents
+   import environ
+
+
+   env = environ.Env()
+   env.prefix = 'DJANGO_'
+
+   env.str('TEST')  # foo

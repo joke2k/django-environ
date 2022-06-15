@@ -49,10 +49,17 @@ MULTILINE_ESCAPED_STR_VAR=---BEGIN---\\n---END---
 INT_LIST=42,33
 CYRILLIC_VAR=фуубар
 INT_TUPLE=(42,33)
+MIX_TUPLE=(42,Test)
 DATABASE_ORACLE_TNS_URL=oracle://user:password@sid
 DATABASE_ORACLE_URL=oracle://user:password@host:1521/sid
 DATABASE_REDSHIFT_URL=redshift://user:password@examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com:5439/dev
 DATABASE_CUSTOM_BACKEND_URL=custom.backend://user:password@example.com:5430/database
 
+# Djangosaml2's SAML_ATTRIBUTE_MAPPING
+SAML_ATTRIBUTE_MAPPING="uid=username;mail=email;cn=first_name;sn=last_name;"
+
 # Exports
 export EXPORTED_VAR="exported var"
+
+# Prefixed
+PREFIX_TEST='foo'

@@ -1,6 +1,6 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -27,6 +27,12 @@ class FakeEnv:
     DICT = dict(foo='bar', test='on')
     PATH = '/home/dev'
     EXPORTED = 'exported var'
+    SAML_ATTRIBUTE_MAPPING = dict(
+        uid=('username',),
+        mail=('email',),
+        cn=('first_name',),
+        sn=('last_name',)
+    )
 
     @classmethod
     def generate_data(cls):
@@ -57,6 +63,7 @@ class FakeEnv:
                     ESCAPED_VAR=r'\$baz',
                     INT_LIST='42,33',
                     INT_TUPLE='(42,33)',
+                    MIX_TUPLE='(42,Test)',
                     STR_LIST_WITH_SPACES=' foo,  bar',
                     EMPTY_LIST='',
                     DICT_VAR='foo=bar,test=on',
@@ -75,4 +82,7 @@ class FakeEnv:
                     URL_VAR=cls.URL,
                     JSON_VAR=json.dumps(cls.JSON),
                     PATH_VAR=cls.PATH,
-                    EXPORTED_VAR=cls.EXPORTED)
+                    EXPORTED_VAR=cls.EXPORTED,
+                    SAML_ATTRIBUTE_MAPPING='uid=username;mail=email;cn=first_name;sn=last_name;',
+                    PREFIX_TEST='foo',
+                    )

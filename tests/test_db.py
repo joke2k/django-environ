@@ -17,52 +17,73 @@ from environ.compat import DJANGO_POSTGRES
 @pytest.mark.parametrize(
     'url,engine,name,host,user,passwd,port',
     [
-        ('postgres://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.'
-         'compute-1.amazonaws.com:5431/d8r82722r2kuvn',
+        # postgres://user:password@host:port/dbname
+        ('postgres://enigma:secret@example.com:5431/dbname',
          DJANGO_POSTGRES,
-         'd8r82722r2kuvn',
-         'ec2-107-21-253-135.compute-1.amazonaws.com',
-         'uf07k1i6d8ia0v',
-         'wegauwhgeuioweg',
+         'dbname',
+         'example.com',
+         'enigma',
+         'secret',
          5431),
-        ('postgres:////var/run/postgresql/db',
+        # postgres://path/dbname
+        ('postgres:////var/run/postgresql/dbname',
          DJANGO_POSTGRES,
-         'db',
+         'dbname',
          '/var/run/postgresql',
          '',
          '',
          ''),
-        ('postgis://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.'
-         'compute-1.amazonaws.com:5431/d8r82722r2kuvn',
+        # postgis://user:password@host:port/dbname
+        ('postgis://enigma:secret@example.com:5431/dbname',
          'django.contrib.gis.db.backends.postgis',
-         'd8r82722r2kuvn',
-         'ec2-107-21-253-135.compute-1.amazonaws.com',
-         'uf07k1i6d8ia0v',
-         'wegauwhgeuioweg',
+         'dbname',
+         'example.com',
+         'enigma',
+         'secret',
          5431),
-        ('mysqlgis://uf07k1i6d8ia0v:wegauwhgeuioweg@ec2-107-21-253-135.'
-         'compute-1.amazonaws.com:5431/d8r82722r2kuvn',
+        # postgres://user:password@host:port,host:port,host:port/dbname
+        ('postgres://username:p@ss:12,wor:34d@host1:111,22.55.44.88:222,[2001:db8::1234]:333/db',
+         DJANGO_POSTGRES,
+         'db',
+         'host1,22.55.44.88,[2001:db8::1234]',
+         'username',
+         'p@ss:12,wor:34d',
+         '111,222,333'
+         ),
+        # postgres://host,host,host/dbname
+        ('postgres://node1,node2,node3/db',
+         DJANGO_POSTGRES,
+         'db',
+         'node1,node2,node3',
+         '',
+         '',
+         ''
+         ),
+        # mysqlgis://user:password@host:port/dbname
+        ('mysqlgis://enigma:secret@example.com:5431/dbname',
          'django.contrib.gis.db.backends.mysql',
-         'd8r82722r2kuvn',
-         'ec2-107-21-253-135.compute-1.amazonaws.com',
-         'uf07k1i6d8ia0v',
-         'wegauwhgeuioweg',
+         'dbname',
+         'example.com',
+         'enigma',
+         'secret',
          5431),
-        ('mysql://bea6eb025ca0d8:69772142@us-cdbr-east.cleardb.com'
-         '/heroku_97681db3eff7580?reconnect=true',
+        # mysql://user:password@host/dbname?options
+        ('mysql://enigma:secret@reconnect.com/dbname?reconnect=true',
          'django.db.backends.mysql',
-         'heroku_97681db3eff7580',
-         'us-cdbr-east.cleardb.com',
-         'bea6eb025ca0d8',
-         '69772142',
+         'dbname',
+         'reconnect.com',
+         'enigma',
+         'secret',
          ''),
-        ('mysql://travis@localhost/test_db',
+        # mysql://user@host/dbname
+        ('mysql://enigma@localhost/dbname',
          'django.db.backends.mysql',
-         'test_db',
+         'dbname',
          'localhost',
-         'travis',
+         'enigma',
          '',
          ''),
+        # sqlite://
         ('sqlite://',
          'django.db.backends.sqlite3',
          ':memory:',
@@ -70,6 +91,7 @@ from environ.compat import DJANGO_POSTGRES
          '',
          '',
          ''),
+        # sqlite:////absolute/path/to/db/file
         ('sqlite:////full/path/to/your/file.sqlite',
          'django.db.backends.sqlite3',
          '/full/path/to/your/file.sqlite',
@@ -77,6 +99,7 @@ from environ.compat import DJANGO_POSTGRES
          '',
          '',
          ''),
+        # sqlite://:memory:
         ('sqlite://:memory:',
          'django.db.backends.sqlite3',
          ':memory:',
@@ -84,19 +107,39 @@ from environ.compat import DJANGO_POSTGRES
          '',
          '',
          ''),
-        ('ldap://cn=admin,dc=nodomain,dc=org:'
-         'some_secret_password@ldap.nodomain.org/',
+        # ldap://user:password@host
+        ('ldap://cn=admin,dc=nodomain,dc=org:secret@example.com',
          'ldapdb.backends.ldap',
-         'ldap://ldap.nodomain.org',
-         'ldap.nodomain.org',
+         'ldap://example.com',
+         'example.com',
          'cn=admin,dc=nodomain,dc=org',
-         'some_secret_password',
+         'secret',
          ''),
+        # mysql://user:password@host/dbname
+        ('mssql://enigma:secret@example.com/dbname'
+         '?driver=ODBC Driver 13 for SQL Server',
+         'sql_server.pyodbc',
+         'dbname',
+         'example.com',
+         'enigma',
+         'secret',
+         ''),
+        # mysql://user:password@host:port/dbname
+        ('mssql://enigma:secret@amazonaws.com\\insnsnss:12345/dbname'
+         '?driver=ODBC Driver 13 for SQL Server',
+         'sql_server.pyodbc',
+         'dbname',
+         'amazonaws.com\\insnsnss',
+         'enigma',
+         'secret',
+         12345),
     ],
     ids=[
         'postgres',
         'postgres_unix_domain',
         'postgis',
+        'postgres_cluster',
+        'postgres_no_ports',
         'mysqlgis',
         'cleardb',
         'mysql_no_password',
@@ -104,6 +147,8 @@ from environ.compat import DJANGO_POSTGRES
         'sqlite_file',
         'sqlite_memory',
         'ldap',
+        'mssql',
+        'mssql_port',
     ],
 )
 def test_db_parsing(url, engine, name, host, user, passwd, port):
@@ -117,6 +162,13 @@ def test_db_parsing(url, engine, name, host, user, passwd, port):
         assert config['PASSWORD'] == passwd
         assert config['USER'] == user
         assert config['HOST'] == host
+
+    if engine == 'sql_server.pyodbc':
+        assert config['OPTIONS'] == {'driver': 'ODBC Driver 13 for SQL Server'}
+
+    if host == 'reconnect.com':
+        assert config['OPTIONS'] == {'reconnect': 'true'}
+        
 
 
 def test_postgres_complex_db_name_parsing():

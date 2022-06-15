@@ -5,8 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-`v0.8.1`_ - 20-October-2021
+`v0.9.0`_ - 15-June-2022
+------------------------------
+Added
++++++
+- Added support for Postgresql cluster URI
+  `#355 <https://github.com/joke2k/django-environ/pull/355>`_.
+- Added support for Django 4.0
+  `#371 <https://github.com/joke2k/django-environ/issues/371>`_.
+- Added support for prefixed variables
+  `#362 <https://github.com/joke2k/django-environ/issues/362>`_.
+- Amended documentation.
 
+
+Deprecated
+++++++++++
+- ``Env.unicode()`` is deprecated and will be removed in the next
+  major release. Use ``Env.str()`` instead.
+
+
+Changed
++++++++
+- Attach cause to ``ImproperlyConfigured`` exception
+  `#360 <https://github.com/joke2k/django-environ/issues/360>`_.
+
+
+Fixed
++++++
+- Fixed ``_cast_urlstr`` unquoting
+  `#357 <https://github.com/joke2k/django-environ/issues/357>`_.
+- Fixed documentation regarding unsafe characters in URLs
+  `#220 <https://github.com/joke2k/django-environ/issues/220>`_.
+- Fixed ``environ.Path.__eq__()`` to compare paths correctly
+  `#86 <https://github.com/joke2k/django-environ/issues/86>`_,
+  `#197 <https://github.com/joke2k/django-environ/issues/197>`_.
+
+
+`v0.8.1`_ - 20-October-2021
+---------------------------
 Fixed
 +++++
 - Fixed "Invalid line" spam logs on blank lines in env file
@@ -16,7 +52,7 @@ Fixed
 
 
 `v0.8.0`_ - 17-October-2021
-------------------------------
+---------------------------
 Added
 +++++
 - Log invalid lines when parse .env file
@@ -108,7 +144,7 @@ Added
 - Support for Django 2.1 & 2.2.
 - Added tox.ini targets.
 - Added secure redis backend URLs via ``rediss://``.
-- Add ``cast=str`` to ``str()`` method.
+- Added ``cast=str`` to ``str()`` method.
 
 Fixed
 +++++
@@ -149,7 +185,7 @@ Added
 - Support for Elasticsearch2.
 - Support for Mysql-connector.
 - Support for ``pyodbc``.
-- Add ``__contains__`` feature to Environ class.
+- Added ``__contains__`` feature to Environ class.
 
 Fixed
 +++++
@@ -171,7 +207,7 @@ Added
 
 Changed
 +++++++
-- Fix uwsgi settings reload problem
+- Fixed uwsgi settings reload problem
   `#55 <https://github.com/joke2k/django-environ/issues/55>`_.
 - Update support for ``django-redis`` urls
   `#109 <https://github.com/joke2k/django-environ/pull/109>`_.
@@ -184,26 +220,26 @@ Added
 
 Changed
 +++++++
-- Fix for unsafe characters into URLs.
+- Fixed for unsafe characters into URLs.
 - Clarifying warning on missing or unreadable file.
   Thanks to `@nickcatal <https://github.com/nickcatal>`_.
-- Fix support for Oracle urls.
-- Fix support for ``django-redis``.
+- Fixed support for Oracle urls.
+- Fixed support for ``django-redis``.
 
 `v0.4`_ - 23-September-2015
 ---------------------------
 Added
 +++++
 - New email schemes - ``smtp+ssl`` and ``smtp+tls`` (``smtps`` would be deprecated).
-- Add tuple support. Thanks to `@anonymouzz <https://github.com/anonymouzz>`_.
-- Add LDAP url support for database. Thanks to
+- Added tuple support. Thanks to `@anonymouzz <https://github.com/anonymouzz>`_.
+- Added LDAP url support for database. Thanks to
   `django-ldapdb/django-ldapdb <https://github.com/django-ldapdb/django-ldapdb>`_.
 
 Changed
 +++++++
-- Fix non-ascii values (broken in Python 2.x).
+- Fixed non-ascii values (broken in Python 2.x).
 - ``redis_cache`` replaced by ``django_redis``.
-- Fix psql/pgsql url.
+- Fixed psql/pgsql url.
 
 
 `v0.3.1`_ - 19 Sep 2015
@@ -225,9 +261,9 @@ Fixed
 ----------------------
 Added
 +++++
-- Add cache url support.
-- Add email url support.
-- Add search url support.
+- Added cache url support.
+- Added email url support.
+- Added search url support.
 
 Changed
 +++++++
@@ -243,7 +279,7 @@ v0.2 - 16-April-2013
 --------------------
 Added
 +++++
-- Add advanced float parsing (comma and dot symbols to separate thousands and decimals).
+- Added advanced float parsing (comma and dot symbols to separate thousands and decimals).
 
 Fixed
 +++++
@@ -256,6 +292,7 @@ Added
 - Initial release.
 
 
+.. _v0.9.0: https://github.com/joke2k/django-environ/compare/v0.8.1...v0.9.0
 .. _v0.8.1: https://github.com/joke2k/django-environ/compare/v0.8.0...v0.8.1
 .. _v0.8.0: https://github.com/joke2k/django-environ/compare/v0.7.0...v0.8.0
 .. _v0.7.0: https://github.com/joke2k/django-environ/compare/v0.6.0...v0.7.0

@@ -15,36 +15,73 @@ Overview
    :start-after: -overview-
    :end-before: -project-information-
 
-Quick Start
-===========
-
-.. include:: ../README.rst
-   :start-after: -code-begin-
-   :end-before: -overview-
-
-.. include:: ../README.rst
-   :start-after: -support-
-
 ----
 
 Full Table of Contents
 ======================
 
+The User Guide
+--------------
+
+This part of the documentation, which is mostly prose, begins with some
+background information about django-environ, then focuses on step-by-step
+instructions for getting the most out of django-environ.
+
 .. toctree::
    :maxdepth: 2
 
-   getting-started
+   install
+   quickstart
+
+
+The Community Guide
+-------------------
+
+This part of the documentation, which is mostly prose, details the
+django-environ ecosystem and community.
+
+.. toctree::
+   :maxdepth: 2
+
+   faq
    types
    tips
-   contributing
-   backers
-
-.. include:: ../README.rst
-   :start-after: -project-information-
-   :end-before: -support-
 
 .. toctree::
    :maxdepth: 1
 
-   license
+   deprecations
    changelog
+
+
+The API Documentation / Guide
+-----------------------------
+
+If you are looking for information on a specific function, class, or method,
+this part of the documentation is for you.
+
+.. toctree::
+   :maxdepth: 2
+
+   api
+
+
+The Contributor Guide
+---------------------
+
+If you want to contribute to the project, this part of the documentation is for
+you.
+
+.. toctree::
+   :maxdepth: 3
+
+   contributing
+   backers
+   license
+
+.. include:: ../README.rst
+   :start-after: -support-
+
+.. include:: ../README.rst
+   :start-after: -project-information-
+   :end-before: -support-

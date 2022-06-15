@@ -1,6 +1,6 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -12,6 +12,7 @@ variables to configure your Django application.
 """
 
 import ast
+import itertools
 import logging
 import os
 import re
@@ -21,6 +22,7 @@ import warnings
 from urllib.parse import (
     parse_qs,
     ParseResult,
+    unquote,
     unquote_plus,
     urlparse,
     urlunparse,
@@ -61,7 +63,7 @@ def _cast_int(v):
 
 
 def _cast_urlstr(v):
-    return unquote_plus(v) if isinstance(v, str) else v
+    return unquote(v) if isinstance(v, str) else v
 
 
 class NoValue:
@@ -72,13 +74,32 @@ class NoValue:
 
 class Env:
     """Provide scheme-based lookups of environment variables so that each
-    caller doesn't have to pass in `cast` and `default` parameters.
+    caller doesn't have to pass in ``cast`` and ``default`` parameters.
 
     Usage:::
 
-        env = Env(MAIL_ENABLED=bool, SMTP_LOGIN=(str, 'DEFAULT'))
-        if env('MAIL_ENABLED'):
-            ...
+        import environ
+        import os
+
+        env = environ.Env(
+            # set casting, default value
+            MAIL_ENABLED=(bool, False),
+            SMTP_LOGIN=(str, 'DEFAULT')
+        )
+
+        # Set the project base directory
+        BASE_DIR = os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__))
+        )
+
+        # Take environment variables from .env file
+        environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+
+        # False if not in os.environ due to casting above
+        MAIL_ENABLED = env('MAIL_ENABLED')
+
+        # 'DEFAULT' if not in os.environ due to casting above
+        SMTP_LOGIN = env('SMTP_LOGIN')
     """
 
     ENVIRON = os.environ
@@ -169,6 +190,7 @@ class Env:
     def __init__(self, **scheme):
         self.smart_cast = True
         self.escape_proxy = False
+        self.prefix = ""
         self.scheme = scheme
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
@@ -197,6 +219,15 @@ class Env:
         """Helper for python2
         :rtype: unicode
         """
+        warnings.warn(
+            '`%s.unicode` is deprecated, use `%s.str` instead' % (
+                self.__class__.__name__,
+                self.__class__.__name__,
+            ),
+            DeprecationWarning,
+            stacklevel=2
+        )
+
         return self.get_value(var, cast=str, default=default)
 
     def bytes(self, var, default=NOTSET, encoding='utf8'):
@@ -260,7 +291,7 @@ class Env:
 
     def url(self, var, default=NOTSET):
         """
-        :rtype: urlparse.ParseResult
+        :rtype: urllib.parse.ParseResult
         """
         return self.get_value(
             var,
@@ -330,20 +361,25 @@ class Env:
     def get_value(self, var, cast=None, default=NOTSET, parse_default=False):
         """Return value for given environment variable.
 
-        :param var: Name of variable.
-        :param cast: Type to cast return value as.
-        :param default: If var not present in environ, return this instead.
-        :param parse_default: force to parse default..
-
-        :returns: Value from environment or default (if set)
+        :param str var:
+            Name of variable.
+        :param collections.abc.Callable or None cast:
+            Type to cast return value as.
+        :param default:
+             If var not present in environ, return this instead.
+        :param bool parse_default:
+            Force to parse default.
+        :returns: Value from environment or default (if set).
+        :rtype: typing.IO[typing.Any]
         """
 
         logger.debug("get '{}' casted as '{}' with default '{}'".format(
             var, cast, default
         ))
 
-        if var in self.scheme:
-            var_info = self.scheme[var]
+        var_name = "{}{}".format(self.prefix, var)
+        if var_name in self.scheme:
+            var_info = self.scheme[var_name]
 
             try:
                 has_default = len(var_info) == 2
@@ -364,11 +400,11 @@ class Env:
                     cast = var_info
 
         try:
-            value = self.ENVIRON[var]
-        except KeyError:
+            value = self.ENVIRON[var_name]
+        except KeyError as exc:
             if default is self.NOTSET:
                 error_msg = "Set the {} environment variable".format(var)
-                raise ImproperlyConfigured(error_msg)
+                raise ImproperlyConfigured(error_msg) from exc
 
             value = default
 
@@ -456,15 +492,29 @@ class Env:
 
     @classmethod
     def db_url_config(cls, url, engine=None):
-        """Pulled from DJ-Database-URL, parse an arbitrary Database URL.
+        """Parse an arbitrary database URL.
 
-        Support currently exists for PostgreSQL, PostGIS, MySQL, Oracle and
-        SQLite.
+        Supports the following URL schemas:
 
-        SQLite connects to file based databases. The same URL format is used,
-        omitting the hostname, and using the "file" portion as the filename of
-        the database. This has the effect of four slashes being present for an
-        absolute file path.
+        * PostgreSQL: ``postgres[ql]?://`` or ``p[g]?sql://``
+        * PostGIS: ``postgis://``
+        * MySQL: ``mysql://`` or ``mysql2://``
+        * MySQL (GIS): ``mysqlgis://``
+        * MySQL Connector Python from Oracle: ``mysql-connector://``
+        * SQLite: ``sqlite://``
+        * SQLite with SpatiaLite for GeoDjango: ``spatialite://``
+        * Oracle: ``oracle://``
+        * Microsoft SQL Server: ``mssql://``
+        * PyODBC: ``pyodbc://``
+        * Amazon Redshift: ``redshift://``
+        * LDAP: ``ldap://``
+
+        :param urllib.parse.ParseResult or str url:
+            Database URL to parse.
+        :param str or None engine:
+            If None, the database engine is evaluates from the ``url``.
+        :return: Parsed database URL.
+        :rtype: dict
         """
         if not isinstance(url, cls.URL_CLASS):
             if url == 'sqlite://:memory:':
@@ -501,13 +551,30 @@ class Env:
             if url.port:
                 path += ':{port}'.format(port=url.port)
 
+        user_host = url.netloc.rsplit('@', 1)
+        if url.scheme in cls.POSTGRES_FAMILY and ',' in user_host[-1]:
+            # Parsing postgres cluster dsn
+            hinfo = list(
+                itertools.zip_longest(
+                    *(
+                        host.rsplit(':', 1)
+                        for host in user_host[-1].split(',')
+                    )
+                )
+            )
+            hostname = ','.join(hinfo[0])
+            port = ','.join(filter(None, hinfo[1])) if len(hinfo) == 2 else ''
+        else:
+            hostname = url.hostname
+            port = url.port
+
         # Update with environment configuration.
         config.update({
             'NAME': path or '',
             'USER': _cast_urlstr(url.username) or '',
             'PASSWORD': _cast_urlstr(url.password) or '',
-            'HOST': url.hostname or '',
-            'PORT': _cast_int(url.port) or '',
+            'HOST': hostname or '',
+            'PORT': _cast_int(port) or '',
         })
 
         if (
@@ -552,11 +619,14 @@ class Env:
 
     @classmethod
     def cache_url_config(cls, url, backend=None):
-        """Pulled from DJ-Cache-URL, parse an arbitrary Cache URL.
+        """Parse an arbitrary cache URL.
 
-        :param url:
-        :param backend:
-        :return:
+        :param urllib.parse.ParseResult or str url:
+            Cache URL to parse.
+        :param str or None backend:
+            If None, the backend is evaluates from the ``url``.
+        :return: Parsed cache URL.
+        :rtype: dict
         """
         if not isinstance(url, cls.URL_CLASS):
             if not url:
@@ -625,7 +695,15 @@ class Env:
 
     @classmethod
     def email_url_config(cls, url, backend=None):
-        """Parses an email URL."""
+        """Parse an arbitrary email URL.
+
+        :param urllib.parse.ParseResult or str url:
+            Email URL to parse.
+        :param str or None backend:
+            If None, the backend is evaluates from the ``url``.
+        :return: Parsed email URL.
+        :rtype: dict
+        """
 
         config = {}
 
@@ -670,6 +748,16 @@ class Env:
 
     @classmethod
     def search_url_config(cls, url, engine=None):
+        """Parse an arbitrary search URL.
+
+        :param urllib.parse.ParseResult or str url:
+            Search URL to parse.
+        :param str or None engine:
+            If None, the engine is evaluates from the ``url``.
+        :return: Parsed search URL.
+        :rtype: dict
+        """
+
         config = {}
 
         url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
@@ -759,26 +847,26 @@ class Env:
 
     @classmethod
     def read_env(cls, env_file=None, overwrite=False, **overrides):
-        """Read a .env file into os.environ.
+        r"""Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack
         backtracking to find the dotenv in the same directory as the file that
-        called read_env.
+        called ``read_env``.
 
         Existing environment variables take precedent and are NOT overwritten
         by the file content. ``overwrite=True`` will force an overwrite of
         existing environment variables.
 
         Refs:
-        - https://wellfire.co/learn/easier-12-factor-django
-        - https://gist.github.com/bennylope/2999704
 
-        :param env_file: The path to the `.env` file your application should
+        * https://wellfire.co/learn/easier-12-factor-django
+
+        :param env_file: The path to the ``.env`` file your application should
             use. If a path is not provided, `read_env` will attempt to import
             the Django settings module from the Django project root.
         :param overwrite: ``overwrite=True`` will force an overwrite of
             existing environment variables.
-        :param **overrides: Any additional keyword arguments provided directly
+        :param \**overrides: Any additional keyword arguments provided directly
             to read_env will be added to the environment. If the key matches an
             existing environment variable, the value will be overridden.
         """
@@ -881,13 +969,12 @@ class Path:
         return self.__class__(self.__root__, *paths, **kwargs)
 
     def file(self, name, *args, **kwargs):
-        """Open a file.
+        r"""Open a file.
 
-        :param name: Filename appended to self.root
-        :param args: passed to open()
-        :param kwargs: passed to open()
-
-        :rtype: file
+        :param str name: Filename appended to :py:attr:`~root`
+        :param \*args: ``*args`` passed to :py:func:`open`
+        :param \**kwargs: ``**kwargs`` passed to :py:func:`open`
+        :rtype: typing.IO[typing.Any]
         """
         return open(self(name), *args, **kwargs)
 
@@ -914,7 +1001,9 @@ class Path:
         return self._absolute_join(self.__root__, *paths, **kwargs)
 
     def __eq__(self, other):
-        return self.__root__ == other.__root__
+        if isinstance(other, Path):
+            return self.__root__ == other.__root__
+        return self.__root__ == other
 
     def __ne__(self, other):
         return not self.__eq__(other)
