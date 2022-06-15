@@ -10,9 +10,19 @@
 
 import codecs
 import re
+import sys
+import warnings
 from os import path
 
 from setuptools import find_packages, setup
+
+
+if sys.version_info < (3, 6):
+    warnings.warn(
+        "Support of Python < 3.6 is deprecated"
+        "and will be removed in a future release.",
+        DeprecationWarning
+    )
 
 
 def read_file(filepath):
@@ -139,7 +149,6 @@ CLASSIFIERS = [
 
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.4',
     'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
@@ -217,7 +226,7 @@ if __name__ == '__main__':
         platforms=['any'],
         include_package_data=True,
         zip_safe=False,
-        python_requires='>=3.4,<4',
+        python_requires='>=3.5,<4',
         install_requires=INSTALL_REQUIRES,
         dependency_links=DEPENDENCY_LINKS,
         extras_require=EXTRAS_REQUIRE,

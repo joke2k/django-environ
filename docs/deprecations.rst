@@ -2,6 +2,16 @@
 Deprecations
 ============
 
+Features deprecated in 0.10.0
+=============================
+
+Python
+------
+
+* Support of Python < 3.6 is deprecated and will be removed
+  in next major version.
+
+
 Features deprecated in 0.9.0
 ============================
 
