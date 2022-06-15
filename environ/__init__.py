@@ -18,10 +18,10 @@ for details on the use of this package.
 from .environ import *
 
 
-__copyright__ = 'Copyright (C) 2021 Daniele Faraglia'
+__copyright__ = 'Copyright (C) 2013-2022 Daniele Faraglia'
 """The copyright notice of the package."""
 
-__version__ = '0.9.0'
+__version__ = '0.10.0'
 """The version of the package."""
 
 __license__ = 'MIT'
