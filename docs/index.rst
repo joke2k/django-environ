@@ -1,5 +1,3 @@
-.. module:: environ
-
 =======================================
 Welcome to django-environ documentation
 =======================================
