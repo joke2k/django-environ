@@ -32,12 +32,12 @@ Changed
 
 Fixed
 +++++
-- Fix ``_cast_urlstr`` unquoting
+- Fixed ``_cast_urlstr`` unquoting
   `#357 <https://github.com/joke2k/django-environ/issues/357>`_.
-- Fix documentation regarding unsafe characters in URLs
+- Fixed documentation regarding unsafe characters in URLs
   `#220 <https://github.com/joke2k/django-environ/issues/220>`_.
-- Fix ``environ.Path.__eq__()`` to compare paths correctly
-  `#86 <https://github.com/joke2k/django-environ/issues/86>`_
+- Fixed ``environ.Path.__eq__()`` to compare paths correctly
+  `#86 <https://github.com/joke2k/django-environ/issues/86>`_,
   `#197 <https://github.com/joke2k/django-environ/issues/197>`_.
 
 
@@ -144,7 +144,7 @@ Added
 - Support for Django 2.1 & 2.2.
 - Added tox.ini targets.
 - Added secure redis backend URLs via ``rediss://``.
-- Add ``cast=str`` to ``str()`` method.
+- Added ``cast=str`` to ``str()`` method.
 
 Fixed
 +++++
@@ -185,7 +185,7 @@ Added
 - Support for Elasticsearch2.
 - Support for Mysql-connector.
 - Support for ``pyodbc``.
-- Add ``__contains__`` feature to Environ class.
+- Added ``__contains__`` feature to Environ class.
 
 Fixed
 +++++
@@ -207,7 +207,7 @@ Added
 
 Changed
 +++++++
-- Fix uwsgi settings reload problem
+- Fixed uwsgi settings reload problem
   `#55 <https://github.com/joke2k/django-environ/issues/55>`_.
 - Update support for ``django-redis`` urls
   `#109 <https://github.com/joke2k/django-environ/pull/109>`_.
@@ -220,26 +220,26 @@ Added
 
 Changed
 +++++++
-- Fix for unsafe characters into URLs.
+- Fixed for unsafe characters into URLs.
 - Clarifying warning on missing or unreadable file.
   Thanks to `@nickcatal <https://github.com/nickcatal>`_.
-- Fix support for Oracle urls.
-- Fix support for ``django-redis``.
+- Fixed support for Oracle urls.
+- Fixed support for ``django-redis``.
 
 `v0.4`_ - 23-September-2015
 ---------------------------
 Added
 +++++
 - New email schemes - ``smtp+ssl`` and ``smtp+tls`` (``smtps`` would be deprecated).
-- Add tuple support. Thanks to `@anonymouzz <https://github.com/anonymouzz>`_.
-- Add LDAP url support for database. Thanks to
+- Added tuple support. Thanks to `@anonymouzz <https://github.com/anonymouzz>`_.
+- Added LDAP url support for database. Thanks to
   `django-ldapdb/django-ldapdb <https://github.com/django-ldapdb/django-ldapdb>`_.
 
 Changed
 +++++++
-- Fix non-ascii values (broken in Python 2.x).
+- Fixed non-ascii values (broken in Python 2.x).
 - ``redis_cache`` replaced by ``django_redis``.
-- Fix psql/pgsql url.
+- Fixed psql/pgsql url.
 
 
 `v0.3.1`_ - 19 Sep 2015
@@ -261,9 +261,9 @@ Fixed
 ----------------------
 Added
 +++++
-- Add cache url support.
-- Add email url support.
-- Add search url support.
+- Added cache url support.
+- Added email url support.
+- Added search url support.
 
 Changed
 +++++++
@@ -279,7 +279,7 @@ v0.2 - 16-April-2013
 --------------------
 Added
 +++++
-- Add advanced float parsing (comma and dot symbols to separate thousands and decimals).
+- Added advanced float parsing (comma and dot symbols to separate thousands and decimals).
 
 Fixed
 +++++
