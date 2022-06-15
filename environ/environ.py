@@ -215,21 +215,6 @@ class Env:
             return re.sub(r'(\\r)?\\n', r'\n', value)
         return value
 
-    def unicode(self, var, default=NOTSET):
-        """Helper for python2
-        :rtype: unicode
-        """
-        warnings.warn(
-            '`%s.unicode` is deprecated, use `%s.str` instead' % (
-                self.__class__.__name__,
-                self.__class__.__name__,
-            ),
-            DeprecationWarning,
-            stacklevel=2
-        )
-
-        return self.get_value(var, cast=str, default=default)
-
     def bytes(self, var, default=NOTSET, encoding='utf8'):
         """
         :rtype: bytes
