@@ -47,7 +47,7 @@ def test_repr(volume):
         assert root.__repr__() == '<Path:/home>'
 
 
-def test_comparison():
+def test_comparison(volume):
     root = Path('/home')
     assert root.__eq__(Path('/home'))
     assert root in Path('/')
@@ -62,6 +62,14 @@ def test_comparison():
     assert Path('/home/foo/').__fspath__() == str(Path('/home/foo/'))
     assert ~Path('/home') == Path('/')
 
+    if sys.platform == 'win32':
+        assert Path('/home') == '{}home'.format(volume)
+        assert '{}home'.format(volume) == Path('/home')
+    else:
+        assert Path('/home') == '/home'
+        assert '/home' == Path('/home')
+
+    assert Path('/home') != '/usr'
 
 def test_sum():
     """Make sure Path correct handle __add__."""

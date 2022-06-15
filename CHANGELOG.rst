@@ -36,6 +36,9 @@ Fixed
   `#357 <https://github.com/joke2k/django-environ/issues/357>`_.
 - Fix documentation regarding unsafe characters in URLs
   `#220 <https://github.com/joke2k/django-environ/issues/220>`_.
+- Fix ``environ.Path.__eq__()`` to compare paths correctly
+  `#86 <https://github.com/joke2k/django-environ/issues/86>`_
+  `#197 <https://github.com/joke2k/django-environ/issues/197>`_.
 
 
 `v0.8.1`_ - 20-October-2021

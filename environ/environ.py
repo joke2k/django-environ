@@ -361,12 +361,16 @@ class Env:
     def get_value(self, var, cast=None, default=NOTSET, parse_default=False):
         """Return value for given environment variable.
 
-        :param var: Name of variable.
-        :param cast: Type to cast return value as.
-        :param default: If var not present in environ, return this instead.
-        :param parse_default: force to parse default..
-
-        :returns: Value from environment or default (if set)
+        :param str var:
+            Name of variable.
+        :param collections.abc.Callable or None cast:
+            Type to cast return value as.
+        :param default:
+             If var not present in environ, return this instead.
+        :param bool parse_default:
+            Force to parse default.
+        :returns: Value from environment or default (if set).
+        :rtype: typing.IO[typing.Any]
         """
 
         logger.debug("get '{}' casted as '{}' with default '{}'".format(
@@ -997,7 +1001,9 @@ class Path:
         return self._absolute_join(self.__root__, *paths, **kwargs)
 
     def __eq__(self, other):
-        return self.__root__ == other.__root__
+        if isinstance(other, Path):
+            return self.__root__ == other.__root__
+        return self.__root__ == other
 
     def __ne__(self, other):
         return not self.__eq__(other)
