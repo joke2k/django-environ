@@ -8,8 +8,9 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 `v0.10.0`_ - 00-Unreleased-2022
 -------------------------------
 
-WIP
-+++
+Removed
++++++++
+- Removed deprecated ``Env.unicode()``.
 
 
 `v0.9.0`_ - 15-June-2022
