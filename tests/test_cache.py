@@ -7,7 +7,6 @@
 # the LICENSE.txt file that was distributed with this source code.
 
 from unittest import mock
-from environ import compat
 
 import pytest
 
@@ -55,7 +54,7 @@ def test_base_options_parsing():
         ('rediscache://host1:6379,host2:6379,host3:9999/1', REDIS_DRIVER,
          ['redis://host1:6379/1', 'redis://host2:6379/1',
           'redis://host3:9999/1']),
-        ('rediscache:///path/to/socket:1', compat.choose_rediscache_driver(),
+        ('rediscache:///path/to/socket:1', REDIS_DRIVER,
          'unix:///path/to/socket:1'),
         ('memcache:///tmp/memcached.sock',
          'django.core.cache.backends.memcached.MemcachedCache',
@@ -186,14 +185,12 @@ def test_cache_url_password_using_sub_delims(monkeypatch, chars):
     monkeypatch.setenv('CACHE_URL', url)
     env = Env()
 
-    redis_backend = compat.choose_rediscache_driver()
-
     result = env.cache()
-    assert result['BACKEND'] == redis_backend
+    assert result['BACKEND'] == REDIS_DRIVER
     assert result['LOCATION'] == url
 
     result = env.cache_url_config(url)
-    assert result['BACKEND'] == redis_backend
+    assert result['BACKEND'] == REDIS_DRIVER
     assert result['LOCATION'] == url
 
     url = 'rediss://enigma:sec{}ret@ondigitalocean.com:25061/2'.format(chars)
@@ -201,11 +198,11 @@ def test_cache_url_password_using_sub_delims(monkeypatch, chars):
     env = Env()
 
     result = env.cache()
-    assert result['BACKEND'] == redis_backend
+    assert result['BACKEND'] == REDIS_DRIVER
     assert result['LOCATION'] == url
 
     result = env.cache_url_config(url)
-    assert result['BACKEND'] == redis_backend
+    assert result['BACKEND'] == REDIS_DRIVER
     assert result['LOCATION'] == url
 
     url = 'rediss://enigma:{}secret@ondigitalocean.com:25061/2'.format(chars)
@@ -213,11 +210,11 @@ def test_cache_url_password_using_sub_delims(monkeypatch, chars):
     env = Env()
 
     result = env.cache()
-    assert result['BACKEND'] == redis_backend
+    assert result['BACKEND'] == REDIS_DRIVER
     assert result['LOCATION'] == url
 
     result = env.cache_url_config(url)
-    assert result['BACKEND'] == redis_backend
+    assert result['BACKEND'] == REDIS_DRIVER
     assert result['LOCATION'] == url
 
 
@@ -232,10 +229,8 @@ def test_cache_url_password_using_gen_delims(monkeypatch, chars):
     monkeypatch.setenv('CACHE_URL', url)
     env = Env()
 
-    redis_backend = compat.choose_rediscache_driver()
-
     result = env.cache()
-    assert result['BACKEND'] == redis_backend
+    assert result['BACKEND'] == REDIS_DRIVER
     assert result['LOCATION'] == url
 
     url = 'rediss://enigma:sec{}ret@ondigitalocean.com:25061/2'.format(chars)
@@ -243,7 +238,7 @@ def test_cache_url_password_using_gen_delims(monkeypatch, chars):
     env = Env()
 
     result = env.cache()
-    assert result['BACKEND'] == redis_backend
+    assert result['BACKEND'] == REDIS_DRIVER
     assert result['LOCATION'] == url
 
     url = 'rediss://enigma:{}secret@ondigitalocean.com:25061/2'.format(chars)
@@ -251,7 +246,7 @@ def test_cache_url_password_using_gen_delims(monkeypatch, chars):
     env = Env()
 
     result = env.cache()
-    assert result['BACKEND'] == redis_backend
+    assert result['BACKEND'] == REDIS_DRIVER
     assert result['LOCATION'] == url
 
 
