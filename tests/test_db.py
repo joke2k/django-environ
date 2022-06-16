@@ -1,6 +1,6 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -168,7 +168,6 @@ def test_db_parsing(url, engine, name, host, user, passwd, port):
 
     if host == 'reconnect.com':
         assert config['OPTIONS'] == {'reconnect': 'true'}
-        
 
 
 def test_postgres_complex_db_name_parsing():
