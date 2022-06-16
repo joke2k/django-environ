@@ -19,6 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     name: Code linting
 
+    # The maximum number of minutes to let a workflow run
+    # before GitHub automatically cancels it. Default: 360
+    timeout-minutes: 30
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3.0.2

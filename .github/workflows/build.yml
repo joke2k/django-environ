@@ -11,6 +11,7 @@ on:
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
+  # The branches below must be a subset of the branches above
   pull_request:
     branches:
       - develop
@@ -20,6 +21,10 @@ jobs:
   build:
     name: Build and test package distribution
     runs-on: ${{ matrix.os }}
+
+    # The maximum number of minutes to let a workflow run
+    # before GitHub automatically cancels it. Default: 360
+    timeout-minutes: 30
 
     strategy:
       matrix:
