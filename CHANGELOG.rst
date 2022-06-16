@@ -20,6 +20,9 @@ Deprecated
 Removed
 +++++++
 - Removed deprecated ``Env.unicode()``.
+- Remove ``environ.register_schemes`` calls and do not modify global
+  ``urllib.parse.urlparse``'s ``uses_*`` variables as this no longer needed.
+  `#246 <https://github.com/joke2k/django-environ/pull/246>`_.
 
 
 `v0.9.0`_ - 15-June-2022
