@@ -9,6 +9,7 @@ on:
       - 'release/**'
       - 'fix/**'
 
+  # The branches below must be a subset of the branches above
   pull_request:
     branches:
       - develop
@@ -18,6 +19,10 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     name: Build and test package documentation
+
+    # The maximum number of minutes to let a workflow run
+    # before GitHub automatically cancels it. Default: 360
+    timeout-minutes: 30
 
     steps:
       - name: Checkout code

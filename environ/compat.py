@@ -31,11 +31,11 @@ def choose_rediscache_driver():
     # use built-in support if Django 4+
     if DJANGO_VERSION is not None and DJANGO_VERSION >= (4, 0):
         return 'django.core.cache.backends.redis.RedisCache'
+
     # back compatibility with redis_cache package
-    elif find_loader('redis_cache'):
+    if find_loader('redis_cache'):
         return 'redis_cache.RedisCache'
-    else:
-        return 'django_redis.cache.RedisCache'
+    return 'django_redis.cache.RedisCache'
 
 
 def choose_postgres_driver():

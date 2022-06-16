@@ -7,6 +7,11 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 `v0.10.0`_ - 00-Unreleased-2022
 -------------------------------
+Added
++++++
+- Use the core redis library by default if running Django >= 4.0
+  `#356 <https://github.com/joke2k/django-environ/issues/356>`_.
+
 Deprecated
 ++++++++++
 - Support of Python < 3.6 is deprecated and will be removed

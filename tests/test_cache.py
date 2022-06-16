@@ -1,6 +1,6 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -12,7 +12,11 @@ import pytest
 
 import environ.compat
 from environ import Env
-from environ.compat import PYMEMCACHE_DRIVER, REDIS_DRIVER, ImproperlyConfigured
+from environ.compat import (
+    ImproperlyConfigured,
+    PYMEMCACHE_DRIVER,
+    REDIS_DRIVER,
+)
 
 
 def test_base_options_parsing():
@@ -110,6 +114,23 @@ def test_pymemcache_compat(django_version, pymemcache_installed):
                 assert driver == old
             else:
                 assert driver == new if pymemcache_installed else old
+
+
+@pytest.mark.parametrize('django_version', ((4, 0), (3, 2), None))
+@pytest.mark.parametrize('redis_cache_installed', (True, False))
+def test_rediscache_compat(django_version, redis_cache_installed):
+    django_new = 'django.core.cache.backends.redis.RedisCache'
+    redis_cache = 'redis_cache.RedisCache'
+    django_old = 'django_redis.cache.RedisCache'
+
+    with mock.patch.object(environ.compat, 'DJANGO_VERSION', django_version):
+        with mock.patch('environ.compat.find_loader') as mock_find_loader:
+            mock_find_loader.return_value = redis_cache_installed
+            driver = environ.compat.choose_rediscache_driver()
+            if django_version and django_version >= (4, 0):
+                assert driver == django_new
+            else:
+                assert driver == redis_cache if redis_cache_installed else django_old
 
 
 def test_redis_parsing():

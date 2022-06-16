@@ -12,7 +12,11 @@ from urllib.parse import quote
 import pytest
 
 from environ import Env, Path
-from environ.compat import DJANGO_POSTGRES, REDIS_DRIVER, ImproperlyConfigured
+from environ.compat import (
+    DJANGO_POSTGRES,
+    ImproperlyConfigured,
+    REDIS_DRIVER,
+)
 from .asserts import assert_type_and_value
 from .fixtures import FakeEnv
 
@@ -152,12 +156,23 @@ class TestEnv:
 
     def test_mix_tuple_issue_387(self):
         """Cast a tuple of mixed types.
-        
+
         Casts a string like "(42,Test)" to a tuple like  (42, 'Test').
         See: https://github.com/joke2k/django-environ/issues/387 for details."""
-        caster = lambda v: int(v) if v.isdigit() else v.strip()
-        cast = lambda t: tuple(map(caster, [c for c in t.strip('()').split(',')]))
-        assert_type_and_value(tuple, (42, 'Test'), self.env( 'MIX_TUPLE', default=(0, ''), cast=cast))
+        assert_type_and_value(
+            tuple,
+            (42, 'Test'),
+            self.env(
+                'MIX_TUPLE',
+                default=(0, ''),
+                cast=lambda t: tuple(
+                    map(
+                        lambda v: int(v) if v.isdigit() else v.strip(),
+                        [c for c in t.strip('()').split(',')]
+                    )
+                ),
+            )
+        )
 
     def test_str_list_with_spaces(self):
         assert_type_and_value(list, [' foo', '  bar'],
