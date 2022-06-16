@@ -17,7 +17,6 @@ import logging
 import os
 import re
 import sys
-import urllib.parse as urlparselib
 import warnings
 from urllib.parse import (
     parse_qs,
@@ -1048,21 +1047,3 @@ class Path:
             raise ImproperlyConfigured(
                 "Create required path: {}".format(absolute_path))
         return absolute_path
-
-
-def register_scheme(scheme):
-    for method in dir(urlparselib):
-        if method.startswith('uses_'):
-            getattr(urlparselib, method).append(scheme)
-
-
-def register_schemes(schemes):
-    for scheme in schemes:
-        register_scheme(scheme)
-
-
-# Register database and cache schemes in URLs.
-register_schemes(Env.DB_SCHEMES.keys())
-register_schemes(Env.CACHE_SCHEMES.keys())
-register_schemes(Env.SEARCH_SCHEMES.keys())
-register_schemes(Env.EMAIL_SCHEMES.keys())

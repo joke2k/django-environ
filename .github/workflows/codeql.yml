@@ -14,12 +14,12 @@ on:
 
   schedule:
     - cron: '40 22 * * 5'
-      #      | | | | |
-      #      | | | | |____ day of the week (0 - 6 or SUN-SAT)
-      #      | | | |____ month (1 - 12 or JAN-DEC)
-      #      | | |____ day of the month (1 - 31)
-      #      | |____ hour (0 - 23)
-      #      |____ minute (0 - 59)
+      #       |  | | | |
+      #       |  | | | |____ day of the week (0 - 6 or SUN-SAT)
+      #       |  | | |____ month (1 - 12 or JAN-DEC)
+      #       |  | |____ day of the month (1 - 31)
+      #       |  |____ hour (0 - 23)
+      #       |____ minute (0 - 59)
 
 jobs:
   analyze:
