@@ -12,7 +12,7 @@ from urllib.parse import quote
 import pytest
 
 from environ import Env, Path
-from environ.compat import ImproperlyConfigured, DJANGO_POSTGRES
+from environ.compat import DJANGO_POSTGRES, REDIS_DRIVER, ImproperlyConfigured
 from .asserts import assert_type_and_value
 from .fixtures import FakeEnv
 
@@ -275,7 +275,7 @@ class TestEnv:
             (Env.DEFAULT_CACHE_ENV,
              'django.core.cache.backends.memcached.MemcachedCache',
              '127.0.0.1:11211', None),
-            ('CACHE_REDIS', 'django_redis.cache.RedisCache',
+            ('CACHE_REDIS', REDIS_DRIVER,
              'redis://127.0.0.1:6379/1',
              {'CLIENT_CLASS': 'django_redis.client.DefaultClient',
               'PASSWORD': 'secret'}),
