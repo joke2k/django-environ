@@ -25,8 +25,11 @@ else:
     class ImproperlyConfigured(Exception):
         pass
 
+# use built-in support if Django 4+
+if DJANGO_VERSION is not None and DJANGO_VERSION >= (4, 0):
+    REDIS_DRIVER='django.core.cache.backends.redis.RedisCache'
 # back compatibility with redis_cache package
-if find_loader('redis_cache'):
+elif find_loader('redis_cache'):
     REDIS_DRIVER = 'redis_cache.RedisCache'
 else:
     REDIS_DRIVER = 'django_redis.cache.RedisCache'
