@@ -185,6 +185,7 @@ class TestEnv:
 
     def test_dict_value(self):
         assert_type_and_value(dict, FakeEnv.DICT, self.env.dict('DICT_VAR'))
+        assert_type_and_value(dict, FakeEnv.DICT_WITH_EQ, self.env.dict('DICT_WITH_EQ_VAR'))
 
     def test_complex_dict_value(self):
         assert_type_and_value(

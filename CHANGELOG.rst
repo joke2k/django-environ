@@ -11,6 +11,8 @@ Added
 +++++
 - Use the core redis library by default if running Django >= 4.0
   `#356 <https://github.com/joke2k/django-environ/issues/356>`_.
+- Value of dict can now contain an equal sign
+  `#241 <https://github.com/joke2k/django-environ/pull/241>`_.
 
 Deprecated
 ++++++++++
