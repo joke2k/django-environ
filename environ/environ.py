@@ -455,6 +455,7 @@ class Env:
             value = [x for x in value.split(',') if x]
         elif cast is tuple:
             val = value.strip('(').strip(')').split(',')
+            # pylint: disable=consider-using-generator
             value = tuple([x for x in val if x])
         elif cast is float:
             # clean string
@@ -851,6 +852,7 @@ class Env:
             existing environment variable, the value will be overridden.
         """
         if env_file is None:
+            # pylint: disable=protected-access
             frame = sys._getframe()
             env_file = os.path.join(
                 os.path.dirname(frame.f_back.f_code.co_filename),
@@ -956,6 +958,7 @@ class Path:
         :param \**kwargs: ``**kwargs`` passed to :py:func:`open`
         :rtype: typing.IO[typing.Any]
         """
+        # pylint: disable=unspecified-encoding
         return open(self(name), *args, **kwargs)
 
     @property
@@ -963,6 +966,7 @@ class Path:
         """Current directory for this Path"""
         return self.__root__
 
+    # pylint: disable=keyword-arg-before-vararg
     def __init__(self, start='', *paths, **kwargs):
 
         super().__init__()

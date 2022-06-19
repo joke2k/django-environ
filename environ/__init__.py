@@ -42,5 +42,6 @@ __maintainer_email__ = 'egrep@protonmail.ch'
 __url__ = 'https://django-environ.readthedocs.org'
 """The URL of the package."""
 
+# pylint: disable=line-too-long
 __description__ = 'A package that allows you to utilize 12factor inspired environment variables to configure your Django application.'  # noqa: E501
 """The description of the package."""
