@@ -66,6 +66,7 @@ def _cast_urlstr(v):
 
 
 class NoValue:
+    """Represent of no value object."""
 
     def __repr__(self):
         return '<{}>'.format(self.__class__.__name__)
