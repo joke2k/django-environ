@@ -19,6 +19,10 @@ Deprecated
 - Support of Python < 3.6 is deprecated and will be removed
   in next major version.
 
+Changed
++++++++
+- Use UTF-8 as a encoding when open ``.env`` file.
+
 Removed
 +++++++
 - Removed deprecated ``Env.unicode()``.
@@ -74,7 +78,7 @@ Fixed
 ---------------------------
 Added
 +++++
-- Log invalid lines when parse .env file
+- Log invalid lines when parse ``.env`` file
   `#283 <https://github.com/joke2k/django-environ/pull/283>`_.
 - Added docker-style file variable support
   `#189 <https://github.com/joke2k/django-environ/issues/189>`_.

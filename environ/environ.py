@@ -66,6 +66,7 @@ def _cast_urlstr(v):
 
 
 class NoValue:
+    """Represent of no value object."""
 
     def __repr__(self):
         return '<{}>'.format(self.__class__.__name__)
@@ -202,8 +203,6 @@ class Env:
 
     def __contains__(self, var):
         return var in self.ENVIRON
-
-    # Shortcuts
 
     def str(self, var, default=NOTSET, multiline=False):
         """
@@ -357,9 +356,9 @@ class Env:
         :rtype: typing.IO[typing.Any]
         """
 
-        logger.debug("get '{}' casted as '{}' with default '{}'".format(
-            var, cast, default
-        ))
+        logger.debug(
+            "get '%s' casted as '%s' with default '%s'",
+            var, cast, default)
 
         var_name = "{}{}".format(self.prefix, var)
         if var_name in self.scheme:
@@ -415,8 +414,6 @@ class Env:
 
         return value
 
-    # Class and static methods
-
     @classmethod
     def parse_value(cls, value, cast):
         """Parse and cast provided value
@@ -428,7 +425,7 @@ class Env:
         """
         if cast is None:
             return value
-        elif cast is bool:
+        if cast is bool:
             try:
                 value = int(value) != 0
             except ValueError:
@@ -441,7 +438,7 @@ class Env:
         elif isinstance(cast, dict):
             key_cast = cast.get('key', str)
             value_cast = cast.get('value', str)
-            value_cast_by_key = cast.get('cast', dict())
+            value_cast_by_key = cast.get('cast', {})
             value = dict(map(
                 lambda kv: (
                     key_cast(kv[0]),
@@ -458,6 +455,7 @@ class Env:
             value = [x for x in value.split(',') if x]
         elif cast is tuple:
             val = value.strip('(').strip(')').split(',')
+            # pylint: disable=consider-using-generator
             value = tuple([x for x in val if x])
         elif cast is float:
             # clean string
@@ -574,7 +572,7 @@ class Env:
         if url.scheme == 'oracle':
             # Django oracle/base.py strips port and fails on non-string value
             if not config['PORT']:
-                del (config['PORT'])
+                del config['PORT']
             else:
                 config['PORT'] = str(config['PORT'])
 
@@ -615,8 +613,7 @@ class Env:
         if not isinstance(url, cls.URL_CLASS):
             if not url:
                 return {}
-            else:
-                url = urlparse(url)
+            url = urlparse(url)
 
         if url.scheme not in cls.CACHE_SCHEMES:
             raise ImproperlyConfigured(
@@ -760,15 +757,15 @@ class Env:
         params = {}  # type: dict
         if url.query:
             params = parse_qs(url.query)
-            if 'EXCLUDED_INDEXES' in params.keys():
+            if 'EXCLUDED_INDEXES' in params:
                 config['EXCLUDED_INDEXES'] \
                     = params['EXCLUDED_INDEXES'][0].split(',')
-            if 'INCLUDE_SPELLING' in params.keys():
+            if 'INCLUDE_SPELLING' in params:
                 config['INCLUDE_SPELLING'] = cls.parse_value(
                     params['INCLUDE_SPELLING'][0],
                     bool
                 )
-            if 'BATCH_SIZE' in params.keys():
+            if 'BATCH_SIZE' in params:
                 config['BATCH_SIZE'] = cls.parse_value(
                     params['BATCH_SIZE'][0],
                     int
@@ -776,8 +773,8 @@ class Env:
 
         if url.scheme == 'simple':
             return config
-        elif url.scheme in ['solr'] + cls.ELASTICSEARCH_FAMILY:
-            if 'KWARGS' in params.keys():
+        if url.scheme in ['solr'] + cls.ELASTICSEARCH_FAMILY:
+            if 'KWARGS' in params:
                 config['KWARGS'] = params['KWARGS'][0]
 
         # remove trailing slash
@@ -788,7 +785,7 @@ class Env:
             config['URL'] = urlunparse(
                 ('http',) + url[1:2] + (path,) + ('', '', '')
             )
-            if 'TIMEOUT' in params.keys():
+            if 'TIMEOUT' in params:
                 config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
             return config
 
@@ -805,7 +802,7 @@ class Env:
             config['URL'] = urlunparse(
                 ('http',) + url[1:2] + (path,) + ('', '', '')
             )
-            if 'TIMEOUT' in params.keys():
+            if 'TIMEOUT' in params:
                 config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
             config['INDEX_NAME'] = index
             return config
@@ -813,15 +810,15 @@ class Env:
         config['PATH'] = '/' + path
 
         if url.scheme == 'whoosh':
-            if 'STORAGE' in params.keys():
+            if 'STORAGE' in params:
                 config['STORAGE'] = params['STORAGE'][0]
-            if 'POST_LIMIT' in params.keys():
+            if 'POST_LIMIT' in params:
                 config['POST_LIMIT'] = cls.parse_value(
                     params['POST_LIMIT'][0],
                     int
                 )
         elif url.scheme == 'xapian':
-            if 'FLAGS' in params.keys():
+            if 'FLAGS' in params:
                 config['FLAGS'] = params['FLAGS'][0]
 
         if engine:
@@ -855,6 +852,7 @@ class Env:
             existing environment variable, the value will be overridden.
         """
         if env_file is None:
+            # pylint: disable=protected-access
             frame = sys._getframe()
             env_file = os.path.join(
                 os.path.dirname(frame.f_back.f_code.co_filename),
@@ -863,13 +861,13 @@ class Env:
             if not os.path.exists(env_file):
                 logger.info(
                     "%s doesn't exist - if you're not configuring your "
-                    "environment separately, create one." % env_file)
+                    "environment separately, create one.", env_file)
                 return
 
         try:
             if isinstance(env_file, Openable):
                 # Python 3.5 support (wrap path with str).
-                with open(str(env_file)) as f:
+                with open(str(env_file), encoding='utf-8') as f:
                     content = f.read()
             else:
                 with env_file as f:
@@ -877,10 +875,10 @@ class Env:
         except OSError:
             logger.info(
                 "%s not found - if you're not configuring your "
-                "environment separately, check this." % env_file)
+                "environment separately, check this.", env_file)
             return
 
-        logger.debug('Read environment variables from: {}'.format(env_file))
+        logger.debug('Read environment variables from: %s', env_file)
 
         def _keep_escaped_format_characters(match):
             """Keep escaped newline/tabs in quoted strings"""
@@ -960,6 +958,7 @@ class Path:
         :param \**kwargs: ``**kwargs`` passed to :py:func:`open`
         :rtype: typing.IO[typing.Any]
         """
+        # pylint: disable=unspecified-encoding
         return open(self(name), *args, **kwargs)
 
     @property
@@ -967,6 +966,7 @@ class Path:
         """Current directory for this Path"""
         return self.__root__
 
+    # pylint: disable=keyword-arg-before-vararg
     def __init__(self, start='', *paths, **kwargs):
 
         super().__init__()
@@ -1000,9 +1000,9 @@ class Path:
     def __sub__(self, other):
         if isinstance(other, int):
             return self.path('../' * other)
-        elif isinstance(other, str):
-            if self.__root__.endswith(other):
-                return Path(self.__root__.rstrip(other))
+        if isinstance(other, str) and self.__root__.endswith(other):
+            return Path(self.__root__.rstrip(other))
+
         raise TypeError(
             "unsupported operand type(s) for -: '{self}' and '{other}' "
             "unless value of {self} ends with value of {other}".format(
@@ -1035,10 +1035,12 @@ class Path:
         return self.__str__()
 
     def rfind(self, *args, **kwargs):
-        return self.__str__().rfind(*args, **kwargs)
+        """Proxy method to :py:func:`str.rfind`"""
+        return str(self).rfind(*args, **kwargs)
 
     def find(self, *args, **kwargs):
-        return self.__str__().find(*args, **kwargs)
+        """Proxy method to :py:func:`str.find`"""
+        return str(self).find(*args, **kwargs)
 
     @staticmethod
     def _absolute_join(base, *paths, **kwargs):

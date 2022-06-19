@@ -23,7 +23,7 @@ else:
     DJANGO_VERSION = None
 
     class ImproperlyConfigured(Exception):
-        pass
+        """Django is somehow improperly configured"""
 
 
 def choose_rediscache_driver():
