@@ -864,7 +864,7 @@ class Env:
         try:
             if isinstance(env_file, Openable):
                 # Python 3.5 support (wrap path with str).
-                with open(str(env_file)) as f:
+                with open(str(env_file), encoding='utf-8') as f:
                     content = f.read()
             else:
                 with env_file as f:
