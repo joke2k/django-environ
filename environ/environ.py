@@ -355,9 +355,9 @@ class Env:
         :rtype: typing.IO[typing.Any]
         """
 
-        logger.debug("get '{}' casted as '{}' with default '{}'".format(
-            var, cast, default
-        ))
+        logger.debug(
+            "get '%s' casted as '%s' with default '%s'",
+            var, cast, default)
 
         var_name = "{}{}".format(self.prefix, var)
         if var_name in self.scheme:
@@ -858,7 +858,7 @@ class Env:
             if not os.path.exists(env_file):
                 logger.info(
                     "%s doesn't exist - if you're not configuring your "
-                    "environment separately, create one." % env_file)
+                    "environment separately, create one.", env_file)
                 return
 
         try:
@@ -872,10 +872,10 @@ class Env:
         except OSError:
             logger.info(
                 "%s not found - if you're not configuring your "
-                "environment separately, check this." % env_file)
+                "environment separately, check this.", env_file)
             return
 
-        logger.debug('Read environment variables from: {}'.format(env_file))
+        logger.debug('Read environment variables from: %s', env_file)
 
         def _keep_escaped_format_characters(match):
             """Keep escaped newline/tabs in quoted strings"""
