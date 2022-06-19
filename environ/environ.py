@@ -203,8 +203,6 @@ class Env:
     def __contains__(self, var):
         return var in self.ENVIRON
 
-    # Shortcuts
-
     def str(self, var, default=NOTSET, multiline=False):
         """
         :rtype: str
@@ -414,8 +412,6 @@ class Env:
             value = self.parse_value(value, cast)
 
         return value
-
-    # Class and static methods
 
     @classmethod
     def parse_value(cls, value, cast):
@@ -1034,9 +1030,11 @@ class Path:
         return self.__str__()
 
     def rfind(self, *args, **kwargs):
+        """Proxy method to :py:func:`str.rfind`"""
         return str(self).rfind(*args, **kwargs)
 
     def find(self, *args, **kwargs):
+        """Proxy method to :py:func:`str.find`"""
         return str(self).find(*args, **kwargs)
 
     @staticmethod

@@ -126,6 +126,8 @@ linkcheck_ignore = [
 # In nitpick mode (-n), still ignore any of the following "broken" references
 # to non-types.
 nitpick_ignore = [
+    ('py:func', 'str.rfind'),
+    ('py:func', 'str.find'),
 ]
 
 #
