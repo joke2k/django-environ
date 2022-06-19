@@ -45,7 +45,7 @@ class FileAwareMapping(MutableMapping):
             return self.files_cache[key]
         key_file = self.env.get(key + "_FILE")
         if key_file:
-            with open(key_file) as f:
+            with open(key_file, encoding='utf-8') as f:
                 value = f.read()
             if self.cache:
                 self.files_cache[key] = value
