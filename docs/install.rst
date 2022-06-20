@@ -12,7 +12,7 @@ Requirements
 Installing django-environ
 =========================
 
-``django-environ`` is a Python-only package `hosted_on_pypi`_.
+django-environ is a Python-only package `hosted_on_pypi`_.
 The recommended installation method is `pip`_-installing into a
 :mod:`virtualenv <python:venv>`:
 
@@ -22,7 +22,7 @@ The recommended installation method is `pip`_-installing into a
 
 .. note::
 
-   After installing ``django-environ``, no need to add it to ``INSTALLED_APPS``.
+   After installing django-environ, no need to add it to ``INSTALLED_APPS``.
 
 
 .. _hosted_on_pypi: https://pypi.org/project/django-environ/
@@ -43,7 +43,7 @@ experience might be not as smooth:
    # OR
    $ pip install --upgrade https://github.com/joke2k/django-environ.git/archive/develop.tar.gz
 
-This command will download the latest version of ``django-environ`` and install
+This command will download the latest version of django-environ and install
 it to your system.
 
 .. note::
