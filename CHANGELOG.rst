@@ -13,6 +13,7 @@ Added
   `#356 <https://github.com/joke2k/django-environ/issues/356>`_.
 - Value of dict can now contain an equal sign
   `#241 <https://github.com/joke2k/django-environ/pull/241>`_.
+- Added support for Python 3.11
 
 Deprecated
 ++++++++++
