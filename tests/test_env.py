@@ -227,6 +227,13 @@ class TestEnv:
         assert url.geturl() == FakeEnv.URL
         assert self.env.url('OTHER_URL', default=None) is None
 
+    def test_url_empty_string_default_value(self):
+        unset_var_name = 'VARIABLE_NOT_SET_IN_ENVIRONMENT'
+        assert unset_var_name not in os.environ
+        url = self.env.url(unset_var_name, '')
+        assert url.__class__ == self.env.URL_CLASS
+        assert url.geturl() == ''
+
     def test_url_encoded_parts(self):
         password_with_unquoted_characters = "#password"
         encoded_url = "mysql://user:%s@127.0.0.1:3306/dbname" % quote(
