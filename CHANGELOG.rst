@@ -24,6 +24,12 @@ Changed
 +++++++
 - Use UTF-8 as a encoding when open ``.env`` file.
 
+Fixed
++++++
+- Fix logic of ``Env.get_value()`` to skip parsing only when
+  ``default=None``, not for all default values that coerce to ``False``
+  `#404 <https://github.com/joke2k/django-environ/issues/404>`_.
+
 Removed
 +++++++
 - Removed deprecated ``Env.unicode()``.
