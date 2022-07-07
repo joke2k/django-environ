@@ -409,7 +409,7 @@ class Env:
 
         value = None if default is None and value == '' else value
 
-        if value != default or (parse_default and value):
+        if value != default or (parse_default and value is not None):
             value = self.parse_value(value, cast)
 
         return value
