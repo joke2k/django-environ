@@ -134,6 +134,7 @@ class Env:
         'ATOMIC_REQUESTS',
         'AUTOCOMMIT',
         'DISABLE_SERVER_SIDE_CURSORS',
+        'CONN_HEALTH_CHECKS',
     ]
 
     DEFAULT_CACHE_ENV = 'CACHE_URL'
