@@ -591,8 +591,8 @@ class Env:
         else:
             config['ENGINE'] = url.scheme
 
-        if config['ENGINE'] in Env.DB_SCHEMES:
-            config['ENGINE'] = Env.DB_SCHEMES[config['ENGINE']]
+        if config['ENGINE'] in cls.DB_SCHEMES:
+            config['ENGINE'] = cls.DB_SCHEMES[config['ENGINE']]
 
         if not config.get('ENGINE', False):
             warnings.warn("Engine not recognized from url: {}".format(config))
