@@ -14,6 +14,8 @@ Added
 - Value of dict can now contain an equal sign
   `#241 <https://github.com/joke2k/django-environ/pull/241>`_.
 - Added support for Python 3.11
+- Added ``CONN_HEALTH_CHECKS`` to database base options
+  `#413 <https://github.com/joke2k/django-environ/issues/413>`_.
 
 Deprecated
 ++++++++++
