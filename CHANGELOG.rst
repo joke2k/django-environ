@@ -25,6 +25,9 @@ Deprecated
 Changed
 +++++++
 - Use UTF-8 as a encoding when open ``.env`` file.
+- Provide access to ```DB_SCHEMES`` through ``cls`` rather than
+  ``Env`` in ``db_url_config``
+  `#414 <https://github.com/joke2k/django-environ/pull/414>`_.
 
 Fixed
 +++++
