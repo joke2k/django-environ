@@ -17,6 +17,8 @@ Added
   `#468 <https://github.com/joke2k/django-environ/pull/468>`_.
 - Added capability to handle comments after #, after quoted values, like ``KEY= 'part1 # part2' # comment``
   `#475 <https://github.com/joke2k/django-environ/pull/475>`_.
+- Added support for ``interpolate`` parameter
+  `#419 <https://github.com/joke2k/django-environ/pull/419>`_.
 
 Changed
 +++++++
