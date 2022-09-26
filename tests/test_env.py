@@ -134,6 +134,10 @@ class TestEnv:
     def test_proxied_value(self):
         assert self.env('PROXIED_VAR') == 'bar'
 
+    def test_not_interpolated_proxied_value(self):
+        env = Env(interpolate=False)
+        assert env('PROXIED_VAR') == '$STR_VAR'
+
     def test_escaped_dollar_sign(self):
         self.env.escape_proxy = True
         assert self.env('ESCAPED_VAR') == '$baz'

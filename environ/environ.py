@@ -197,11 +197,12 @@ class Env:
     VAR = re.compile(r'(?<!\\)\$\{?(?P<name>[A-Z_][0-9A-Z_]*)}?',
                      re.IGNORECASE)
 
-    def __init__(self, **scheme):
+    def __init__(self, interpolate=True, **scheme):
         self._local = threading.local()
         self.smart_cast = True
         self.escape_proxy = False
         self.prefix = ""
+        self.interpolate = interpolate
         self.scheme = scheme
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
@@ -425,7 +426,8 @@ class Env:
             value = default
 
         # Expand variables
-        if isinstance(value, (bytes, str)) and var_name not in NOT_EXPANDED:
+        if self.interpolate and isinstance(value, (bytes, str)) \
+                and var_name not in NOT_EXPANDED:
             def repl(match_):
                 return self.get_value(
                     match_.group('name'), cast=cast, default=default,
