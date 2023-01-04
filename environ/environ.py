@@ -411,7 +411,15 @@ class Env:
         # Resolve any proxied values
         prefix = b'$' if isinstance(value, bytes) else '$'
         escape = rb'\$' if isinstance(value, bytes) else r'\$'
-        if hasattr(value, 'startswith') and value.startswith(prefix):
+
+        def repl(self, match_obj):
+            if match_obj.group() is not None:
+                return self.get_value(match_obj.group(1))
+
+        s_pattern = r'\$\{([^}]+)\}'
+        if re.search(s_pattern, value):
+            value = re.sub(s_pattern, lambda match: repl(self, match), value)
+        elif hasattr(value, 'startswith') and value.startswith(prefix):
             value = value.lstrip(prefix)
             value = self.get_value(value, cast=cast, default=default)
 
