@@ -417,7 +417,7 @@ class Env:
                 return self.get_value(match_obj.group(1))
 
         s_pattern = r'\$\{([^}]+)\}'
-        if re.search(s_pattern, value):
+        if (isinstance(value, bytes) or isinstance(value, str)) and re.search(s_pattern, value):
             value = re.sub(s_pattern, lambda match: repl(self, match), value)
         elif hasattr(value, 'startswith') and value.startswith(prefix):
             value = value.lstrip(prefix)
