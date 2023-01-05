@@ -27,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.3.0
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v4.0.0
@@ -67,7 +67,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.3.0
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v4.0.0
