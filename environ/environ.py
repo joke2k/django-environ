@@ -846,7 +846,7 @@ class Env:
         return config
 
     @classmethod
-    def read_env(cls, env_file=None, overwrite=False, **overrides):
+    def read_env(cls, env_file=None, overwrite=False, encoding='utf8', **overrides):
         r"""Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack
@@ -866,6 +866,7 @@ class Env:
             the Django settings module from the Django project root.
         :param overwrite: ``overwrite=True`` will force an overwrite of
             existing environment variables.
+        :param encoding: The encoding to use when reading the environment file.
         :param \**overrides: Any additional keyword arguments provided directly
             to read_env will be added to the environment. If the key matches an
             existing environment variable, the value will be overridden.
@@ -885,7 +886,7 @@ class Env:
         try:
             if isinstance(env_file, Openable):
                 # Python 3.5 support (wrap path with str).
-                with open(str(env_file)) as f:
+                with open(str(env_file), encoding=encoding) as f:
                     content = f.read()
             else:
                 with env_file as f:
