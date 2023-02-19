@@ -33,10 +33,10 @@ else:
     DJANGO_POSTGRES = 'django.db.backends.postgresql'
 
 # back compatibility with redis_cache package
-if DJANGO_VERSION is not None and DJANGO_VERSION >= (4, 0):
-    REDIS_DRIVER = 'django.core.cache.backends.redis.RedisCache'
-elif find_loader('redis_cache'):
+if find_loader('redis_cache'):
     REDIS_DRIVER = 'redis_cache.RedisCache'
+elif DJANGO_VERSION >= (4, 0) and not find_loader('django_redis'):
+    REDIS_DRIVER = 'django.core.cache.backends.redis.RedisCache'
 else:
     REDIS_DRIVER = 'django_redis.cache.RedisCache'
 
