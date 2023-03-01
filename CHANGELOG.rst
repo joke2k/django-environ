@@ -18,7 +18,7 @@ Added
   `#413 <https://github.com/joke2k/django-environ/issues/413>`_.
 - Added ``encoding`` parameter to ``read_env`` with default value 'utf8'
   `#442 <https://github.com/joke2k/django-environ/pull/442>`_.
-- Added support for Django 4.1.
+- Added support for Django 4.1
   `#416 <https://github.com/joke2k/django-environ/issues/416>`_.
 
 Deprecated
@@ -49,7 +49,7 @@ Removed
 +++++++
 - Removed deprecated ``Env.unicode()``.
 - Removed ``environ.register_schemes`` calls and do not modify global
-  ``urllib.parse.urlparse``'s ``uses_*`` variables as this no longer needed.
+  ``urllib.parse.urlparse``'s ``uses_*`` variables as this no longer needed
   `#246 <https://github.com/joke2k/django-environ/pull/246>`_.
 
 
