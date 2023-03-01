@@ -47,7 +47,6 @@ jobs:
 
       matrix:
         python:
-          - '3.7'
           - '3.8'
           - '3.9'
           - '3.10'
@@ -57,7 +56,8 @@ jobs:
 
         # These versions are no longer supported by Python team, and may
         # eventually be dropped from GitHub Actions.  The support of these
-        # versions by django-environ as good as we can and can stop at any time.
+        # versions by django-environ will continue for as long as possible,
+        # and may be discontinued at any time.
         include:
           - python: '3.5'
             os: ubuntu-20.04
