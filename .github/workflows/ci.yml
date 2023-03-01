@@ -54,11 +54,17 @@ jobs:
           - '3.11'
           - 'pypy-3.7'
         os: [ ubuntu-latest, macos-latest, windows-latest ]
+
+        # These versions are no longer supported by Python team, and may
+        # eventually be dropped from GitHub Actions.  The support of these
+        # versions by django-environ as good as we can and can stop at any time.
         include:
           - python: '3.5'
-            os: ubuntu-16.04
+            os: ubuntu-20.04
           - python: '3.6'
-            os: ubuntu-16.04
+            os: ubuntu-20.04
+          - python: '3.7'
+            os: ubuntu-20.04
 
     steps:
       - name: Checkout code
