@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches:
-      - develop
-      - main
-      - 'feature/**'
-      - 'release/**'
-      - 'fix/**'
+    branches-ignore:
+      # These should always correspond to pull requests, so ignore them for
+      # the push trigger and let them be triggered by the pull_request
+      # trigger, avoiding running the workflow twice.  This is a minor
+      # optimization so there's no need to ensure this is comprehensive.
+      - 'dependabot/**'
 
   # The branches below must be a subset of the branches above
   pull_request:
@@ -68,12 +68,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.3.0
         with:
           fetch-depth: 5
 
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v4.1.0
+        uses: actions/setup-python@v4.5.0
         with:
           python-version: ${{ matrix.python }}
 
