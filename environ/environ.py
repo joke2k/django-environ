@@ -828,7 +828,8 @@ class Env:
         return config
 
     @classmethod
-    def read_env(cls, env_file=None, overwrite=False, encoding='utf8', **overrides):
+    def read_env(cls, env_file=None, overwrite=False, encoding='utf8',
+                 **overrides):
         r"""Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack
