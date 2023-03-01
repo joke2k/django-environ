@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-`v0.10.0`_ - 00-Unreleased-2022
+`v0.10.0`_ - 1-March-2023
 -------------------------------
 Added
 +++++
@@ -13,9 +13,13 @@ Added
   `#356 <https://github.com/joke2k/django-environ/issues/356>`_.
 - Value of dict can now contain an equal sign
   `#241 <https://github.com/joke2k/django-environ/pull/241>`_.
-- Added support for Python 3.11
+- Added support for Python 3.11.
 - Added ``CONN_HEALTH_CHECKS`` to database base options
   `#413 <https://github.com/joke2k/django-environ/issues/413>`_.
+- Added ``encoding`` parameter to ``read_env`` with default value 'utf8'
+  `#442 <https://github.com/joke2k/django-environ/pull/442>`_.
+- Added support for Django 4.1.
+  `#416 <https://github.com/joke2k/django-environ/issues/416>`_.
 
 Deprecated
 ++++++++++
@@ -24,21 +28,27 @@ Deprecated
 
 Changed
 +++++++
-- Use UTF-8 as a encoding when open ``.env`` file.
-- Provide access to ```DB_SCHEMES`` through ``cls`` rather than
+- Used UTF-8 as a encoding when open ``.env`` file.
+- Provided access to ```DB_SCHEMES`` through ``cls`` rather than
   ``Env`` in ``db_url_config``
   `#414 <https://github.com/joke2k/django-environ/pull/414>`_.
+- Correct CI workflow to use supported Python versions/OS matrix
+  `#441 <https://github.com/joke2k/django-environ/pull/441>`_.
+- Reworked trigger CI workflows strategy
+  `#440 <https://github.com/joke2k/django-environ/pull/440>`_.
 
 Fixed
 +++++
-- Fix logic of ``Env.get_value()`` to skip parsing only when
+- Fixed logic of ``Env.get_value()`` to skip parsing only when
   ``default=None``, not for all default values that coerce to ``False``
   `#404 <https://github.com/joke2k/django-environ/issues/404>`_.
+- Deleted duplicated include in docs/quickstart.rst
+  `#439 <https://github.com/joke2k/django-environ/pull/439>`_.
 
 Removed
 +++++++
 - Removed deprecated ``Env.unicode()``.
-- Remove ``environ.register_schemes`` calls and do not modify global
+- Removed ``environ.register_schemes`` calls and do not modify global
   ``urllib.parse.urlparse``'s ``uses_*`` variables as this no longer needed.
   `#246 <https://github.com/joke2k/django-environ/pull/246>`_.
 
