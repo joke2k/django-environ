@@ -25,6 +25,7 @@ class FakeEnv:
     EMAIL = 'smtps://user@domain.com:password@smtp.example.com:587'
     JSON = dict(one='bar', two=2, three=33.44)
     DICT = dict(foo='bar', test='on')
+    DICT_WITH_EQ = dict(key1='sub_key1=sub_value1', key2='value2')
     PATH = '/home/dev'
     EXPORTED = 'exported var'
     SAML_ATTRIBUTE_MAPPING = dict(
@@ -67,6 +68,7 @@ class FakeEnv:
                     STR_LIST_WITH_SPACES=' foo,  bar',
                     EMPTY_LIST='',
                     DICT_VAR='foo=bar,test=on',
+                    DICT_WITH_EQ_VAR='key1=sub_key1=sub_value1,key2=value2',
                     DATABASE_URL=cls.POSTGRES,
                     DATABASE_MYSQL_URL=cls.MYSQL,
                     DATABASE_MYSQL_GIS_URL=cls.MYSQLGIS,

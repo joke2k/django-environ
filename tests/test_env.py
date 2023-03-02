@@ -8,12 +8,15 @@
 
 import os
 from urllib.parse import quote
-from warnings import catch_warnings
 
 import pytest
 
 from environ import Env, Path
-from environ.compat import ImproperlyConfigured, DJANGO_POSTGRES
+from environ.compat import (
+    DJANGO_POSTGRES,
+    ImproperlyConfigured,
+    REDIS_DRIVER,
+)
 from .asserts import assert_type_and_value
 from .fixtures import FakeEnv
 
@@ -70,21 +73,6 @@ class TestEnv:
         if not multiline:
             assert self.env(var) == val
         assert self.env.str(var, multiline=multiline) == val
-
-    def test_unicode(self, recwarn):
-        actual = self.env.unicode('CYRILLIC_VAR', default='фуубар')
-        expected = self.env.str('CYRILLIC_VAR', default='фуубар')
-
-        assert actual == expected
-        assert len(recwarn) == 1
-        w = recwarn.pop(DeprecationWarning)
-        assert issubclass(w.category, DeprecationWarning)
-        assert str(w.message) == '`%s.unicode` is deprecated, use `%s.str` instead' %(
-            self.env.__class__.__name__,
-            self.env.__class__.__name__,
-        )
-        assert w.filename
-        assert w.lineno
 
     @pytest.mark.parametrize(
         'var,val,default',
@@ -168,12 +156,23 @@ class TestEnv:
 
     def test_mix_tuple_issue_387(self):
         """Cast a tuple of mixed types.
-        
+
         Casts a string like "(42,Test)" to a tuple like  (42, 'Test').
         See: https://github.com/joke2k/django-environ/issues/387 for details."""
-        caster = lambda v: int(v) if v.isdigit() else v.strip()
-        cast = lambda t: tuple(map(caster, [c for c in t.strip('()').split(',')]))
-        assert_type_and_value(tuple, (42, 'Test'), self.env( 'MIX_TUPLE', default=(0, ''), cast=cast))
+        assert_type_and_value(
+            tuple,
+            (42, 'Test'),
+            self.env(
+                'MIX_TUPLE',
+                default=(0, ''),
+                cast=lambda t: tuple(
+                    map(
+                        lambda v: int(v) if v.isdigit() else v.strip(),
+                        [c for c in t.strip('()').split(',')]
+                    )
+                ),
+            )
+        )
 
     def test_str_list_with_spaces(self):
         assert_type_and_value(list, [' foo', '  bar'],
@@ -186,6 +185,7 @@ class TestEnv:
 
     def test_dict_value(self):
         assert_type_and_value(dict, FakeEnv.DICT, self.env.dict('DICT_VAR'))
+        assert_type_and_value(dict, FakeEnv.DICT_WITH_EQ, self.env.dict('DICT_WITH_EQ_VAR'))
 
     def test_complex_dict_value(self):
         assert_type_and_value(
@@ -226,6 +226,13 @@ class TestEnv:
         assert url.__class__ == self.env.URL_CLASS
         assert url.geturl() == FakeEnv.URL
         assert self.env.url('OTHER_URL', default=None) is None
+
+    def test_url_empty_string_default_value(self):
+        unset_var_name = 'VARIABLE_NOT_SET_IN_ENVIRONMENT'
+        assert unset_var_name not in os.environ
+        url = self.env.url(unset_var_name, '')
+        assert url.__class__ == self.env.URL_CLASS
+        assert url.geturl() == ''
 
     def test_url_encoded_parts(self):
         password_with_unquoted_characters = "#password"
@@ -291,7 +298,7 @@ class TestEnv:
             (Env.DEFAULT_CACHE_ENV,
              'django.core.cache.backends.memcached.MemcachedCache',
              '127.0.0.1:11211', None),
-            ('CACHE_REDIS', 'django_redis.cache.RedisCache',
+            ('CACHE_REDIS', REDIS_DRIVER,
              'redis://127.0.0.1:6379/1',
              {'CLIENT_CLASS': 'django_redis.client.DefaultClient',
               'PASSWORD': 'secret'}),

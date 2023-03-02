@@ -1,4 +1,5 @@
 DICT_VAR=foo=bar,test=on
+DICT_WITH_EQ_VAR=key1=sub_key1=sub_value1,key2=value2
 
 # Database variables
 DATABASE_MYSQL_URL=mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/heroku_97681?reconnect=true

@@ -23,20 +23,27 @@ else:
     DJANGO_VERSION = None
 
     class ImproperlyConfigured(Exception):
-        pass
+        """Django is somehow improperly configured"""
 
-# back compatibility with django postgresql package
-if DJANGO_VERSION is not None and DJANGO_VERSION < (2, 0):
-    DJANGO_POSTGRES = 'django.db.backends.postgresql_psycopg2'
-else:
-    # https://docs.djangoproject.com/en/2.0/releases/2.0/#id1
-    DJANGO_POSTGRES = 'django.db.backends.postgresql'
 
-# back compatibility with redis_cache package
-if find_loader('redis_cache'):
-    REDIS_DRIVER = 'redis_cache.RedisCache'
-else:
-    REDIS_DRIVER = 'django_redis.cache.RedisCache'
+def choose_rediscache_driver():
+    """Backward compatibility for RedisCache driver."""
+    # use built-in support if Django 4+
+    if DJANGO_VERSION is not None and DJANGO_VERSION >= (4, 0):
+        return 'django.core.cache.backends.redis.RedisCache'
+
+    # back compatibility with redis_cache package
+    if find_loader('redis_cache'):
+        return 'redis_cache.RedisCache'
+    return 'django_redis.cache.RedisCache'
+
+
+def choose_postgres_driver():
+    """Backward compatibility for postgresql driver."""
+    old_django = DJANGO_VERSION is not None and DJANGO_VERSION < (2, 0)
+    if old_django:
+        return 'django.db.backends.postgresql_psycopg2'
+    return 'django.db.backends.postgresql'
 
 
 def choose_pymemcache_driver():
@@ -49,4 +56,11 @@ def choose_pymemcache_driver():
     return 'django.core.cache.backends.memcached.PyMemcacheCache'
 
 
+REDIS_DRIVER = choose_rediscache_driver()
+"""The name of the RedisCache driver."""
+
+DJANGO_POSTGRES = choose_postgres_driver()
+"""The name of the PostgreSQL driver."""
+
 PYMEMCACHE_DRIVER = choose_pymemcache_driver()
+"""The name of the Pymemcache driver."""
