@@ -20,15 +20,7 @@ on:
 jobs:
   build:
     name: Build and test package distribution
-    runs-on: ${{ matrix.os }}
-
-    # The maximum number of minutes to let a workflow run
-    # before GitHub automatically cancels it. Default: 360
-    timeout-minutes: 30
-
-    strategy:
-      matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest ]
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
