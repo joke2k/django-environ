@@ -12,6 +12,10 @@ Changed
 - Used ``mssql-django`` as engine for SQL Server
   `#446 <https://github.com/joke2k/django-environ/pull/446>`_.
 
+Removed
++++++++
+- Removed support of Python 3.5.
+
 
 `v0.10.0`_ - 2-March-2023
 -------------------------
