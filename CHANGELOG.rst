@@ -5,11 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-`v0.10.1`_ - 6-March-2023
+`v0.10.1`_ - 5-March-2023
 ------------------------------
 Changed
 +++++++
 - Used `mssql-django` as engine for SQL Server.
+  `#446 <https://github.com/joke2k/django-environ/pull/446>`_.
 
 
 `v0.10.0`_ - 2-March-2023
