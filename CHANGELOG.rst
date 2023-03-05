@@ -5,16 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-`v0.10.1`_ - 5-March-2023
-------------------------------
+`v0.11.0`_ - 00-Unreleased-2023
+-------------------------------
 Changed
 +++++++
-- Used `mssql-django` as engine for SQL Server.
+- Used ``mssql-django`` as engine for SQL Server
   `#446 <https://github.com/joke2k/django-environ/pull/446>`_.
 
 
 `v0.10.0`_ - 2-March-2023
--------------------------------
+-------------------------
 Added
 +++++
 - Use the core redis library by default if running Django >= 4.0
@@ -37,7 +37,7 @@ Deprecated
 Changed
 +++++++
 - Used UTF-8 as a encoding when open ``.env`` file.
-- Provided access to ```DB_SCHEMES`` through ``cls`` rather than
+- Provided access to ``DB_SCHEMES`` through ``cls`` rather than
   ``Env`` in ``db_url_config``
   `#414 <https://github.com/joke2k/django-environ/pull/414>`_.
 - Correct CI workflow to use supported Python versions/OS matrix
@@ -349,7 +349,8 @@ Added
 - Initial release.
 
 
-.. _v0.10.0: https://github.com/joke2k/django-environ/compare/v0.9.0...develop
+.. _v0.11.0: https://github.com/joke2k/django-environ/compare/v0.10.0...develop
+.. _v0.10.0: https://github.com/joke2k/django-environ/compare/v0.9.0...v0.10.0
 .. _v0.9.0: https://github.com/joke2k/django-environ/compare/v0.8.1...v0.9.0
 .. _v0.8.1: https://github.com/joke2k/django-environ/compare/v0.8.0...v0.8.1
 .. _v0.8.0: https://github.com/joke2k/django-environ/compare/v0.7.0...v0.8.0
