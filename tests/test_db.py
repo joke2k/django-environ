@@ -118,7 +118,7 @@ from environ.compat import DJANGO_POSTGRES
         # mysql://user:password@host/dbname
         ('mssql://enigma:secret@example.com/dbname'
          '?driver=ODBC Driver 13 for SQL Server',
-         'sql_server.pyodbc',
+         'mssql',
          'dbname',
          'example.com',
          'enigma',
@@ -127,7 +127,7 @@ from environ.compat import DJANGO_POSTGRES
         # mysql://user:password@host:port/dbname
         ('mssql://enigma:secret@amazonaws.com\\insnsnss:12345/dbname'
          '?driver=ODBC Driver 13 for SQL Server',
-         'sql_server.pyodbc',
+         'mssql',
          'dbname',
          'amazonaws.com\\insnsnss',
          'enigma',
