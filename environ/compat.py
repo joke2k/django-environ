@@ -9,8 +9,6 @@
 """This module handles import compatibility issues."""
 
 from pkgutil import find_loader
-import warnings
-
 
 if find_loader('simplejson'):
     import simplejson as json
@@ -33,13 +31,14 @@ def choose_rediscache_driver():
     # django-redis library takes precedence
     if find_loader('django_redis'):
         return 'django_redis.cache.RedisCache'
-    
+
     # use built-in support if Django 4+
     if DJANGO_VERSION is not None and DJANGO_VERSION >= (4, 0):
         return 'django.core.cache.backends.redis.RedisCache'
 
     # back compatibility with redis_cache package
     return 'redis_cache.RedisCache'
+
 
 def choose_postgres_driver():
     """Backward compatibility for postgresql driver."""
