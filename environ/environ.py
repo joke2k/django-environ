@@ -124,7 +124,7 @@ class Env:
         'mysql2': 'django.db.backends.mysql',
         'mysql-connector': 'mysql.connector.django',
         'mysqlgis': 'django.contrib.gis.db.backends.mysql',
-        'mssql': 'sql_server.pyodbc',
+        'mssql': 'mssql',
         'oracle': 'django.db.backends.oracle',
         'pyodbc': 'sql_server.pyodbc',
         'redshift': 'django_redshift_backend',
@@ -515,15 +515,15 @@ class Env:
                 # sqlalchemy)
                 path = ':memory:'
             if url.netloc:
-                warnings.warn('SQLite URL contains host component %r, '
-                              'it will be ignored' % url.netloc, stacklevel=3)
+                warnings.warn(
+                    f'SQLite URL contains host component {url.netloc!r}, '
+                    'it will be ignored',
+                    stacklevel=3
+                )
         if url.scheme == 'ldap':
-            path = '{scheme}://{hostname}'.format(
-                scheme=url.scheme,
-                hostname=url.hostname,
-            )
+            path = f'{url.scheme}://{url.hostname}'
             if url.port:
-                path += ':{port}'.format(port=url.port)
+                path += f':{url.port}'
 
         user_host = url.netloc.rsplit('@', 1)
         if url.scheme in cls.POSTGRES_FAMILY and ',' in user_host[-1]:
@@ -681,7 +681,7 @@ class Env:
             config['EMAIL_BACKEND'] = backend
         elif url.scheme not in cls.EMAIL_SCHEMES:
             raise ImproperlyConfigured(f'Invalid email schema {url.scheme}')
-        else:
+        elif url.scheme in cls.EMAIL_SCHEMES:
             config['EMAIL_BACKEND'] = cls.EMAIL_SCHEMES[url.scheme]
 
         if url.scheme in ('smtps', 'smtp+tls'):
@@ -721,9 +721,10 @@ class Env:
 
         if url.scheme not in cls.SEARCH_SCHEMES:
             raise ImproperlyConfigured(f'Invalid search schema {url.scheme}')
-        config = {"ENGINE": cls.SEARCH_SCHEMES[url.scheme]}
+        config["ENGINE"] = cls.SEARCH_SCHEMES[url.scheme]
+
         # check commons params
-        params = {}  # type: dict
+        params = {}
         if url.query:
             params = parse_qs(url.query)
             if 'EXCLUDED_INDEXES' in params:
@@ -749,7 +750,7 @@ class Env:
             config['KWARGS'] = params['KWARGS'][0]
 
         # remove trailing slash
-        if path.endswith("/"):
+        if path.endswith('/'):
             path = path[:-1]
 
         if url.scheme == 'solr':
@@ -1018,5 +1019,7 @@ class Path:
     def _absolute_join(base, *paths, **kwargs):
         absolute_path = os.path.abspath(os.path.join(base, *paths))
         if kwargs.get('required', False) and not os.path.exists(absolute_path):
-            raise ImproperlyConfigured(f"Create required path: {absolute_path}")
+            raise ImproperlyConfigured(
+                f'Create required path: {absolute_path}'
+            )
         return absolute_path
