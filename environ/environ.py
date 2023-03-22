@@ -187,6 +187,7 @@ class Env:
         "simple": "haystack.backends.simple_backend.SimpleEngine",
     }
     CLOUDSQL = 'cloudsql'
+    _WARN_ON_DEFAULT_VALUE_USAGE = False
 
     def __init__(self, **scheme):
         self.smart_cast = True
@@ -213,6 +214,8 @@ class Env:
         if multiline:
             return re.sub(r'(\\r)?\\n', r'\n', value)
         return value
+    def warn_on_default_value_usage(self, enabled: bool = True):
+        self._WARN_ON_DEFAULT_VALUE_USAGE = enabled
 
     def bytes(self, var, default=NOTSET, encoding='utf8'):
         """
@@ -391,6 +394,8 @@ class Env:
                 raise ImproperlyConfigured(error_msg) from exc
 
             value = default
+            if self._WARN_ON_DEFAULT_VALUE_USAGE:
+                logger.warn(f"Variable '{var}' is using a default variable.")
 
         # Resolve any proxied values
         prefix = b'$' if isinstance(value, bytes) else '$'
