@@ -117,21 +117,22 @@ def test_pymemcache_compat(django_version, pymemcache_installed):
 
 
 @pytest.mark.parametrize('django_version', ((4, 0), (3, 2), None))
-@pytest.mark.parametrize('redis_cache_installed', (True, False))
-def test_rediscache_compat(django_version, redis_cache_installed):
+@pytest.mark.parametrize('django_redis_installed', (True, False))
+def test_rediscache_compat(django_version, django_redis_installed):
     django_new = 'django.core.cache.backends.redis.RedisCache'
     redis_cache = 'redis_cache.RedisCache'
-    django_old = 'django_redis.cache.RedisCache'
+    django_redis = 'django_redis.cache.RedisCache'
 
     with mock.patch.object(environ.compat, 'DJANGO_VERSION', django_version):
         with mock.patch('environ.compat.find_loader') as mock_find_loader:
-            mock_find_loader.return_value = redis_cache_installed
+            mock_find_loader.return_value = django_redis_installed
             driver = environ.compat.choose_rediscache_driver()
-            if django_version and django_version >= (4, 0):
+            if django_redis_installed:
+                assert driver == django_redis
+            elif django_version and django_version >= (4, 0):
                 assert driver == django_new
             else:
-                assert driver == redis_cache if redis_cache_installed else django_old
-
+                assert driver == redis_cache
 
 def test_redis_parsing():
     url = ('rediscache://127.0.0.1:6379/1?client_class='

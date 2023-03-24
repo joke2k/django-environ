@@ -69,7 +69,7 @@ class NoValue:
     """Represent of no value object."""
 
     def __repr__(self):
-        return '<{}>'.format(self.__class__.__name__)
+        return f'<{self.__class__.__name__}>'
 
 
 class Env:
@@ -121,7 +121,7 @@ class Env:
         'mysql2': 'django.db.backends.mysql',
         'mysql-connector': 'mysql.connector.django',
         'mysqlgis': 'django.contrib.gis.db.backends.mysql',
-        'mssql': 'sql_server.pyodbc',
+        'mssql': 'mssql',
         'oracle': 'django.db.backends.oracle',
         'pyodbc': 'sql_server.pyodbc',
         'redshift': 'django_redshift_backend',
@@ -361,7 +361,7 @@ class Env:
             "get '%s' casted as '%s' with default '%s'",
             var, cast, default)
 
-        var_name = "{}{}".format(self.prefix, var)
+        var_name = f'{self.prefix}{var}'
         if var_name in self.scheme:
             var_info = self.scheme[var_name]
 
@@ -387,7 +387,7 @@ class Env:
             value = self.ENVIRON[var_name]
         except KeyError as exc:
             if default is self.NOTSET:
-                error_msg = "Set the {} environment variable".format(var)
+                error_msg = f'Set the {var} environment variable'
                 raise ImproperlyConfigured(error_msg) from exc
 
             value = default
@@ -467,7 +467,7 @@ class Env:
             if len(parts) == 1:
                 float_str = parts[0]
             else:
-                float_str = "{}.{}".format(''.join(parts[0:-1]), parts[-1])
+                float_str = f"{''.join(parts[0:-1])}.{parts[-1]}"
             value = float(float_str)
         else:
             value = cast(value)
@@ -524,15 +524,15 @@ class Env:
                 # sqlalchemy)
                 path = ':memory:'
             if url.netloc:
-                warnings.warn('SQLite URL contains host component %r, '
-                              'it will be ignored' % url.netloc, stacklevel=3)
+                warnings.warn(
+                    f'SQLite URL contains host component {url.netloc!r}, '
+                    'it will be ignored',
+                    stacklevel=3
+                )
         if url.scheme == 'ldap':
-            path = '{scheme}://{hostname}'.format(
-                scheme=url.scheme,
-                hostname=url.hostname,
-            )
+            path = f'{url.scheme}://{url.hostname}'
             if url.port:
-                path += ':{port}'.format(port=url.port)
+                path += f':{url.port}'
 
         user_host = url.netloc.rsplit('@', 1)
         if url.scheme in cls.POSTGRES_FAMILY and ',' in user_host[-1]:
@@ -595,7 +595,7 @@ class Env:
             config['ENGINE'] = cls.DB_SCHEMES[config['ENGINE']]
 
         if not config.get('ENGINE', False):
-            warnings.warn("Engine not recognized from url: {}".format(config))
+            warnings.warn(f'Engine not recognized from url: {config}')
             return {}
 
         return config
@@ -617,9 +617,7 @@ class Env:
             url = urlparse(url)
 
         if url.scheme not in cls.CACHE_SCHEMES:
-            raise ImproperlyConfigured(
-                'Invalid cache schema {}'.format(url.scheme)
-            )
+            raise ImproperlyConfigured(f'Invalid cache schema {url.scheme}')
 
         location = url.netloc.split(',')
         if len(location) == 1:
@@ -707,7 +705,7 @@ class Env:
         if backend:
             config['EMAIL_BACKEND'] = backend
         elif url.scheme not in cls.EMAIL_SCHEMES:
-            raise ImproperlyConfigured('Invalid email schema %s' % url.scheme)
+            raise ImproperlyConfigured(f'Invalid email schema {url.scheme}')
         elif url.scheme in cls.EMAIL_SCHEMES:
             config['EMAIL_BACKEND'] = cls.EMAIL_SCHEMES[url.scheme]
 
@@ -749,13 +747,11 @@ class Env:
         path = unquote_plus(path.split('?', 2)[0])
 
         if url.scheme not in cls.SEARCH_SCHEMES:
-            raise ImproperlyConfigured(
-                'Invalid search schema %s' % url.scheme
-            )
+            raise ImproperlyConfigured(f'Invalid search schema {url.scheme}')
         config["ENGINE"] = cls.SEARCH_SCHEMES[url.scheme]
 
         # check commons params
-        params = {}  # type: dict
+        params = {}
         if url.query:
             params = parse_qs(url.query)
             if 'EXCLUDED_INDEXES' in params:
@@ -779,7 +775,7 @@ class Env:
                 config['KWARGS'] = params['KWARGS'][0]
 
         # remove trailing slash
-        if path.endswith("/"):
+        if path.endswith('/'):
             path = path[:-1]
 
         if url.scheme == 'solr':
@@ -1023,7 +1019,7 @@ class Path:
         return item.__root__.startswith(base_path)
 
     def __repr__(self):
-        return "<Path:{}>".format(self.__root__)
+        return f'<Path:{self.__root__}>'
 
     def __str__(self):
         return self.__root__
@@ -1050,5 +1046,6 @@ class Path:
         absolute_path = os.path.abspath(os.path.join(base, *paths))
         if kwargs.get('required', False) and not os.path.exists(absolute_path):
             raise ImproperlyConfigured(
-                "Create required path: {}".format(absolute_path))
+                f'Create required path: {absolute_path}'
+            )
         return absolute_path
