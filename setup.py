@@ -14,7 +14,6 @@ from os import path
 
 from setuptools import find_packages, setup
 
-
 # Use this code block for future deprecations of Python version:
 #
 # import warnings
@@ -145,6 +144,7 @@ CLASSIFIERS = [
     'Framework :: Django :: 3.2',
     'Framework :: Django :: 4.0',
     'Framework :: Django :: 4.1',
+    'Framework :: Django :: 4.2',
 
     'Operating System :: OS Independent',
 
