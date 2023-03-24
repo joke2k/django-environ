@@ -16,7 +16,6 @@ from os import path
 
 from setuptools import find_packages, setup
 
-
 if sys.version_info < (3, 6):
     warnings.warn(
         "Support of Python < 3.6 is deprecated"
@@ -142,6 +141,7 @@ CLASSIFIERS = [
     'Framework :: Django :: 3.2',
     'Framework :: Django :: 4.0',
     'Framework :: Django :: 4.1',
+    'Framework :: Django :: 4.2',
 
     'Operating System :: OS Independent',
 
