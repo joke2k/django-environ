@@ -68,6 +68,7 @@ def _cast_urlstr(v):
 def _urlparse_quote(url):
     return urlparse(quote(url, safe=':/?&=@'))
 
+
 class NoValue:
     """Represent of no value object."""
 
