@@ -23,6 +23,7 @@ from urllib.parse import (
     ParseResult,
     unquote,
     unquote_plus,
+    quote,
     urlparse,
     urlunparse,
 )
@@ -64,6 +65,8 @@ def _cast_int(v):
 def _cast_urlstr(v):
     return unquote(v) if isinstance(v, str) else v
 
+def _urlparse_quote(url):
+    return urlparse(quote(url, safe=':/?&=@'))
 
 class NoValue:
     """Represent of no value object."""
@@ -509,7 +512,7 @@ class Env:
                     'NAME': ':memory:'
                 }
                 # note: no other settings are required for sqlite
-            url = urlparse(url)
+            url = _urlparse_quote(url)
 
         config = {}
 
@@ -614,7 +617,7 @@ class Env:
         if not isinstance(url, cls.URL_CLASS):
             if not url:
                 return {}
-            url = urlparse(url)
+            url = _urlparse_quote(url)
 
         if url.scheme not in cls.CACHE_SCHEMES:
             raise ImproperlyConfigured(
