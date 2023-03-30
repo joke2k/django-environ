@@ -133,6 +133,22 @@ from environ.compat import DJANGO_POSTGRES
          'enigma',
          'secret',
          12345),
+         # mysql://user:password@host:port/dbname
+        ('mysql://enigma:><{~!@#$%^&*}[]@example.com:1234/dbname',
+         'django.db.backends.mysql',
+         'dbname',
+         'example.com',
+         'enigma',
+         '><{~!@#$%^&*}[]',
+         1234),
+        # mysql://user:password@host/dbname
+        ('mysql://enigma:]password]@example.com/dbname',
+         'django.db.backends.mysql',
+         'dbname',
+         'example.com',
+         'enigma',
+         ']password]',
+         ''),
     ],
     ids=[
         'postgres',
@@ -149,6 +165,8 @@ from environ.compat import DJANGO_POSTGRES
         'ldap',
         'mssql',
         'mssql_port',
+        'mysql_password_special_chars',
+        'mysql_invalid_ipv6_password',
     ],
 )
 def test_db_parsing(url, engine, name, host, user, passwd, port):
