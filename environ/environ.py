@@ -23,6 +23,7 @@ from urllib.parse import (
     ParseResult,
     unquote,
     unquote_plus,
+    quote,
     urlparse,
     urlunparse,
 )
@@ -509,7 +510,7 @@ class Env:
                     'NAME': ':memory:'
                 }
                 # note: no other settings are required for sqlite
-            url = urlparse(url)
+            url = urlparse(quote(url, safe=':/?&=@'))
 
         config = {}
 
