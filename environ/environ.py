@@ -65,6 +65,7 @@ def _cast_int(v):
 def _cast_urlstr(v):
     return unquote(v) if isinstance(v, str) else v
 
+
 def _urlparse_quote(url):
     return urlparse(quote(url, safe=':/?&=@'))
 
