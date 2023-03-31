@@ -21,6 +21,7 @@ import warnings
 from urllib.parse import (
     parse_qs,
     ParseResult,
+    quote,
     unquote,
     unquote_plus,
     urlparse,
@@ -63,6 +64,10 @@ def _cast_int(v):
 
 def _cast_urlstr(v):
     return unquote(v) if isinstance(v, str) else v
+
+
+def _urlparse_quote(url):
+    return urlparse(quote(url, safe=':/?&=@'))
 
 
 class NoValue:
@@ -474,7 +479,9 @@ class Env:
         return value
 
     @classmethod
+    # pylint: disable=too-many-statements
     def db_url_config(cls, url, engine=None):
+        # pylint: enable-msg=too-many-statements
         """Parse an arbitrary database URL.
 
         Supports the following URL schemas:
@@ -509,10 +516,17 @@ class Env:
                     'NAME': ':memory:'
                 }
                 # note: no other settings are required for sqlite
-            url = urlparse(url)
+            try:
+                url = urlparse(url)
+            # handle Invalid IPv6 URL
+            except ValueError:
+                url = _urlparse_quote(url)
 
         config = {}
 
+        # handle unexpected URL schemes with special characters
+        if not url.path:
+            url = _urlparse_quote(urlunparse(url))
         # Remove query strings.
         path = url.path[1:]
         path = unquote_plus(path.split('?', 2)[0])
