@@ -479,9 +479,9 @@ class Env:
         return value
 
     @classmethod
-    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-statements
     def db_url_config(cls, url, engine=None):
-        # pylint: enable-msg=too-many-arguments
+        # pylint: enable-msg=too-many-statements
         """Parse an arbitrary database URL.
 
         Supports the following URL schemas:
