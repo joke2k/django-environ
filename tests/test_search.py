@@ -33,25 +33,45 @@ def test_solr_multicore_parsing(solr_url):
 
 
 @pytest.mark.parametrize(
-    'url,engine',
+    'url,engine,scheme',
     [
         ('elasticsearch://127.0.0.1:9200/index',
-         'elasticsearch_backend.ElasticsearchSearchEngine'),
+         'elasticsearch_backend.ElasticsearchSearchEngine',
+         'http',),
+        ('elasticsearchs://127.0.0.1:9200/index',
+         'elasticsearch_backend.ElasticsearchSearchEngine',
+         'https',),
         ('elasticsearch2://127.0.0.1:9200/index',
-         'elasticsearch2_backend.Elasticsearch2SearchEngine'),
+         'elasticsearch2_backend.Elasticsearch2SearchEngine',
+         'http',),
+        ('elasticsearch2s://127.0.0.1:9200/index',
+         'elasticsearch2_backend.Elasticsearch2SearchEngine',
+         'https',),
         ('elasticsearch5://127.0.0.1:9200/index',
-         'elasticsearch5_backend.Elasticsearch5SearchEngine'),
+         'elasticsearch5_backend.Elasticsearch5SearchEngine',
+         'http'),
+        ('elasticsearch5s://127.0.0.1:9200/index',
+         'elasticsearch5_backend.Elasticsearch5SearchEngine',
+         'https'),
         ('elasticsearch7://127.0.0.1:9200/index',
-         'elasticsearch7_backend.Elasticsearch7SearchEngine'),
+         'elasticsearch7_backend.Elasticsearch7SearchEngine',
+         'http'),
+        ('elasticsearch7s://127.0.0.1:9200/index',
+         'elasticsearch7_backend.Elasticsearch7SearchEngine',
+         'https'),
     ],
     ids=[
         'elasticsearch',
+        'elasticsearchs',
         'elasticsearch2',
+        'elasticsearch2s',
         'elasticsearch5',
+        'elasticsearch5s',
         'elasticsearch7',
+        'elasticsearch7s',
     ]
 )
-def test_elasticsearch_parsing(url, engine):
+def test_elasticsearch_parsing(url, engine, scheme):
     """Ensure all supported Elasticsearch engines are recognized."""
     timeout = 360
     url = '{}?TIMEOUT={}'.format(url, timeout)
@@ -63,6 +83,7 @@ def test_elasticsearch_parsing(url, engine):
     assert 'TIMEOUT' in url.keys()
     assert url['TIMEOUT'] == timeout
     assert 'PATH' not in url
+    assert url["URL"].startswith(scheme + ":")
 
 
 @pytest.mark.parametrize('storage', ['file', 'ram'])
