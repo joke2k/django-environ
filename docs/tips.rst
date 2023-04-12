@@ -55,7 +55,7 @@ See https://perishablepress.com/stop-using-unsafe-characters-in-urls/ for refere
 Smart Casting
 =============
 
-``django-environ`` has a "Smart-casting" enabled by default, if you don't provide a ``cast`` type, it will be detected from ``default`` type.
+django-environ has a "Smart-casting" enabled by default, if you don't provide a ``cast`` type, it will be detected from ``default`` type.
 This could raise side effects (see `#192 <https://github.com/joke2k/django-environ/issues/192>`_).
 To disable it use ``env.smart_cast = False``.
 
@@ -316,6 +316,8 @@ file from the filesystem:
    env.read_env(pathlib.Path(str(BASE_DIR)).joinpath('.env'))
    env.read_env(pathlib.Path(str(BASE_DIR)) / '.env')
 
+
+.. _overwriting-existing-env:
 
 Overwriting existing environment values from env files
 ------------------------------------------------------

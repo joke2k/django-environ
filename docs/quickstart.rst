@@ -2,10 +2,6 @@
 Quick Start
 ===========
 
-.. include:: ../README.rst
-   :start-after: -code-begin-
-   :end-before: -overview-
-
 Usage
 =====
 

@@ -1,0 +1,60 @@
+name: CodeQL
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+
+  # The branches below must be a subset of the branches above
+  pull_request:
+    branches:
+      - develop
+      - main
+
+  schedule:
+    - cron: '40 22 * * 5'
+      #       |  | | | |
+      #       |  | | | |____ day of the week (0 - 6 or SUN-SAT)
+      #       |  | | |____ month (1 - 12 or JAN-DEC)
+      #       |  | |____ day of the month (1 - 31)
+      #       |  |____ hour (0 - 23)
+      #       |____ minute (0 - 59)
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    # The maximum number of minutes to let a workflow run
+    # before GitHub automatically cancels it. Default: 360
+    timeout-minutes: 30
+
+    strategy:
+      # When set to true, GitHub cancels
+      # all in-progress jobs if any matrix job fails.
+      fail-fast: false
+
+      matrix:
+        language:
+          - python
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3.3.0
+
+    # Initializes the CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v2
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
