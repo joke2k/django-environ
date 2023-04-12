@@ -18,9 +18,8 @@ import os
 import re
 import sys
 import threading
-import urllib.parse as urlparselib
 import warnings
-from os.path import expandvars
+from os.path import expandvars  # noqa: C0412
 from urllib.parse import (
     parse_qs,
     ParseResult,
@@ -40,13 +39,15 @@ from .compat import (
 from .fileaware_mapping import FileAwareMapping
 
 try:
-    from os import PathLike
+    from os import PathLike  # pylint: disable=C0412
 except ImportError:  # Python 3.5 support
     from pathlib import PurePath as PathLike
 
 Openable = (str, PathLike)
 
 logger = logging.getLogger(__name__)
+
+SKIP_ENV_VARS = 'DJANGO_SECRET_KEY', 'CACHE_URL'
 
 
 def _cast(value):
@@ -191,7 +192,8 @@ class Env:
     }
     CLOUDSQL = 'cloudsql'
 
-    VAR = re.compile(r'(?<!\\)\$\{?(?P<name>[A-Z_][0-9A-Z_]*)}?', re.IGNORECASE)
+    VAR = re.compile(r'(?<!\\)\$\{?(?P<name>[A-Z_][0-9A-Z_]*)}?',
+                     re.IGNORECASE)
 
     def __init__(self, **scheme):
         self._local = threading.local()
@@ -348,7 +350,8 @@ class Env:
         """
         return Path(self.get_value(var, default=default), **kwargs)
 
-    def get_value(self, var, cast=None, default=NOTSET, parse_default=False, add_prefix=True):
+    def get_value(self, var, cast=None,  # pylint: disable=R0913
+                  default=NOTSET, parse_default=False, add_prefix=True):
         """Return value for given environment variable.
 
         - Substitute environment variable values.
@@ -372,19 +375,23 @@ class Env:
         if not hasattr(self._local, 'vars'):
             self._local.vars = set()
         if var_name in self._local.vars:
-            error_msg = "Environment variable '{}' recursively references itself (eventually)".format(var_name)
+            error_msg = "Environment variable '{}' recursively references "\
+                        "itself (eventually)".format(var_name)
             raise ImproperlyConfigured(error_msg)
 
         self._local.vars.add(var_name)
         try:
-            return self._get_value(var_name, cast=cast, default=default, parse_default=parse_default)
+            return self._get_value(
+                var_name, cast=cast, default=default,
+                parse_default=parse_default)
         finally:
             self._local.vars.remove(var_name)
 
-    def _get_value(self, var_name, cast=None, default=NOTSET, parse_default=False):
+    def _get_value(self, var_name, cast=None, default=NOTSET,
+                   parse_default=False):
         logger.debug(
             "get '%s' casted as '%s' with default '%s'",
-            var, cast, default)
+            var_name, cast, default)
 
         if var_name in self.scheme:
             var_info = self.scheme[var_name]
@@ -417,12 +424,18 @@ class Env:
             value = default
 
         # Substitute environment variables
-        if isinstance(value, (str, bytes)) and var_name != 'DJANGO_SECRET_KEY':
-            def repl(m):
-                return self.get_value(m['name'], cast=cast, default=default,
-                                      parse_default=parse_default, add_prefix=False)
+        if isinstance(value, (bytes, str)) and var_name not in SKIP_ENV_VARS:
+            def repl(match_):
+                return self.get_value(
+                    match_.group('name'), cast=cast, default=default,
+                    parse_default=parse_default, add_prefix=False)
+            is_bytes = isinstance(value, bytes)
+            if is_bytes:
+                value = value.decode('utf-8')
             value = self.VAR.sub(repl, value)
             value = expandvars(value)
+            if is_bytes:
+                value = value.encode('utf-8')
 
         # Resolve any proxied values
         prefix = b'$' if isinstance(value, bytes) else '$'
@@ -431,7 +444,8 @@ class Env:
             value = value.replace(escape, prefix)
 
         # Smart casting
-        if self.smart_cast and cast is None and default is not None and not isinstance(default, NoValue):
+        if self.smart_cast and cast is None and default is not None \
+                and not isinstance(default, NoValue):
             cast = type(default)
 
         value = None if default is None and value == '' else value
