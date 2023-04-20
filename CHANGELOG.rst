@@ -11,6 +11,7 @@ Added
 +++++
 - Added support for secure Elasticsearch connections
   `#463 <https://github.com/joke2k/django-environ/pull/463>`_.
+
 Changed
 +++++++
 - Used ``mssql-django`` as engine for SQL Server
