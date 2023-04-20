@@ -190,7 +190,8 @@ class Env:
         "xapian": "haystack.backends.xapian_backend.XapianEngine",
         "simple": "haystack.backends.simple_backend.SimpleEngine",
     }
-    ELASTICSEARCH_FAMILY = [scheme + s for scheme in SEARCH_SCHEMES if scheme.startswith("elasticsearch")
+    ELASTICSEARCH_FAMILY = [scheme + s for scheme in SEARCH_SCHEMES
+                            if scheme.startswith("elasticsearch")
                             for s in ('', 's')]
     CLOUDSQL = 'cloudsql'
 

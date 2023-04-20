@@ -7,6 +7,10 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 `v0.11.0`_ - 00-Unreleased-2023
 -------------------------------
+Added
++++++
+- Added support for secure Elasticsearch connections
+  `#463 <https://github.com/joke2k/django-environ/pull/463>`_.
 Changed
 +++++++
 - Used ``mssql-django`` as engine for SQL Server
