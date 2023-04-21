@@ -506,6 +506,10 @@ class Env:
         :return: Parsed database URL.
         :rtype: dict
         """
+        # Return blank configuration when url is null or empty
+        if not url:
+            return {}
+        
         if not isinstance(url, cls.URL_CLASS):
             if url == 'sqlite://:memory:':
                 # this is a special case, because if we pass this URL into
@@ -701,6 +705,10 @@ class Env:
 
         config = {}
 
+        # Return blank configuration when url is null or empty
+        if not url:
+            return config
+
         url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
         # Remove query strings
@@ -753,6 +761,10 @@ class Env:
         """
 
         config = {}
+
+        # Return blank configuration when url is null or empty
+        if not url:
+            return config
 
         url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
