@@ -113,7 +113,6 @@ class Env:
     URL_CLASS = ParseResult
 
     POSTGRES_FAMILY = ['postgres', 'postgresql', 'psql', 'pgsql', 'postgis']
-    ELASTICSEARCH_FAMILY = ['elasticsearch' + x for x in ['', '2', '5', '7']]
 
     DEFAULT_DATABASE_ENV = 'DATABASE_URL'
     DB_SCHEMES = {
@@ -191,6 +190,9 @@ class Env:
         "xapian": "haystack.backends.xapian_backend.XapianEngine",
         "simple": "haystack.backends.simple_backend.SimpleEngine",
     }
+    ELASTICSEARCH_FAMILY = [scheme + s for scheme in SEARCH_SCHEMES
+                            if scheme.startswith("elasticsearch")
+                            for s in ('', 's')]
     CLOUDSQL = 'cloudsql'
 
     def __init__(self, **scheme):
@@ -760,9 +762,15 @@ class Env:
         path = url.path[1:]
         path = unquote_plus(path.split('?', 2)[0])
 
-        if url.scheme not in cls.SEARCH_SCHEMES:
+        scheme = url.scheme
+        secure = False
+        # elasticsearch supports secure schemes, similar to http -> https
+        if scheme in cls.ELASTICSEARCH_FAMILY and scheme.endswith('s'):
+            scheme = scheme[:-1]
+            secure = True
+        if scheme not in cls.SEARCH_SCHEMES:
             raise ImproperlyConfigured(f'Invalid search schema {url.scheme}')
-        config["ENGINE"] = cls.SEARCH_SCHEMES[url.scheme]
+        config["ENGINE"] = cls.SEARCH_SCHEMES[scheme]
 
         # check commons params
         params = {}
@@ -811,7 +819,7 @@ class Env:
                 index = split[0]
 
             config['URL'] = urlunparse(
-                ('http',) + url[1:2] + (path,) + ('', '', '')
+                ('https' if secure else 'http', url[1], path, '', '', '')
             )
             if 'TIMEOUT' in params:
                 config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
