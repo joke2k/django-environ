@@ -37,13 +37,7 @@ from .compat import (
 )
 from .fileaware_mapping import FileAwareMapping
 
-try:
-    from os import PathLike
-except ImportError:  # Python 3.5 support
-    from pathlib import PurePath as PathLike
-
-Openable = (str, PathLike)
-
+Openable = (str, os.PathLike)
 logger = logging.getLogger(__name__)
 
 
@@ -832,8 +826,7 @@ class Env:
             scheme = scheme[:-1]
             secure = True
         if scheme not in cls.SEARCH_SCHEMES:
-            raise ImproperlyConfigured(
-                'Invalid search schema ' + url.scheme)
+            raise ImproperlyConfigured(f'Invalid search schema {url.scheme}')
         config['ENGINE'] = cls.SEARCH_SCHEMES[scheme]
 
         # check commons params
