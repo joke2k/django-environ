@@ -743,6 +743,72 @@ class Env:
         return config
 
     @classmethod
+    def _parse_common_search_params(cls, url):
+        cfg = {}
+        prs = {}
+
+        if not url.query or str(url.query) == '':
+            return cfg, prs
+
+        prs = parse_qs(url.query)
+        if 'EXCLUDED_INDEXES' in prs:
+            cfg['EXCLUDED_INDEXES'] = prs['EXCLUDED_INDEXES'][0].split(',')
+        if 'INCLUDE_SPELLING' in prs:
+            val = prs['INCLUDE_SPELLING'][0]
+            cfg['INCLUDE_SPELLING'] = cls.parse_value(val, bool)
+        if 'BATCH_SIZE' in prs:
+            cfg['BATCH_SIZE'] = cls.parse_value(prs['BATCH_SIZE'][0], int)
+        return cfg, prs
+
+    @classmethod
+    def _parse_elasticsearch_search_params(cls, url, path, secure, params):
+        cfg = {}
+        split = path.rsplit('/', 1)
+
+        if len(split) > 1:
+            path = '/'.join(split[:-1])
+            index = split[-1]
+        else:
+            path = ""
+            index = split[0]
+
+        cfg['URL'] = urlunparse(
+            ('https' if secure else 'http', url[1], path, '', '', '')
+        )
+        if 'TIMEOUT' in params:
+            cfg['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
+        if 'KWARGS' in params:
+            cfg['KWARGS'] = params['KWARGS'][0]
+        cfg['INDEX_NAME'] = index
+        return cfg
+
+    @classmethod
+    def _parse_solr_search_params(cls, url, path, params):
+        cfg = {}
+        cfg['URL'] = urlunparse(('http',) + url[1:2] + (path,) + ('', '', ''))
+        if 'TIMEOUT' in params:
+            cfg['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
+        if 'KWARGS' in params:
+            cfg['KWARGS'] = params['KWARGS'][0]
+        return cfg
+
+    @classmethod
+    def _parse_whoosh_search_params(cls, params):
+        cfg = {}
+        if 'STORAGE' in params:
+            cfg['STORAGE'] = params['STORAGE'][0]
+        if 'POST_LIMIT' in params:
+            cfg['POST_LIMIT'] = cls.parse_value(params['POST_LIMIT'][0], int)
+        return cfg
+
+    @classmethod
+    def _parse_xapian_search_params(cls, params):
+        cfg = {}
+        if 'FLAGS' in params:
+            cfg['FLAGS'] = params['FLAGS'][0]
+        return cfg
+
+    @classmethod
     def search_url_config(cls, url, engine=None):
         """Parse an arbitrary search URL.
 
@@ -753,14 +819,11 @@ class Env:
         :return: Parsed search URL.
         :rtype: dict
         """
-
         config = {}
-
         url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
         # Remove query strings.
-        path = url.path[1:]
-        path = unquote_plus(path.split('?', 2)[0])
+        path = unquote_plus(url.path[1:].split('?', 2)[0])
 
         scheme = url.scheme
         secure = False
@@ -769,76 +832,36 @@ class Env:
             scheme = scheme[:-1]
             secure = True
         if scheme not in cls.SEARCH_SCHEMES:
-            raise ImproperlyConfigured(f'Invalid search schema {url.scheme}')
-        config["ENGINE"] = cls.SEARCH_SCHEMES[scheme]
+            raise ImproperlyConfigured(
+                'Invalid search schema ' + url.scheme)
+        config['ENGINE'] = cls.SEARCH_SCHEMES[scheme]
 
         # check commons params
-        params = {}
-        if url.query:
-            params = parse_qs(url.query)
-            if 'EXCLUDED_INDEXES' in params:
-                config['EXCLUDED_INDEXES'] \
-                    = params['EXCLUDED_INDEXES'][0].split(',')
-            if 'INCLUDE_SPELLING' in params:
-                config['INCLUDE_SPELLING'] = cls.parse_value(
-                    params['INCLUDE_SPELLING'][0],
-                    bool
-                )
-            if 'BATCH_SIZE' in params:
-                config['BATCH_SIZE'] = cls.parse_value(
-                    params['BATCH_SIZE'][0],
-                    int
-                )
+        cfg, params = cls._parse_common_search_params(url)
+        config.update(cfg)
 
         if url.scheme == 'simple':
             return config
-        if url.scheme in ['solr'] + cls.ELASTICSEARCH_FAMILY:
-            if 'KWARGS' in params:
-                config['KWARGS'] = params['KWARGS'][0]
 
         # remove trailing slash
         if path.endswith('/'):
             path = path[:-1]
 
         if url.scheme == 'solr':
-            config['URL'] = urlunparse(
-                ('http',) + url[1:2] + (path,) + ('', '', '')
-            )
-            if 'TIMEOUT' in params:
-                config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
+            config.update(cls._parse_solr_search_params(url, path, params))
             return config
 
         if url.scheme in cls.ELASTICSEARCH_FAMILY:
-            split = path.rsplit("/", 1)
-
-            if len(split) > 1:
-                path = "/".join(split[:-1])
-                index = split[-1]
-            else:
-                path = ""
-                index = split[0]
-
-            config['URL'] = urlunparse(
-                ('https' if secure else 'http', url[1], path, '', '', '')
-            )
-            if 'TIMEOUT' in params:
-                config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
-            config['INDEX_NAME'] = index
+            config.update(cls._parse_elasticsearch_search_params(
+                url, path, secure, params))
             return config
 
         config['PATH'] = '/' + path
 
         if url.scheme == 'whoosh':
-            if 'STORAGE' in params:
-                config['STORAGE'] = params['STORAGE'][0]
-            if 'POST_LIMIT' in params:
-                config['POST_LIMIT'] = cls.parse_value(
-                    params['POST_LIMIT'][0],
-                    int
-                )
+            config.update(cls._parse_whoosh_search_params(params))
         elif url.scheme == 'xapian':
-            if 'FLAGS' in params:
-                config['FLAGS'] = params['FLAGS'][0]
+            config.update(cls._parse_xapian_search_params(params))
 
         if engine:
             config['ENGINE'] = engine
