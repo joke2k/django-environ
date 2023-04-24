@@ -11,6 +11,8 @@ Added
 +++++
 - Added support for secure Elasticsearch connections
   `#463 <https://github.com/joke2k/django-environ/pull/463>`_.
+- Added variable expansion
+  `#468 <https://github.com/joke2k/django-environ/pull/468>`_.
 
 Changed
 +++++++
