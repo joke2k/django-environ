@@ -9,6 +9,8 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 -------------------------------
 Added
 +++++
+- Added support for Django 4.2
+  `#456 <https://github.com/joke2k/django-environ/pull/456>`_.
 - Added support for secure Elasticsearch connections
   `#463 <https://github.com/joke2k/django-environ/pull/463>`_.
 - Added variable expansion
