@@ -430,7 +430,7 @@ class Env:
             try:
                 value = int(value) != 0
             except ValueError:
-                value = value.lower() in cls.BOOLEAN_TRUE_STRINGS
+                value = value.lower().strip() in cls.BOOLEAN_TRUE_STRINGS
         elif isinstance(cast, list):
             value = list(map(cast[0], [x for x in value.split(',') if x]))
         elif isinstance(cast, tuple):
@@ -894,9 +894,13 @@ class Env:
             m1 = re.match(r'\A(?:export )?([A-Za-z_0-9]+)=(.*)\Z', line)
             if m1:
                 key, val = m1.group(1), m1.group(2)
-                m2 = re.match(r"\A'(.*)'\Z", val)
+                m2 = re.match(r"\A\s*'(?<!\\)(.*)'\s*(#.*\s*)?\Z", val) # search for value within quotes, ignore comments after # (outside quotes)
                 if m2:
                     val = m2.group(1)
+                else:
+                    m2a = re.match(r"\A(.*?)(#.*\s*)?\Z", val) # if no quotes, search for value, ignore comments after first #
+                    if m2a:
+                        val = m2a.group(1)
                 m3 = re.match(r'\A"(.*)"\Z', val)
                 if m3:
                     val = re.sub(r'\\(.)', _keep_escaped_format_characters,
