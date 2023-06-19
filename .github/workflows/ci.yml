@@ -2,13 +2,14 @@ name: CI
 
 on:
   push:
-    branches:
-      - develop
-      - main
-      - 'feature/**'
-      - 'release/**'
-      - 'fix/**'
+    branches-ignore:
+      # These should always correspond to pull requests, so ignore them for
+      # the push trigger and let them be triggered by the pull_request
+      # trigger, avoiding running the workflow twice.  This is a minor
+      # optimization so there's no need to ensure this is comprehensive.
+      - 'dependabot/**'
 
+  # The branches below must be a subset of the branches above
   pull_request:
     branches:
       - develop
@@ -46,23 +47,33 @@ jobs:
 
       matrix:
         python:
-          - '3.5'
-          - '3.6'
-          - '3.7'
           - '3.8'
           - '3.9'
           - '3.10'
+          - '3.11'
           - 'pypy-3.7'
         os: [ ubuntu-latest, macos-latest, windows-latest ]
 
+        # These versions are no longer supported by Python team, and may
+        # eventually be dropped from GitHub Actions.  The support of these
+        # versions by django-environ will continue for as long as possible,
+        # and may be discontinued at any time.
+        include:
+          - python: '3.5'
+            os: ubuntu-20.04
+          - python: '3.6'
+            os: ubuntu-20.04
+          - python: '3.7'
+            os: ubuntu-20.04
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3.0.2
+        uses: actions/checkout@v3.3.0
         with:
           fetch-depth: 5
 
       - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v4.0.0
+        uses: actions/setup-python@v4.5.0
         with:
           python-version: ${{ matrix.python }}
 

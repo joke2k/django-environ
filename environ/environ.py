@@ -17,7 +17,6 @@ import logging
 import os
 import re
 import sys
-import urllib.parse as urlparselib
 import warnings
 from urllib.parse import (
     parse_qs,
@@ -67,6 +66,7 @@ def _cast_urlstr(v):
 
 
 class NoValue:
+    """Represent of no value object."""
 
     def __repr__(self):
         return '<{}>'.format(self.__class__.__name__)
@@ -134,6 +134,7 @@ class Env:
         'ATOMIC_REQUESTS',
         'AUTOCOMMIT',
         'DISABLE_SERVER_SIDE_CURSORS',
+        'CONN_HEALTH_CHECKS',
     ]
 
     DEFAULT_CACHE_ENV = 'CACHE_URL'
@@ -204,8 +205,6 @@ class Env:
     def __contains__(self, var):
         return var in self.ENVIRON
 
-    # Shortcuts
-
     def str(self, var, default=NOTSET, multiline=False):
         """
         :rtype: str
@@ -214,21 +213,6 @@ class Env:
         if multiline:
             return re.sub(r'(\\r)?\\n', r'\n', value)
         return value
-
-    def unicode(self, var, default=NOTSET):
-        """Helper for python2
-        :rtype: unicode
-        """
-        warnings.warn(
-            '`%s.unicode` is deprecated, use `%s.str` instead' % (
-                self.__class__.__name__,
-                self.__class__.__name__,
-            ),
-            DeprecationWarning,
-            stacklevel=2
-        )
-
-        return self.get_value(var, cast=str, default=default)
 
     def bytes(self, var, default=NOTSET, encoding='utf8'):
         """
@@ -373,9 +357,9 @@ class Env:
         :rtype: typing.IO[typing.Any]
         """
 
-        logger.debug("get '{}' casted as '{}' with default '{}'".format(
-            var, cast, default
-        ))
+        logger.debug(
+            "get '%s' casted as '%s' with default '%s'",
+            var, cast, default)
 
         var_name = "{}{}".format(self.prefix, var)
         if var_name in self.scheme:
@@ -434,12 +418,10 @@ class Env:
 
         value = None if default is None and value == '' else value
 
-        if value != default or (parse_default and value):
+        if value != default or (parse_default and value is not None):
             value = self.parse_value(value, cast)
 
         return value
-
-    # Class and static methods
 
     @classmethod
     def parse_value(cls, value, cast):
@@ -452,7 +434,7 @@ class Env:
         """
         if cast is None:
             return value
-        elif cast is bool:
+        if cast is bool:
             try:
                 value = int(value) != 0
             except ValueError:
@@ -465,7 +447,7 @@ class Env:
         elif isinstance(cast, dict):
             key_cast = cast.get('key', str)
             value_cast = cast.get('value', str)
-            value_cast_by_key = cast.get('cast', dict())
+            value_cast_by_key = cast.get('cast', {})
             value = dict(map(
                 lambda kv: (
                     key_cast(kv[0]),
@@ -477,11 +459,12 @@ class Env:
                 [val.split('=') for val in value.split(';') if val]
             ))
         elif cast is dict:
-            value = dict([val.split('=') for val in value.split(',') if val])
+            value = dict([v.split('=', 1) for v in value.split(',') if v])
         elif cast is list:
             value = [x for x in value.split(',') if x]
         elif cast is tuple:
             val = value.strip('(').strip(')').split(',')
+            # pylint: disable=consider-using-generator
             value = tuple([x for x in val if x])
         elif cast is float:
             # clean string
@@ -598,7 +581,7 @@ class Env:
         if url.scheme == 'oracle':
             # Django oracle/base.py strips port and fails on non-string value
             if not config['PORT']:
-                del (config['PORT'])
+                del config['PORT']
             else:
                 config['PORT'] = str(config['PORT'])
 
@@ -616,8 +599,8 @@ class Env:
         else:
             config['ENGINE'] = url.scheme
 
-        if config['ENGINE'] in Env.DB_SCHEMES:
-            config['ENGINE'] = Env.DB_SCHEMES[config['ENGINE']]
+        if config['ENGINE'] in cls.DB_SCHEMES:
+            config['ENGINE'] = cls.DB_SCHEMES[config['ENGINE']]
 
         if not config.get('ENGINE', False):
             warnings.warn("Engine not recognized from url: {}".format(config))
@@ -639,8 +622,7 @@ class Env:
         if not isinstance(url, cls.URL_CLASS):
             if not url:
                 return {}
-            else:
-                url = urlparse(url)
+            url = urlparse(url)
 
         if url.scheme not in cls.CACHE_SCHEMES:
             raise ImproperlyConfigured(
@@ -784,15 +766,15 @@ class Env:
         params = {}  # type: dict
         if url.query:
             params = parse_qs(url.query)
-            if 'EXCLUDED_INDEXES' in params.keys():
+            if 'EXCLUDED_INDEXES' in params:
                 config['EXCLUDED_INDEXES'] \
                     = params['EXCLUDED_INDEXES'][0].split(',')
-            if 'INCLUDE_SPELLING' in params.keys():
+            if 'INCLUDE_SPELLING' in params:
                 config['INCLUDE_SPELLING'] = cls.parse_value(
                     params['INCLUDE_SPELLING'][0],
                     bool
                 )
-            if 'BATCH_SIZE' in params.keys():
+            if 'BATCH_SIZE' in params:
                 config['BATCH_SIZE'] = cls.parse_value(
                     params['BATCH_SIZE'][0],
                     int
@@ -800,8 +782,8 @@ class Env:
 
         if url.scheme == 'simple':
             return config
-        elif url.scheme in ['solr'] + cls.ELASTICSEARCH_FAMILY:
-            if 'KWARGS' in params.keys():
+        if url.scheme in ['solr'] + cls.ELASTICSEARCH_FAMILY:
+            if 'KWARGS' in params:
                 config['KWARGS'] = params['KWARGS'][0]
 
         # remove trailing slash
@@ -812,7 +794,7 @@ class Env:
             config['URL'] = urlunparse(
                 ('http',) + url[1:2] + (path,) + ('', '', '')
             )
-            if 'TIMEOUT' in params.keys():
+            if 'TIMEOUT' in params:
                 config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
             return config
 
@@ -829,7 +811,7 @@ class Env:
             config['URL'] = urlunparse(
                 ('http',) + url[1:2] + (path,) + ('', '', '')
             )
-            if 'TIMEOUT' in params.keys():
+            if 'TIMEOUT' in params:
                 config['TIMEOUT'] = cls.parse_value(params['TIMEOUT'][0], int)
             config['INDEX_NAME'] = index
             return config
@@ -837,15 +819,15 @@ class Env:
         config['PATH'] = '/' + path
 
         if url.scheme == 'whoosh':
-            if 'STORAGE' in params.keys():
+            if 'STORAGE' in params:
                 config['STORAGE'] = params['STORAGE'][0]
-            if 'POST_LIMIT' in params.keys():
+            if 'POST_LIMIT' in params:
                 config['POST_LIMIT'] = cls.parse_value(
                     params['POST_LIMIT'][0],
                     int
                 )
         elif url.scheme == 'xapian':
-            if 'FLAGS' in params.keys():
+            if 'FLAGS' in params:
                 config['FLAGS'] = params['FLAGS'][0]
 
         if engine:
@@ -854,7 +836,8 @@ class Env:
         return config
 
     @classmethod
-    def read_env(cls, env_file=None, overwrite=False, **overrides):
+    def read_env(cls, env_file=None, overwrite=False, encoding='utf8',
+                 **overrides):
         r"""Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack
@@ -874,11 +857,13 @@ class Env:
             the Django settings module from the Django project root.
         :param overwrite: ``overwrite=True`` will force an overwrite of
             existing environment variables.
+        :param encoding: The encoding to use when reading the environment file.
         :param \**overrides: Any additional keyword arguments provided directly
             to read_env will be added to the environment. If the key matches an
             existing environment variable, the value will be overridden.
         """
         if env_file is None:
+            # pylint: disable=protected-access
             frame = sys._getframe()
             env_file = os.path.join(
                 os.path.dirname(frame.f_back.f_code.co_filename),
@@ -887,13 +872,13 @@ class Env:
             if not os.path.exists(env_file):
                 logger.info(
                     "%s doesn't exist - if you're not configuring your "
-                    "environment separately, create one." % env_file)
+                    "environment separately, create one.", env_file)
                 return
 
         try:
             if isinstance(env_file, Openable):
                 # Python 3.5 support (wrap path with str).
-                with open(str(env_file)) as f:
+                with open(str(env_file), encoding=encoding) as f:
                     content = f.read()
             else:
                 with env_file as f:
@@ -901,10 +886,10 @@ class Env:
         except OSError:
             logger.info(
                 "%s not found - if you're not configuring your "
-                "environment separately, check this." % env_file)
+                "environment separately, check this.", env_file)
             return
 
-        logger.debug('Read environment variables from: {}'.format(env_file))
+        logger.debug('Read environment variables from: %s', env_file)
 
         def _keep_escaped_format_characters(match):
             """Keep escaped newline/tabs in quoted strings"""
@@ -984,6 +969,7 @@ class Path:
         :param \**kwargs: ``**kwargs`` passed to :py:func:`open`
         :rtype: typing.IO[typing.Any]
         """
+        # pylint: disable=unspecified-encoding
         return open(self(name), *args, **kwargs)
 
     @property
@@ -991,6 +977,7 @@ class Path:
         """Current directory for this Path"""
         return self.__root__
 
+    # pylint: disable=keyword-arg-before-vararg
     def __init__(self, start='', *paths, **kwargs):
 
         super().__init__()
@@ -1024,9 +1011,9 @@ class Path:
     def __sub__(self, other):
         if isinstance(other, int):
             return self.path('../' * other)
-        elif isinstance(other, str):
-            if self.__root__.endswith(other):
-                return Path(self.__root__.rstrip(other))
+        if isinstance(other, str) and self.__root__.endswith(other):
+            return Path(self.__root__.rstrip(other))
+
         raise TypeError(
             "unsupported operand type(s) for -: '{self}' and '{other}' "
             "unless value of {self} ends with value of {other}".format(
@@ -1059,10 +1046,12 @@ class Path:
         return self.__str__()
 
     def rfind(self, *args, **kwargs):
-        return self.__str__().rfind(*args, **kwargs)
+        """Proxy method to :py:func:`str.rfind`"""
+        return str(self).rfind(*args, **kwargs)
 
     def find(self, *args, **kwargs):
-        return self.__str__().find(*args, **kwargs)
+        """Proxy method to :py:func:`str.find`"""
+        return str(self).find(*args, **kwargs)
 
     @staticmethod
     def _absolute_join(base, *paths, **kwargs):
@@ -1071,21 +1060,3 @@ class Path:
             raise ImproperlyConfigured(
                 "Create required path: {}".format(absolute_path))
         return absolute_path
-
-
-def register_scheme(scheme):
-    for method in dir(urlparselib):
-        if method.startswith('uses_'):
-            getattr(urlparselib, method).append(scheme)
-
-
-def register_schemes(schemes):
-    for scheme in schemes:
-        register_scheme(scheme)
-
-
-# Register database and cache schemes in URLs.
-register_schemes(Env.DB_SCHEMES.keys())
-register_schemes(Env.CACHE_SCHEMES.keys())
-register_schemes(Env.SEARCH_SCHEMES.keys())
-register_schemes(Env.EMAIL_SCHEMES.keys())
