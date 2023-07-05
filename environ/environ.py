@@ -894,11 +894,13 @@ class Env:
             m1 = re.match(r'\A(?:export )?([A-Za-z_0-9]+)=(.*)\Z', line)
             if m1:
                 key, val = m1.group(1), m1.group(2)
-                m2 = re.match(r"\A\s*'(?<!\\)(.*)'\s*(#.*\s*)?\Z", val) # search for value within quotes, ignore comments after # (outside quotes)
+                # search for value within quotes, ignore comments after # (outside quotes)
+                m2 = re.match(r"\A\s*'(?<!\\)(.*)'\s*(#.*\s*)?\Z", val)
                 if m2:
                     val = m2.group(1)
                 else:
-                    m2a = re.match(r"\A(.*?)(#.*\s*)?\Z", val) # if no quotes, search for value, ignore comments after first #
+                    # if no quotes, search for value, ignore comments after first #
+                    m2a = re.match(r"\A(.*?)(#.*\s*)?\Z", val)
                     if m2a:
                         val = m2a.group(1)
                 m3 = re.match(r'\A"(.*)"\Z', val)
