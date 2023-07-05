@@ -10,7 +10,6 @@
 
 from pkgutil import find_loader
 
-
 if find_loader('simplejson'):
     import simplejson as json
 else:
@@ -28,14 +27,17 @@ else:
 
 def choose_rediscache_driver():
     """Backward compatibility for RedisCache driver."""
+
+    # django-redis library takes precedence
+    if find_loader('django_redis'):
+        return 'django_redis.cache.RedisCache'
+
     # use built-in support if Django 4+
     if DJANGO_VERSION is not None and DJANGO_VERSION >= (4, 0):
         return 'django.core.cache.backends.redis.RedisCache'
 
     # back compatibility with redis_cache package
-    if find_loader('redis_cache'):
-        return 'redis_cache.RedisCache'
-    return 'django_redis.cache.RedisCache'
+    return 'redis_cache.RedisCache'
 
 
 def choose_postgres_driver():

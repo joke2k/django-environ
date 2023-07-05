@@ -156,10 +156,10 @@ For more detailed example see ":ref:`complex_dict_format`".
 
 :py:meth:`~.environ.Env.search_url` supports the following URL schemas:
 
-* Elasticsearch: ``elasticsearch://``
-* Elasticsearch2: ``elasticsearch2://``
-* Elasticsearch5: ``elasticsearch5://``
-* Elasticsearch7: ``elasticsearch7://``
+* Elasticsearch: ``elasticsearch://`` (http) or ``elasticsearchs://`` (https)
+* Elasticsearch2: ``elasticsearch2://`` (http) or ``elasticsearch2s://`` (https)
+* Elasticsearch5: ``elasticsearch5://`` (http) or ``elasticsearch5s://`` (https)
+* Elasticsearch7: ``elasticsearch7://`` (http) or ``elasticsearch7s://`` (https)
 * Solr: ``solr://``
 * Whoosh: ``whoosh://``
 * Xapian: ``xapian://``

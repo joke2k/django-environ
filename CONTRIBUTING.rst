@@ -74,5 +74,5 @@ Resources
 ---------
 
 * `How to Contribute to Open Source <https://opensource.guide/how-to-contribute/>`_
-* `Using Pull Requests <https://help.github.com/articles/about-pull-requests/>`_
-* `Writing good commit messages <http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>`_
+* `Using Pull Requests <https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests>`_
+* `Writing good commit messages <https://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html>`_
