@@ -181,9 +181,6 @@ class TestEnv:
                               self.env('STR_LIST_WITH_SPACES', cast=[str]))
         assert_type_and_value(list, [' foo', '  spaces'],
                               self.env.list('STR_LIST_WITH_SPACES'))
-        # assert_type_and_value(list, [' foo', '  quoted'],
-        #                       self.env.list('STR_LIST_WITH_SPACES_QUOTED')
-        #                       ) # TODO: fix this
 
     def test_empty_list(self):
         assert_type_and_value(list, [], self.env('EMPTY_LIST', cast=[int]))
