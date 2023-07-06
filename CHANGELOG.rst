@@ -15,11 +15,15 @@ Added
   `#463 <https://github.com/joke2k/django-environ/pull/463>`_.
 - Added variable expansion
   `#468 <https://github.com/joke2k/django-environ/pull/468>`_.
+- Added capability to handle comments after #, after quoted values, like ``KEY= 'part1 # part2' # comment``
+  `#475 <https://github.com/joke2k/django-environ/pull/475>`_.
 
 Changed
 +++++++
 - Used ``mssql-django`` as engine for SQL Server
   `#446 <https://github.com/joke2k/django-environ/pull/446>`_.
+- Changed handling bool values, stripping whitespace around value
+  `#475 <https://github.com/joke2k/django-environ/pull/475>`_.
 
 Removed
 +++++++
