@@ -15,7 +15,7 @@ Added
   `#463 <https://github.com/joke2k/django-environ/pull/463>`_.
 - Added variable expansion
   `#468 <https://github.com/joke2k/django-environ/pull/468>`_.
-- Added capability to handle comments after #, after quoted values, like `KEY= 'value_1 # value_2' # comment`
+- Added capability to handle comments after #, after quoted values, like `KEY= 'part1 # part2' # comment`
   `#475 <https://github.com/joke2k/django-environ/pull/475>`_.
 
 Changed
