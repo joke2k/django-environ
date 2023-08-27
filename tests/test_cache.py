@@ -107,8 +107,8 @@ def test_pymemcache_compat(django_version, pymemcache_installed):
     old = 'django.core.cache.backends.memcached.PyLibMCCache'
     new = 'django.core.cache.backends.memcached.PyMemcacheCache'
     with mock.patch.object(environ.compat, 'DJANGO_VERSION', django_version):
-        with mock.patch('environ.compat.find_loader') as mock_find_loader:
-            mock_find_loader.return_value = pymemcache_installed
+        with mock.patch('environ.compat.find_spec') as mock_find_spec:
+            mock_find_spec.return_value = pymemcache_installed
             driver = environ.compat.choose_pymemcache_driver()
             if django_version and django_version < (3, 2):
                 assert driver == old
@@ -124,8 +124,8 @@ def test_rediscache_compat(django_version, django_redis_installed):
     django_redis = 'django_redis.cache.RedisCache'
 
     with mock.patch.object(environ.compat, 'DJANGO_VERSION', django_version):
-        with mock.patch('environ.compat.find_loader') as mock_find_loader:
-            mock_find_loader.return_value = django_redis_installed
+        with mock.patch('environ.compat.find_spec') as mock_find_spec:
+            mock_find_spec.return_value = django_redis_installed
             driver = environ.compat.choose_rediscache_driver()
             if django_redis_installed:
                 assert driver == django_redis
