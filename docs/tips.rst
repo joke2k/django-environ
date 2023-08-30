@@ -226,7 +226,7 @@ Proxy value
 ===========
 
 Values that being with a ``$`` may be interpolated. Pass ``interpolate=True`` to
-``environ.Env()`` to enable this feature (``True`` by default):
+``environ.Env()`` to enable this feature:
 
 .. code-block:: python
 
