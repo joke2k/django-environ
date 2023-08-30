@@ -226,7 +226,7 @@ Proxy value
 ===========
 
 Values that being with a ``$`` may be interpolated. Pass ``interpolate=True`` to
-``environ.Env()`` to enable this feature:
+``environ.Env()`` to enable this feature (``True`` by default):
 
 .. code-block:: python
 
@@ -236,7 +236,7 @@ Values that being with a ``$`` may be interpolated. Pass ``interpolate=True`` to
 
    # BAR=FOO
    # PROXY=$BAR
-   >>> print env.str('PROXY')
+   >>> print(env.str('PROXY'))
    FOO
 
 

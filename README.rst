@@ -126,8 +126,8 @@ its documentation lives at `Read the Docs <https://django-environ.readthedocs.io
 the code on `GitHub <https://github.com/joke2k/django-environ>`_,
 and the latest release on `PyPI <https://pypi.org/project/django-environ/>`_.
 
-It’s rigorously tested on Python 3.5+, and officially supports
-Django 1.11, 2.2, 3., 3.1, 3.2, 4.0 and 4.1.
+It’s rigorously tested on Python 3.6+, and officially supports
+Django 1.11, 2.2, 3.0, 3.1, 3.2, 4.0, 4.1 and 4.2.
 
 If you'd like to contribute to ``django-environ`` you're most welcome!
 

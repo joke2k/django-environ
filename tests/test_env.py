@@ -112,8 +112,10 @@ class TestEnv:
         [
             (True, 'BOOL_TRUE_STRING_LIKE_INT'),
             (True, 'BOOL_TRUE_STRING_LIKE_BOOL'),
+            (True, 'BOOL_TRUE_STRING_LIKE_BOOL_WITH_COMMENT'),
             (True, 'BOOL_TRUE_INT'),
             (True, 'BOOL_TRUE_BOOL'),
+            (True, 'BOOL_TRUE_BOOL_WITH_COMMENT'),
             (True, 'BOOL_TRUE_STRING_1'),
             (True, 'BOOL_TRUE_STRING_2'),
             (True, 'BOOL_TRUE_STRING_3'),
@@ -131,6 +133,10 @@ class TestEnv:
 
     def test_proxied_value(self):
         assert self.env('PROXIED_VAR') == 'bar'
+
+    def test_not_interpolated_proxied_value(self):
+        env = Env(interpolate=False)
+        assert env('PROXIED_VAR') == '$STR_VAR'
 
     def test_escaped_dollar_sign(self):
         self.env.escape_proxy = True
@@ -175,9 +181,9 @@ class TestEnv:
         )
 
     def test_str_list_with_spaces(self):
-        assert_type_and_value(list, [' foo', '  bar'],
+        assert_type_and_value(list, [' foo', '  spaces'],
                               self.env('STR_LIST_WITH_SPACES', cast=[str]))
-        assert_type_and_value(list, [' foo', '  bar'],
+        assert_type_and_value(list, [' foo', '  spaces'],
                               self.env.list('STR_LIST_WITH_SPACES'))
 
     def test_empty_list(self):
@@ -339,6 +345,8 @@ class TestEnv:
 
     def test_smart_cast(self):
         assert self.env.get_value('STR_VAR', default='string') == 'bar'
+        assert self.env.get_value('STR_QUOTED_IGNORE_COMMENT', default='string') == 'foo'
+        assert self.env.get_value('STR_QUOTED_INCLUDE_HASH', default='string') == 'foo # with hash'
         assert self.env.get_value('BOOL_TRUE_STRING_LIKE_INT', default=True)
         assert not self.env.get_value(
             'BOOL_FALSE_STRING_LIKE_INT',

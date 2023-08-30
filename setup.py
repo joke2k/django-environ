@@ -2,7 +2,7 @@
 #
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2023, Serghei Iakovlev <egrep@protonmail.ch>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -10,19 +10,21 @@
 
 import codecs
 import re
-import sys
-import warnings
 from os import path
 
 from setuptools import find_packages, setup
 
-
-if sys.version_info < (3, 6):
-    warnings.warn(
-        "Support of Python < 3.6 is deprecated"
-        "and will be removed in a future release.",
-        DeprecationWarning
-    )
+# Use this code block for future deprecations of Python version:
+#
+# import warnings
+# import sys
+#
+# if sys.version_info < (3, 6):
+#    warnings.warn(
+#        "Support of Python < 3.6 is deprecated"
+#        "and will be removed in a future release.",
+#        DeprecationWarning
+#    )
 
 
 def read_file(filepath):
@@ -120,7 +122,7 @@ def get_version_string():
     return version_string
 
 
-# What does this project relate to.
+# What does this project relate to?
 KEYWORDS = [
     'environment',
     'django',
@@ -142,6 +144,7 @@ CLASSIFIERS = [
     'Framework :: Django :: 3.2',
     'Framework :: Django :: 4.0',
     'Framework :: Django :: 4.1',
+    'Framework :: Django :: 4.2',
 
     'Operating System :: OS Independent',
 
@@ -150,7 +153,6 @@ CLASSIFIERS = [
 
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
@@ -228,7 +230,7 @@ if __name__ == '__main__':
         platforms=['any'],
         include_package_data=True,
         zip_safe=False,
-        python_requires='>=3.5,<4',
+        python_requires='>=3.6,<4',
         install_requires=INSTALL_REQUIRES,
         dependency_links=DEPENDENCY_LINKS,
         extras_require=EXTRAS_REQUIRE,
