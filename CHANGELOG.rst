@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+`v0.12.0`_ - 00-Unreleased-2023
+-------------------------------
+
+
+
 `v0.11.0`_ - 30-August-2023
 -------------------------------
 Added
@@ -372,7 +377,8 @@ Added
 - Initial release.
 
 
-.. _v0.11.0: https://github.com/joke2k/django-environ/compare/v0.10.0...develop
+.. _v0.12.0: https://github.com/joke2k/django-environ/compare/v0.10.0...develop
+.. _v0.11.0: https://github.com/joke2k/django-environ/compare/v0.10.0...v0.11.0
 .. _v0.10.0: https://github.com/joke2k/django-environ/compare/v0.9.0...v0.10.0
 .. _v0.9.0: https://github.com/joke2k/django-environ/compare/v0.8.1...v0.9.0
 .. _v0.8.1: https://github.com/joke2k/django-environ/compare/v0.8.0...v0.8.1
