@@ -10,7 +10,8 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 Fixed
 +++++
-- Set ``interpolate`` parameter default to ``False``.
+- Set ``interpolate`` parameter default to ``False``
+  `#485 <https://github.com/joke2k/django-environ/issues/485>`_.
 
 
 `v0.11.0`_ - 30-August-2023
@@ -380,7 +381,7 @@ Added
 - Initial release.
 
 
-.. _v0.12.0: https://github.com/joke2k/django-environ/compare/v0.10.0...develop
+.. _v0.11.1: https://github.com/joke2k/django-environ/compare/v0.11.0...main
 .. _v0.11.0: https://github.com/joke2k/django-environ/compare/v0.10.0...v0.11.0
 .. _v0.10.0: https://github.com/joke2k/django-environ/compare/v0.9.0...v0.10.0
 .. _v0.9.0: https://github.com/joke2k/django-environ/compare/v0.8.1...v0.9.0
