@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-`v0.11.0`_ - 00-Unreleased-2023
+`v0.11.0`_ - 30-August-2023
 -------------------------------
 Added
 +++++
@@ -15,10 +15,11 @@ Added
   `#463 <https://github.com/joke2k/django-environ/pull/463>`_.
 - Added variable expansion
   `#468 <https://github.com/joke2k/django-environ/pull/468>`_.
-- Added capability to handle comments after #, after quoted values, like ``KEY= 'part1 # part2' # comment``
+- Added capability to handle comments after #, after quoted values,
+  like ``KEY= 'part1 # part2' # comment``
   `#475 <https://github.com/joke2k/django-environ/pull/475>`_.
 - Added support for ``interpolate`` parameter
-  `#419 <https://github.com/joke2k/django-environ/pull/419>`_.
+  `#415 <https://github.com/joke2k/django-environ/pull/415>`_.
 
 Changed
 +++++++
@@ -26,6 +27,9 @@ Changed
   `#446 <https://github.com/joke2k/django-environ/pull/446>`_.
 - Changed handling bool values, stripping whitespace around value
   `#475 <https://github.com/joke2k/django-environ/pull/475>`_.
+- Use ``importlib.util.find_spec`` to ``replace pkgutil.find_loader``
+  `#482 <https://github.com/joke2k/django-environ/pull/482>`_.
+
 
 Removed
 +++++++
