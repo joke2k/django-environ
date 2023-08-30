@@ -197,7 +197,7 @@ class Env:
     VAR = re.compile(r'(?<!\\)\$\{?(?P<name>[A-Z_][0-9A-Z_]*)}?',
                      re.IGNORECASE)
 
-    def __init__(self, interpolate=True, **scheme):
+    def __init__(self, interpolate=False, **scheme):
         self._local = threading.local()
         self.smart_cast = True
         self.escape_proxy = False
