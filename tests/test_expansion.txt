@@ -1,9 +1,0 @@
-VAR1='Hello'
-VAR2='world'
-HELLO="$VAR1, $VAR2!"
-BRACES="${VAR1}, ${VAR2}!"
-RECURSIVE="This variable is $RECURSIVE"
-R1="$R2"
-R2="$R3"
-R3="$R4"
-R4="$R1"

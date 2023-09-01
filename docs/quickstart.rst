@@ -23,28 +23,6 @@ And use it with ``settings.py`` as follows:
    :start-after: -code-begin-
    :end-before: -overview-
 
-Variables can contain references to another variables: ``$VAR`` or ``${VAR}``.
-Referenced variables are searched in the environment and within all definitions
-in the ``.env`` file. References are checked for recursion (self-reference).
-Exception is thrown if any reference results in infinite loop on any level
-of recursion. Variable values are substituted similar to shell parameter
-expansion. Example:
-
-.. code-block:: shell
-
-   # shell
-   export POSTGRES_USERNAME='user' POSTGRES_PASSWORD='SECRET'
-
-.. code-block:: shell
-
-   # .env
-   POSTGRES_HOSTNAME='example.com'
-   POSTGRES_DB='database'
-   DATABASE_URL="postgres://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${POSTGRES_HOSTNAME}:5432/${POSTGRES_DB}"
-
-The value of ``DATABASE_URL`` variable will become
-``postgres://user:SECRET@example.com:5432/database``.
-
 The ``.env`` file should be specific to the environment and not checked into
 version control, it is best practice documenting the ``.env`` file with an example.
 For example, you can also add ``.env.dist`` with a template of your variables to
