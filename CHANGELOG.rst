@@ -7,7 +7,10 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 `v0.12.0`_ - 00-Unreleased-2023
 -------------------------------
-
+Fixed
++++++
+- Revert "Add variable expansion." feature
+  due to `#490 <https://github.com/joke2k/django-environ/issues/490>`_.
 
 
 `v0.11.1`_ - 30-August-2023
