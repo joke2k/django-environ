@@ -65,6 +65,7 @@ class FakeEnv:
                     BOOL_FALSE_STRING_LIKE_BOOL='False',
                     BOOL_FALSE_BOOL=False,
                     PROXIED_VAR='$STR_VAR',
+                    DOLLAR_VAR='SOME_VALUE$S3CR3TK3Y@HELLO',
                     ESCAPED_VAR=r'\$baz',
                     INT_LIST='42,33',
                     INT_TUPLE='(42,33)',

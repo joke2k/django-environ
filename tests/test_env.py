@@ -186,6 +186,9 @@ class TestEnv:
     def test_proxied_value(self):
         assert self.env('PROXIED_VAR') == 'bar'
 
+    def test_dollar_sign(self):
+        assert self.env('DOLLAR_VAR') == 'SOME_VALUE$S3CR3TK3Y@HELLO'
+
     def test_escaped_dollar_sign(self):
         self.env.escape_proxy = True
         assert self.env('ESCAPED_VAR') == '$baz'
