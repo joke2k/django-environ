@@ -7,13 +7,17 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 `v0.11.3`_ - 0-Undefined-2023
 -----------------------------
+Added
++++++
+- Added support for ``interpolate`` parameter
+  `#415 <https://github.com/joke2k/django-environ/pull/415>`_.
+
 Changed
 +++++++
 - Disabled inline comments handling by default due to potential side effects.
   While the feature itself is useful, the project's philosophy dictates that
   it should not be enabled by default for all users
   `#499 <https://github.com/joke2k/django-environ/issues/499>`_.
-
 
 
 `v0.11.2`_ - 1-September-2023

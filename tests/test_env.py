@@ -186,6 +186,10 @@ class TestEnv:
     def test_proxied_value(self):
         assert self.env('PROXIED_VAR') == 'bar'
 
+    def test_not_interpolated_proxied_value(self):
+        env = Env(interpolate=False)
+        assert env('PROXIED_VAR') == '$STR_VAR'
+
     def test_dollar_sign(self):
         assert self.env('DOLLAR_VAR') == 'SOME_VALUE$S3CR3TK3Y@HELLO'
 
