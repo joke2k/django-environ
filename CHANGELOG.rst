@@ -10,7 +10,7 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 Added
 +++++
 - Added support for ``interpolate`` parameter
-  `#415 <https://github.com/joke2k/django-environ/pull/415>`_.
+  `#495 <https://github.com/joke2k/django-environ/pull/495>`_.
 
 Changed
 +++++++
