@@ -2,6 +2,71 @@
 Tips
 ====
 
+Handling Inline Comments in .env Files
+======================================
+
+``django-environ`` provides an optional feature to parse inline comments in ``.env``
+files. This is controlled by the ``parse_comments`` parameter in the ``read_env``
+method.
+
+Modes
+-----
+
+- **Enabled (``parse_comments=True``)**: Inline comments starting with ``#`` will be ignored.
+- **Disabled (``parse_comments=False``)**: The entire line, including comments, will be read as the value.
+- **Default**: The behavior is the same as when ``parse_comments=False``.
+
+Side Effects
+------------
+
+While this feature can be useful for adding context to your ``.env`` files,
+it can introduce unexpected behavior. For example, if your value includes
+a ``#`` symbol, it will be truncated when ``parse_comments=True``.
+
+Why Disabled by Default?
+------------------------
+
+In line with the project's philosophy of being explicit and avoiding unexpected behavior,
+this feature is disabled by default. If you understand the implications and find the feature
+useful, you can enable it explicitly.
+
+Example
+-------
+
+Here is an example demonstrating the different modes of handling inline comments.
+
+**.env file contents**:
+
+.. code-block:: shell
+
+   # .env file contents
+   BOOL_TRUE_WITH_COMMENT=True # This is a comment
+   STR_WITH_HASH=foo#bar # This is also a comment
+
+**Python code**:
+
+.. code-block:: python
+
+   import environ
+
+   # Using parse_comments=True
+   env = environ.Env()
+   env.read_env(parse_comments=True)
+   print(env('BOOL_TRUE_WITH_COMMENT'))  # Output: True
+   print(env('STR_WITH_HASH'))  # Output: foo
+
+   # Using parse_comments=False
+   env = environ.Env()
+   env.read_env(parse_comments=False)
+   print(env('BOOL_TRUE_WITH_COMMENT'))  # Output: True # This is a comment
+   print(env('STR_WITH_HASH'))  # Output: foo#bar # This is also a comment
+
+   # Using default behavior
+   env = environ.Env()
+   env.read_env()
+   print(env('BOOL_TRUE_WITH_COMMENT'))  # Output: True # This is a comment
+   print(env('STR_WITH_HASH'))  # Output: foo#bar # This is also a comment
+
 
 Docker-style file based variables
 =================================
