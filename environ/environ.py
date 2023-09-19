@@ -925,7 +925,7 @@ class Env:
             return escaped_char
 
         for line in content.splitlines():
-            m1 = re.match(r'\A(?:export )?([A-Za-z_0-9]+)=(.*)\Z', line)
+            m1 = re.match(r'\A(?:export )?([A-Za-z_0-9]+)(?:=)?(.*)\Z', line)
             if m1:
                 key, val = m1.group(1), m1.group(2)
                 # Look for value in quotes, ignore post-# comments
