@@ -11,6 +11,10 @@ Added
 +++++
 - Added support for ``interpolate`` parameter
   `#495 <https://github.com/joke2k/django-environ/pull/495>`_.
+  This implies a breaking change on the ``interpolate`` parameter.
+  Before this change, ``Env(interpolate=True)`` and ``Env(interpolate=False)`` had the same
+  behaviour. After the change, ``Env(interpolate=False)`` won't substitute values anymore
+  that start with ``$``.
 
 Changed
 +++++++
