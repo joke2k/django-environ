@@ -191,7 +191,11 @@ class TestEnv:
         assert env('PROXIED_VAR') == '$STR_VAR'
 
     def test_dollar_sign(self):
-        assert self.env('DOLLAR_VAR') == 'SOME_VALUE$S3CR3TK3Y@HELLO'
+        assert self.env('DOLLAR_VAR_1') == 'SOME_VALUE$S3CR3TK3Y@HELLO'
+
+    def test_dollar_sign_not_interpolated(self):
+        env = Env(interpolate=False)
+        assert env('DOLLAR_VAR_1') == 'SOME_VALUE$S3CR3TK3Y@HELLO'
 
     def test_escaped_dollar_sign(self):
         self.env.escape_proxy = True
