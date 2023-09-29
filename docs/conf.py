@@ -1,6 +1,6 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2023, Serghei Iakovlev <egrep@protonmail.ch>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -12,11 +12,9 @@
 
 import codecs
 import os
-import sys
 import re
-
+import sys
 from datetime import date
-
 
 PROJECT_DIR = os.path.abspath('..')
 sys.path.insert(0, PROJECT_DIR)
@@ -71,7 +69,7 @@ templates_path = ["_templates"]
 # The suffix of source filenames.
 source_suffix = ".rst"
 
-# Allow non-local URIs so we can have images in CHANGELOG etc.
+# Allow non-local URIs, so we can have images in CHANGELOG etc.
 suppress_warnings = [
     "image.nonlocal_uri",
 ]
