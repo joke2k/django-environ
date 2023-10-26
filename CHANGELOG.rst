@@ -9,11 +9,11 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 -----------------------------
 Changed
 +++++++
+- Formally support Python 3.12.
 - Disabled inline comments handling by default due to potential side effects.
   While the feature itself is useful, the project's philosophy dictates that
   it should not be enabled by default for all users
   `#499 <https://github.com/joke2k/django-environ/issues/499>`_.
-
 
 
 `v0.11.2`_ - 1-September-2023
