@@ -189,10 +189,11 @@ class Env:
                             for s in ('', 's')]
     CLOUDSQL = 'cloudsql'
 
-    def __init__(self, **scheme):
+    def __init__(self, interpolate=True, **scheme):
         self.smart_cast = True
         self.escape_proxy = False
         self.prefix = ""
+        self.interpolate = interpolate
         self.scheme = scheme
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
@@ -396,7 +397,8 @@ class Env:
         # Resolve any proxied values
         prefix = b'$' if isinstance(value, bytes) else '$'
         escape = rb'\$' if isinstance(value, bytes) else r'\$'
-        if hasattr(value, 'startswith') and value.startswith(prefix):
+        if self.interpolate and \
+                hasattr(value, 'startswith') and value.startswith(prefix):
             value = value.lstrip(prefix)
             value = self.get_value(value, cast=cast, default=default)
 

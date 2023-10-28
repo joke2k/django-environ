@@ -5,8 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-`v0.11.3`_ - 0-Undefined-2023
+`v0.12.0`_ - 0-Undefined-2023
 -----------------------------
+Added
++++++
+- Added support for ``interpolate`` parameter
+  `#495 <https://github.com/joke2k/django-environ/pull/495>`_.
+  This implies a breaking change on the ``interpolate`` parameter.
+  Before this change, ``Env(interpolate=True)`` and ``Env(interpolate=False)`` had the same
+  behaviour. After the change, ``Env(interpolate=False)`` won't substitute values anymore
+  that start with ``$``.
+
 Changed
 +++++++
 - Formally support Python 3.12.
@@ -399,7 +408,7 @@ Added
 - Initial release.
 
 
-.. _v0.11.3: https://github.com/joke2k/django-environ/compare/v0.11.2...v0.11.3
+.. _v0.12.0: https://github.com/joke2k/django-environ/compare/v0.11.2...v0.12.0
 .. _v0.11.2: https://github.com/joke2k/django-environ/compare/v0.11.1...v0.11.2
 .. _v0.11.1: https://github.com/joke2k/django-environ/compare/v0.11.0...v0.11.1
 .. _v0.11.0: https://github.com/joke2k/django-environ/compare/v0.10.0...v0.11.0

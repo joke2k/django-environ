@@ -290,8 +290,8 @@ The following example demonstrates the above:
 Proxy value
 ===========
 
-Values that being with a ``$`` may be interpolated. Pass ``interpolate=True`` to
-``environ.Env()`` to enable this feature:
+Values that begin with a ``$`` may be interpolated. Pass ``interpolate=True`` to
+``environ.Env()`` to enable this feature (``True`` by default):
 
 .. code-block:: python
 
