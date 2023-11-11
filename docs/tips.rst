@@ -290,20 +290,53 @@ The following example demonstrates the above:
 Proxy value
 ===========
 
-Values that being with a ``$`` may be interpolated. Pass ``interpolate=True`` to
-``environ.Env()`` to enable this feature:
+Values that begin with a ``$`` may be interpolated:
 
 .. code-block:: python
 
    import environ
 
-   env = environ.Env(interpolate=True)
+   env = environ.Env()
 
    # BAR=FOO
    # PROXY=$BAR
    >>> print(env.str('PROXY'))
    FOO
 
+Interpolation
+=============
+
+Variable interpolation can be enabled with ``interpolation``. It allows for more
+complex variable interpolation than proxies:
+
+.. code-block:: python
+
+    import environ
+
+    env = environ.Env()
+    env.interpolation = True
+
+    # FOO=abc
+    # BAR=def
+    # INTERPOLATED=prefix:$FOO@${BAR}Suffix
+    env.str('INTERPOLATED')  # prefix:abc@defSuffix
+
+Variables with escaped dollar sign (``\$``) are not interpolated.
+
+When variable does not exist, an exception will be raised. These exceptions can
+be disabled with ``raise_on_missing``:
+
+.. code-block:: python
+
+    import environ
+
+    env = environ.Env()
+    env.interpolation = True
+    env.raise_on_missing = False
+
+    # FOO=abc
+    # INTERPOLATED=prefix:$FOO@${BAR}Suffix
+    env.str('INTERPOLATED')  # prefix:abc@${BAR}Suffix
 
 Escape Proxy
 ============
