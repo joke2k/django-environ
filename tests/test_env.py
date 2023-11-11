@@ -7,6 +7,7 @@
 # the LICENSE.txt file that was distributed with this source code.
 
 import os
+import tempfile
 from urllib.parse import quote
 
 import pytest
@@ -19,6 +20,59 @@ from environ.compat import (
 )
 from .asserts import assert_type_and_value
 from .fixtures import FakeEnv
+
+
+@pytest.mark.parametrize(
+        'variable,value,raw_value,parse_comments',
+        [
+            # parse_comments=True
+            ('BOOL_TRUE_STRING_LIKE_BOOL_WITH_COMMENT', 'True', "'True' # comment\n", True),
+            ('BOOL_TRUE_BOOL_WITH_COMMENT', 'True ', "True # comment\n", True),
+            ('STR_QUOTED_IGNORE_COMMENT', 'foo', " 'foo' # comment\n", True),
+            ('STR_QUOTED_INCLUDE_HASH', 'foo # with hash', "'foo # with hash' # not comment\n", True),
+            ('SECRET_KEY_1', '"abc', '"abc#def"\n', True),
+            ('SECRET_KEY_2', 'abc', 'abc#def\n', True),
+            ('SECRET_KEY_3', 'abc#def', "'abc#def'\n",  True),
+
+            # parse_comments=False
+            ('BOOL_TRUE_STRING_LIKE_BOOL_WITH_COMMENT', "'True' # comment", "'True' # comment\n", False),
+            ('BOOL_TRUE_BOOL_WITH_COMMENT', 'True # comment', "True # comment\n", False),
+            ('STR_QUOTED_IGNORE_COMMENT', " 'foo' # comment", " 'foo' # comment\n", False),
+            ('STR_QUOTED_INCLUDE_HASH', "'foo # with hash' # not comment", "'foo # with hash' # not comment\n", False),
+            ('SECRET_KEY_1', 'abc#def', '"abc#def"\n', False),
+            ('SECRET_KEY_2', 'abc#def', 'abc#def\n', False),
+            ('SECRET_KEY_3', 'abc#def', "'abc#def'\n",  False),
+
+            # parse_comments is not defined (default behavior)
+            ('BOOL_TRUE_STRING_LIKE_BOOL_WITH_COMMENT', "'True' # comment", "'True' # comment\n", None),
+            ('BOOL_TRUE_BOOL_WITH_COMMENT', 'True # comment', "True # comment\n", None),
+            ('STR_QUOTED_IGNORE_COMMENT', " 'foo' # comment", " 'foo' # comment\n", None),
+            ('STR_QUOTED_INCLUDE_HASH', "'foo # with hash' # not comment", "'foo # with hash' # not comment\n", None),
+            ('SECRET_KEY_1', 'abc#def', '"abc#def"\n', None),
+            ('SECRET_KEY_2', 'abc#def', 'abc#def\n', None),
+            ('SECRET_KEY_3', 'abc#def', "'abc#def'\n",  None),
+        ],
+    )
+def test_parse_comments(variable, value, raw_value, parse_comments):
+    old_environ = os.environ
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        env_path = os.path.join(temp_dir, '.env')
+
+        with open(env_path, 'w') as f:
+            f.write(f'{variable}={raw_value}\n')
+            f.flush()
+
+            env = Env()
+            Env.ENVIRON = {}
+            if parse_comments is None:
+                env.read_env(env_path)
+            else:
+                env.read_env(env_path, parse_comments=parse_comments)
+
+            assert env(variable) == value
+
+    os.environ = old_environ
 
 
 class TestEnv:
@@ -112,10 +166,8 @@ class TestEnv:
         [
             (True, 'BOOL_TRUE_STRING_LIKE_INT'),
             (True, 'BOOL_TRUE_STRING_LIKE_BOOL'),
-            (True, 'BOOL_TRUE_STRING_LIKE_BOOL_WITH_COMMENT'),
             (True, 'BOOL_TRUE_INT'),
             (True, 'BOOL_TRUE_BOOL'),
-            (True, 'BOOL_TRUE_BOOL_WITH_COMMENT'),
             (True, 'BOOL_TRUE_STRING_1'),
             (True, 'BOOL_TRUE_STRING_2'),
             (True, 'BOOL_TRUE_STRING_3'),
@@ -341,8 +393,6 @@ class TestEnv:
 
     def test_smart_cast(self):
         assert self.env.get_value('STR_VAR', default='string') == 'bar'
-        assert self.env.get_value('STR_QUOTED_IGNORE_COMMENT', default='string') == 'foo'
-        assert self.env.get_value('STR_QUOTED_INCLUDE_HASH', default='string') == 'foo # with hash'
         assert self.env.get_value('BOOL_TRUE_STRING_LIKE_INT', default=True)
         assert not self.env.get_value(
             'BOOL_FALSE_STRING_LIKE_INT',

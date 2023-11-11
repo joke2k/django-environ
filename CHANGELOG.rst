@@ -12,8 +12,19 @@ Added
 - Add option to interpolate variables as an alternative for simple variable
   proxies.
 
+`v0.11.3`_ - 0-Undefined-2023
+-----------------------------
+Changed
++++++++
+- Formally support Python 3.12.
+- Disabled inline comments handling by default due to potential side effects.
+  While the feature itself is useful, the project's philosophy dictates that
+  it should not be enabled by default for all users
+  `#499 <https://github.com/joke2k/django-environ/issues/499>`_.
+
+
 `v0.11.2`_ - 1-September-2023
--------------------------------
+-----------------------------
 Fixed
 +++++
 - Revert "Add variable expansion." feature
@@ -38,7 +49,7 @@ Added
   `#463 <https://github.com/joke2k/django-environ/pull/463>`_.
 - Added variable expansion
   `#468 <https://github.com/joke2k/django-environ/pull/468>`_.
-- Added capability to handle comments after #, after quoted values,
+- Added capability to handle comments after ``#``, after quoted values,
   like ``KEY= 'part1 # part2' # comment``
   `#475 <https://github.com/joke2k/django-environ/pull/475>`_.
 - Added support for ``interpolate`` parameter
@@ -395,7 +406,8 @@ Added
 - Initial release.
 
 
-.. _v0.12.0: https://github.com/joke2k/django-environ/compare/v0.11.2...v0.12.0
+.. _v0.12.0: https://github.com/joke2k/django-environ/compare/v0.11.3...v0.12.0
+.. _v0.11.3: https://github.com/joke2k/django-environ/compare/v0.11.2...v0.11.3
 .. _v0.11.2: https://github.com/joke2k/django-environ/compare/v0.11.1...v0.11.2
 .. _v0.11.1: https://github.com/joke2k/django-environ/compare/v0.11.0...v0.11.1
 .. _v0.11.0: https://github.com/joke2k/django-environ/compare/v0.10.0...v0.11.0
