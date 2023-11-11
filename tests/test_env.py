@@ -357,6 +357,70 @@ class TestEnv:
         self.env.prefix = 'PREFIX_'
         assert self.env('TEST') == 'foo'
 
+    def test_interpolation_simple(self):
+        self.env.interpolation = True
+        assert self.env('INTERPOLATE_SIMPLE') == 'foo'
+
+    def test_interpolation_simple_parentheses(self):
+        self.env.interpolation = True
+        assert self.env('INTERPOLATE_SIMPLE_PARENTHESES') == 'foo'
+
+    def test_interpolation_simple_escaped(self):
+        self.env.interpolation = True
+        assert self.env('INTERPOLATE_SIMPLE_ESCAPED') == '\\$FOO'
+
+    def test_interpolation_simple_parentheses_escaped(self):
+        self.env.interpolation = True
+        assert self.env('INTERPOLATE_SIMPLE_PARENTHESES_ESCAPED') == '\\${FOO}'
+
+    def test_interpolation_simple_parentheses_not_opened(self):
+        self.env.interpolation = True
+        assert self.env('INTERPOLATE_SIMPLE_PARENTHESES_NOT_OPENED') == 'foo}'
+
+    def test_interpolation_simple_parentheses_not_closed(self):
+        self.env.interpolation = True
+        assert self.env('INTERPOLATE_SIMPLE_PARENTHESES_NOT_CLOSED') == '${FOO'
+
+    def test_interpolation_parentheses_mismatch(self):
+        self.env.interpolation = True
+        assert self.env('INTERPOLATE_PARENTHESES_MISMATCH') == '${FOObar}'
+
+    def test_interpolation_prefixed(self):
+        self.env.interpolation = True
+        assert self.env('INTERPOLATE_PREFIXED') == 'PREFIXEDfoo'
+
+    def test_interpolation_suffixed(self):
+        self.env.interpolation = True
+        assert self.env('INTERPOLATE_SUFFIXED') == 'foo@SUFFIXED'
+
+    def test_interpolation_multiple(self):
+        self.env.interpolation = True
+        assert self.env('INTERPOLATE_MULTIPLE') == 'foobar'
+
+    def test_interpolation_missing(self):
+        self.env.interpolation = True
+        with pytest.raises(ImproperlyConfigured) as excinfo:
+            self.env('INTERPOLATE_MISSING')
+        assert str(excinfo.value) == 'Set the MISSING environment variable'
+        assert excinfo.value.__cause__ is not None
+
+    def test_interpolation_missing_disabled(self):
+        self.env.interpolation = True
+        self.env.raise_on_missing = False
+        assert self.env('INTERPOLATE_MISSING') == '$MISSING'
+
+    def test_interpolation_force_enabled(self):
+        self.env.interpolation = False
+        assert self.env.get_value('INTERPOLATE_PREFIXED', interpolate=True) == 'PREFIXEDfoo'
+
+    def test_interpolation_force_disabled_use_proxy(self):
+        self.env.interpolation = True
+        assert self.env.get_value('INTERPOLATE_SIMPLE', interpolate=False) == 'foo'
+
+    def test_interpolation_force_disabled_no_proxy(self):
+        self.env.interpolation = True
+        assert self.env.get_value('INTERPOLATE_PREFIXED', interpolate=False) == 'PREFIXED$FOO'
+
 
 class TestFileEnv(TestEnv):
     def setup_method(self, method):

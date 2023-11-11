@@ -12,6 +12,7 @@ variables to configure your Django application.
 """
 
 import ast
+import functools
 import itertools
 import logging
 import os
@@ -36,6 +37,8 @@ from .compat import (
     REDIS_DRIVER,
 )
 from .fileaware_mapping import FileAwareMapping
+
+INTERPOLATION_CACHE_SIZE = 128
 
 Openable = (str, os.PathLike)
 logger = logging.getLogger(__name__)
@@ -189,92 +192,104 @@ class Env:
                             for s in ('', 's')]
     CLOUDSQL = 'cloudsql'
 
+    _VAR_PATTERN = re.compile(r"""
+        (?P<to_replace>
+            (?P<escape>\\)?
+            \$(?P<name>[A-Z_][0-9A-Z_]*|\{[A-Z_][0-9A-Z]*})
+        )
+    """, re.IGNORECASE | re.VERBOSE)
+
     def __init__(self, **scheme):
         self.smart_cast = True
         self.escape_proxy = False
+        self.interpolation = False
+        self.raise_on_missing = True
         self.prefix = ""
         self.scheme = scheme
 
-    def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
+    def __call__(self, var, cast=None, default=NOTSET, parse_default=False, interpolate=None):
         return self.get_value(
             var,
             cast=cast,
             default=default,
-            parse_default=parse_default
+            parse_default=parse_default,
+            interpolate=interpolate
         )
 
     def __contains__(self, var):
         return var in self.ENVIRON
 
-    def str(self, var, default=NOTSET, multiline=False):
+    def str(self, var, default=NOTSET, multiline=False, interpolate=None):
         """
         :rtype: str
         """
-        value = self.get_value(var, cast=str, default=default)
+        value = self.get_value(var, cast=str, default=default, interpolate=interpolate)
         if multiline:
             return re.sub(r'(\\r)?\\n', r'\n', value)
         return value
 
-    def bytes(self, var, default=NOTSET, encoding='utf8'):
+    def bytes(self, var, default=NOTSET, encoding='utf8', interpolate=None):
         """
         :rtype: bytes
         """
-        value = self.get_value(var, cast=str, default=default)
+        value = self.get_value(var, cast=str, default=default, interpolate=interpolate)
         if hasattr(value, 'encode'):
             return value.encode(encoding)
         return value
 
-    def bool(self, var, default=NOTSET):
+    def bool(self, var, default=NOTSET, interpolate=None):
         """
         :rtype: bool
         """
-        return self.get_value(var, cast=bool, default=default)
+        return self.get_value(var, cast=bool, default=default, interpolate=interpolate)
 
-    def int(self, var, default=NOTSET):
+    def int(self, var, default=NOTSET, interpolate=None):
         """
         :rtype: int
         """
-        return self.get_value(var, cast=int, default=default)
+        return self.get_value(var, cast=int, default=default, interpolate=interpolate)
 
-    def float(self, var, default=NOTSET):
+    def float(self, var, default=NOTSET, interpolate=None):
         """
         :rtype: float
         """
-        return self.get_value(var, cast=float, default=default)
+        return self.get_value(var, cast=float, default=default, interpolate=interpolate)
 
-    def json(self, var, default=NOTSET):
+    def json(self, var, default=NOTSET, interpolate=None):
         """
         :returns: Json parsed
         """
-        return self.get_value(var, cast=json.loads, default=default)
+        return self.get_value(var, cast=json.loads, default=default, interpolate=interpolate)
 
-    def list(self, var, cast=None, default=NOTSET):
+    def list(self, var, cast=None, default=NOTSET, interpolate=None):
         """
         :rtype: list
         """
         return self.get_value(
             var,
             cast=list if not cast else [cast],
-            default=default
+            default=default,
+            interpolate=interpolate
         )
 
-    def tuple(self, var, cast=None, default=NOTSET):
+    def tuple(self, var, cast=None, default=NOTSET, interpolate=None):
         """
         :rtype: tuple
         """
         return self.get_value(
             var,
             cast=tuple if not cast else (cast,),
-            default=default
+            default=default,
+            interpolate=interpolate
         )
 
-    def dict(self, var, cast=dict, default=NOTSET):
+    def dict(self, var, cast=dict, default=NOTSET, interpolate=None):
         """
         :rtype: dict
         """
-        return self.get_value(var, cast=cast, default=default)
+        return self.get_value(var, cast=cast, default=default, interpolate=interpolate)
 
-    def url(self, var, default=NOTSET):
+    def url(self, var, default=NOTSET, interpolate=None):
         """
         :rtype: urllib.parse.ParseResult
         """
@@ -282,10 +297,11 @@ class Env:
             var,
             cast=urlparse,
             default=default,
-            parse_default=True
+            parse_default=True,
+            interpolate=interpolate
         )
 
-    def db_url(self, var=DEFAULT_DATABASE_ENV, default=NOTSET, engine=None):
+    def db_url(self, var=DEFAULT_DATABASE_ENV, default=NOTSET, engine=None, interpolate=None):
         """Returns a config dictionary, defaulting to DATABASE_URL.
 
         The db method is an alias for db_url.
@@ -293,13 +309,13 @@ class Env:
         :rtype: dict
         """
         return self.db_url_config(
-            self.get_value(var, default=default),
+            self.get_value(var, default=default, interpolate=interpolate),
             engine=engine
         )
 
     db = db_url
 
-    def cache_url(self, var=DEFAULT_CACHE_ENV, default=NOTSET, backend=None):
+    def cache_url(self, var=DEFAULT_CACHE_ENV, default=NOTSET, backend=None, interpolate=None):
         """Returns a config dictionary, defaulting to CACHE_URL.
 
         The cache method is an alias for cache_url.
@@ -307,13 +323,13 @@ class Env:
         :rtype: dict
         """
         return self.cache_url_config(
-            self.url(var, default=default),
+            self.url(var, default=default, interpolate=interpolate),
             backend=backend
         )
 
     cache = cache_url
 
-    def email_url(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
+    def email_url(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None, interpolate=None):
         """Returns a config dictionary, defaulting to EMAIL_URL.
 
         The email method is an alias for email_url.
@@ -321,29 +337,29 @@ class Env:
         :rtype: dict
         """
         return self.email_url_config(
-            self.url(var, default=default),
+            self.url(var, default=default, interpolate=interpolate),
             backend=backend
         )
 
     email = email_url
 
-    def search_url(self, var=DEFAULT_SEARCH_ENV, default=NOTSET, engine=None):
+    def search_url(self, var=DEFAULT_SEARCH_ENV, default=NOTSET, engine=None, interpolate=None):
         """Returns a config dictionary, defaulting to SEARCH_URL.
 
         :rtype: dict
         """
         return self.search_url_config(
-            self.url(var, default=default),
+            self.url(var, default=default, interpolate=interpolate),
             engine=engine
         )
 
-    def path(self, var, default=NOTSET, **kwargs):
+    def path(self, var, default=NOTSET, interpolate=None, **kwargs):
         """
         :rtype: Path
         """
-        return Path(self.get_value(var, default=default), **kwargs)
+        return Path(self.get_value(var, default=default, interpolate=interpolate), **kwargs)
 
-    def get_value(self, var, cast=None, default=NOTSET, parse_default=False):
+    def get_value(self, var, cast=None, default=NOTSET, parse_default=False, interpolate=None):
         """Return value for given environment variable.
 
         :param str var:
@@ -354,6 +370,8 @@ class Env:
              If var not present in environ, return this instead.
         :param bool parse_default:
             Force to parse default.
+        :param bool, optional interpolate:
+            Enable or disable interpolation. Uses class-defined ``interpolation`` as default.
         :returns: Value from environment or default (if set).
         :rtype: typing.IO[typing.Any]
         """
@@ -393,12 +411,19 @@ class Env:
 
             value = default
 
-        # Resolve any proxied values
         prefix = b'$' if isinstance(value, bytes) else '$'
         escape = rb'\$' if isinstance(value, bytes) else r'\$'
-        if hasattr(value, 'startswith') and value.startswith(prefix):
-            value = value.lstrip(prefix)
-            value = self.get_value(value, cast=cast, default=default)
+
+        if interpolate is None:
+            interpolate = self.interpolation
+        if interpolate:
+            # Interpolate variables
+            value = self.interpolate(value, var_name)
+        else:
+            # Resolve any proxied values
+            if hasattr(value, 'startswith') and value.startswith(prefix):
+                value = value.lstrip(prefix)
+                value = self.get_value(value, cast=cast, default=default)
 
         if self.escape_proxy and hasattr(value, 'replace'):
             value = value.replace(escape, prefix)
@@ -415,6 +440,34 @@ class Env:
             value = self.parse_value(value, cast)
 
         return value
+
+    @functools.lru_cache(maxsize=INTERPOLATION_CACHE_SIZE, typed=True)
+    def interpolate(self, value, var_name=None):
+        """Interpolate variables in provided value
+
+        :param IO value:
+            String or bytes object to interpolate.
+        :param str, optional var_name:
+            Name of the variable whose value will be interpolated.
+
+        :returns: Interpolated value.
+        """
+        str_value = value.decode('utf-8') if isinstance(value, bytes) else value
+        for match in self._VAR_PATTERN.finditer(str_value):
+            if match.group('escape'):
+                continue  # skip escaped variables
+            to_replace = match.group('to_replace')
+            name = match.group('name').lstrip('{').rstrip('}')
+            if var_name and name == var_name:
+                error_msg = f'Variable {name} references itself'
+                raise ImproperlyConfigured(error_msg)
+            try:
+                str_value = str_value.replace(to_replace, self.get_value(name))
+            except ImproperlyConfigured:
+                if self.raise_on_missing:
+                    raise
+                logger.warning("environment variable %s is not set", name)
+        return str_value.encode('utf-8') if isinstance(value, bytes) else str_value
 
     @classmethod
     def parse_value(cls, value, cast):

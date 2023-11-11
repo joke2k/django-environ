@@ -21,7 +21,7 @@ from .environ import *
 __copyright__ = 'Copyright (C) 2013-2023 Daniele Faraglia'
 """The copyright notice of the package."""
 
-__version__ = '0.11.2'
+__version__ = '0.12.0'
 """The version of the package."""
 
 __license__ = 'MIT'
