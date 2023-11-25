@@ -59,6 +59,14 @@ from environ.compat import DJANGO_POSTGRES
          '',
          ''
          ),
+        # cockroachdb://username:secret@test.example.com:26258/dbname
+        ('cockroachdb://username:secret@test.example.com:26258/dbname',
+         'django_cockroachdb',
+         'dbname',
+         'test.example.com',
+         'username',
+         'secret',
+         26258),
         # mysqlgis://user:password@host:port/dbname
         ('mysqlgis://enigma:secret@example.com:5431/dbname',
          'django.contrib.gis.db.backends.mysql',
@@ -156,6 +164,7 @@ from environ.compat import DJANGO_POSTGRES
         'postgis',
         'postgres_cluster',
         'postgres_no_ports',
+        'cockroachdb',
         'mysqlgis',
         'cleardb',
         'mysql_no_password',
