@@ -115,6 +115,7 @@ class Env:
         'psql': DJANGO_POSTGRES,
         'pgsql': DJANGO_POSTGRES,
         'postgis': 'django.contrib.gis.db.backends.postgis',
+        'cockroachdb': 'django_cockroachdb',
         'mysql': 'django.db.backends.mysql',
         'mysql2': 'django.db.backends.mysql',
         'mysql-connector': 'mysql.connector.django',
