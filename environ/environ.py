@@ -189,6 +189,12 @@ class Env:
                             for s in ('', 's')]
     CLOUDSQL = 'cloudsql'
 
+    DEFAULT_CHANNELS_ENV = "CHANNELS_URL"
+    CHANNELS_SCHEMES =  {
+        "inmemory": "channels.layers.InMemoryChannelLayer",
+        "redis": "channels_redis.core.RedisChannelLayer"
+    }
+
     def __init__(self, **scheme):
         self.smart_cast = True
         self.escape_proxy = False
@@ -336,6 +342,18 @@ class Env:
             self.url(var, default=default),
             engine=engine
         )
+
+    def channels_url(self, var=DEFAULT_CHANNELS_ENV, default=NOTSET, backend=None):
+        """Returns a config dictionary, defaulting to CHANNELS_URL.
+
+        :rtype: dict
+        """
+        return self.channels_url_config(
+            self.url(var, default=default),
+            backend=backend
+        )
+
+    channels = channels_url
 
     def path(self, var, default=NOTSET, **kwargs):
         """
@@ -733,6 +751,33 @@ class Env:
                 else:
                     config_options.update(opt)
             config['OPTIONS'] = config_options
+
+        return config
+    
+    @classmethod
+    def channels_url_config(cls, url, backend=None):
+        """Parse an arbitrary channels URL.
+
+        :param urllib.parse.ParseResult or str url:
+            Email URL to parse.
+        :param str or None backend:
+            If None, the backend is evaluates from the ``url``.
+        :return: Parsed channels URL.
+        :rtype: dict
+        """
+        config = {}
+        url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+        
+        if backend:
+            config["BACKEND"] = backend
+        elif url.scheme not in cls.CHANNELS_SCHEMES:
+            raise ImproperlyConfigured(f"Invalid channels schema {url.scheme}")
+        else:
+            config["BACKEND"] = cls.CHANNELS_SCHEMES[url.scheme]
+            if url.scheme == "redis":
+                config["CONFIG"] = {
+                    "hosts": [url.geturl()]
+                }
 
         return config
 
