@@ -18,3 +18,8 @@ def test_channels_parsing():
     result = Env.channels_url_config(url)
     assert result["BACKEND"] == "channels_redis.core.RedisChannelLayer"
     assert result["CONFIG"]["hosts"][0] == "redis://user:password@localhost:5173/0"
+
+    url = "redis+pubsub://user:password@localhost:5173/0"
+    result = Env.channels_url_config(url)
+    assert result["BACKEND"] == "channels_redis.pubsub.RedisPubSubChannelLayer"
+    assert result["CONFIG"]["hosts"][0] == "redis://user:password@localhost:5173/0"
