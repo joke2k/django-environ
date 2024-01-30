@@ -86,6 +86,16 @@ def test_elasticsearch_parsing(url, engine, scheme):
     assert url["URL"].startswith(scheme + ":")
 
 
+def test_custom_search_engine():
+    """Override ENGINE determined from schema."""
+    env_url = 'elasticsearch://127.0.0.1:9200/index'
+
+    engine = 'mypackage.backends.whatever'
+    url = Env.db_url_config(env_url, engine=engine)
+
+    assert url['ENGINE'] == engine
+
+
 @pytest.mark.parametrize('storage', ['file', 'ram'])
 def test_whoosh_parsing(whoosh_url, storage):
     post_limit = 128 * 1024 * 1024
