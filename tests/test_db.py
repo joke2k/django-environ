@@ -188,6 +188,16 @@ def test_db_parsing(url, engine, name, host, user, passwd, port):
         assert config['OPTIONS'] == {'reconnect': 'true'}
 
 
+def test_custom_db_engine():
+    """Override ENGINE determined from schema."""
+    env_url = 'postgres://enigma:secret@example.com:5431/dbname'
+
+    engine = 'mypackage.backends.whatever'
+    url = Env.db_url_config(env_url, engine=engine)
+
+    assert url['ENGINE'] == engine
+
+
 def test_postgres_complex_db_name_parsing():
     """Make sure we can use complex postgres host."""
     env_url = (

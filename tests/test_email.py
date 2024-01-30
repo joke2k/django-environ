@@ -22,3 +22,13 @@ def test_smtp_parsing():
     assert url['EMAIL_PORT'] == 587
     assert url['EMAIL_USE_TLS'] is True
     assert url['EMAIL_FILE_PATH'] == ''
+
+
+def test_custom_email_backend():
+    """Override EMAIL_BACKEND determined from schema."""
+    url = 'smtps://user@domain.com:password@smtp.example.com:587'
+
+    backend = 'mypackage.backends.whatever'
+    url = Env.email_url_config(url, backend=backend)
+
+    assert url['EMAIL_BACKEND'] == backend
