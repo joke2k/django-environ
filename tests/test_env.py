@@ -407,6 +407,13 @@ class TestEnv:
         self.env.prefix = 'PREFIX_'
         assert self.env('TEST') == 'foo'
 
+    def test_prefix_and_not_present_without_default(self):
+        self.env.prefix = 'PREFIX_'
+        with pytest.raises(ImproperlyConfigured) as excinfo:
+            self.env('not_present')
+        assert str(excinfo.value) == 'Set the PREFIX_not_present environment variable'
+        assert excinfo.value.__cause__ is not None
+
 
 class TestFileEnv(TestEnv):
     def setup_method(self, method):
