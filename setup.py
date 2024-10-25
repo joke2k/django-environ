@@ -184,8 +184,8 @@ EXTRAS_REQUIRE = {
     ],
     # Dependencies that are required to build documentation
     'docs': [
-        'furo>=2021.8.17b43,==2021.8.*',  # Sphinx documentation theme
-        'sphinx>=3.5.0',  # Python documentation generator
+        'furo>=2024.8.6',  # Sphinx documentation theme
+        'sphinx>=5.0',  # Python documentation generator
         'sphinx-notfound-page',  # Create a custom 404 page
     ],
 }
