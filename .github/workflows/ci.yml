@@ -33,7 +33,7 @@ defaults:
 
 jobs:
   test:
-    name: CI ${{ matrix.python }} on ${{ matrix.os }}
+    name: Python ${{ matrix.python }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     # The maximum number of minutes to let a workflow run

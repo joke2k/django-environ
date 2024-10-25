@@ -2,7 +2,7 @@
 #
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021-2023, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -183,6 +183,7 @@ EXTRAS_REQUIRE = {
     'testing': [
         'coverage[toml]>=5.0a4',  # Code coverage measurement for Python
         'pytest>=4.6.11',  # Our tests framework
+        'setuptools>=71.0.0',  # Needed as a dependency for some tests
     ],
     # Dependencies that are required to build documentation
     'docs': [
