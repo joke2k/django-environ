@@ -7,6 +7,11 @@ and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0
 
 `v0.12.0`_ - 0-Undefined-2024
 -----------------------------
+Fixed
++++++
+- Include prefix in the ``ImproperlyConfigured`` error message
+  `#513 <https://github.com/joke2k/django-environ/issues/513>`_.
+
 Added
 +++++
 - Add support for Python 3.12 and 3.13
@@ -23,8 +28,10 @@ Changed
 
 Removed
 +++++++
-- Removed support of Python 3.6, 3.7 and 3.8.
+- Removed support of Python 3.6, 3.7 and 3.8
+  `#538 <https://github.com/joke2k/django-environ/issues/538>`_.
 - Removed support of Django 1.x.
+  `#538 <https://github.com/joke2k/django-environ/issues/538>`_.
 
 
 `v0.11.2`_ - 1-September-2023
