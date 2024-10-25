@@ -5,15 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
-`v0.11.3`_ - 0-Undefined-2023
+`v0.12.0`_ - 0-Undefined-2024
 -----------------------------
+Added
++++++
+- Add support for Python 3.12 and 3.13
+  `#538 <https://github.com/joke2k/django-environ/issues/538>`_.
+
 Changed
 +++++++
-- Formally support Python 3.12.
 - Disabled inline comments handling by default due to potential side effects.
   While the feature itself is useful, the project's philosophy dictates that
   it should not be enabled by default for all users
   `#499 <https://github.com/joke2k/django-environ/issues/499>`_.
+
+Removed
++++++++
+- Removed support of Python 3.6, 3.7 and 3.8.
+- Removed support of Django 1.x.
 
 
 `v0.11.2`_ - 1-September-2023
