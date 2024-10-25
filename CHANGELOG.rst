@@ -11,6 +11,8 @@ Added
 +++++
 - Add support for Python 3.12 and 3.13
   `#538 <https://github.com/joke2k/django-environ/issues/538>`_.
+- Add support for Django 5.1
+  `#535 <https://github.com/joke2k/django-environ/issues/535>`_.
 
 Changed
 +++++++
@@ -408,7 +410,7 @@ Added
 - Initial release.
 
 
-.. _v0.11.3: https://github.com/joke2k/django-environ/compare/v0.11.2...v0.11.3
+.. _v0.12.0: https://github.com/joke2k/django-environ/compare/v0.11.2...v0.12.0
 .. _v0.11.2: https://github.com/joke2k/django-environ/compare/v0.11.1...v0.11.2
 .. _v0.11.1: https://github.com/joke2k/django-environ/compare/v0.11.0...v0.11.1
 .. _v0.11.0: https://github.com/joke2k/django-environ/compare/v0.10.0...v0.11.0
