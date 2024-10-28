@@ -8,7 +8,7 @@ jobs:
   check-branch:
     runs-on: ubuntu-latest
     steps:
-      - uses: Vankka/pr-target-branch-action@v2
+      - uses: Vankka/pr-target-branch-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
