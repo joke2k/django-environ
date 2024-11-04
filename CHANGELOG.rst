@@ -18,6 +18,8 @@ Added
   `#538 <https://github.com/joke2k/django-environ/issues/538>`_.
 - Add support for Django 5.1
   `#535 <https://github.com/joke2k/django-environ/issues/535>`_.
+- Add support for Django CockroachDB driver
+  `#509 <https://github.com/joke2k/django-environ/issues/509>`_.
 
 Changed
 +++++++
