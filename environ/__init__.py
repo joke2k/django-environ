@@ -36,7 +36,7 @@ __author_email__ = 'daniele.faraglia@gmail.com'
 __maintainer__ = 'Serghei Iakovlev'
 """The maintainer of the package."""
 
-__maintainer_email__ = 'egrep@protonmail.ch'
+__maintainer_email__ = 'oss@serghei.pl'
 """The email of the maintainer of the package."""
 
 __url__ = 'https://django-environ.readthedocs.org'
