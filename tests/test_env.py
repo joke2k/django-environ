@@ -8,6 +8,7 @@
 
 import os
 import tempfile
+from unittest import mock
 from urllib.parse import quote
 
 import pytest
@@ -352,26 +353,40 @@ class TestEnv:
             (Env.DEFAULT_CACHE_ENV,
              'django.core.cache.backends.memcached.MemcachedCache',
              '127.0.0.1:11211', None),
-            ('CACHE_REDIS', REDIS_DRIVER,
+            ('CACHE_REDIS',
+             'django.core.cache.backends.redis.RedisCache',
+             'redis://127.0.0.1:6379/1',
+             {'client_class': 'django_redis.client.DefaultClient',
+              'password': 'secret'}),
+            ('CACHE_REDIS',
+             'django_redis.cache.RedisCache',
              'redis://127.0.0.1:6379/1',
              {'CLIENT_CLASS': 'django_redis.client.DefaultClient',
               'PASSWORD': 'secret'}),
         ],
         ids=[
             'memcached',
-            'redis',
+            'django',  # Django Redis cache backend
+            'redis_django',  # django_redis backend
         ],
     )
     def test_cache_url_value(self, var, backend, location, options):
-        config = self.env.cache_url(var)
+        mocked_cache_schemes = Env.CACHE_SCHEMES.copy()
+        mocked_cache_schemes.update({
+            'rediscache': backend,
+            'redis': backend,
+            'rediss': backend,
+        })
+        with mock.patch.object(Env, 'CACHE_SCHEMES', mocked_cache_schemes):
+            config = self.env.cache_url(var)
 
-        assert config['BACKEND'] == backend
-        assert config['LOCATION'] == location
+            assert config['BACKEND'] == backend
+            assert config['LOCATION'] == location
 
-        if options is None:
-            assert 'OPTIONS' not in config
-        else:
-            assert config['OPTIONS'] == options
+            if options is None:
+                assert 'OPTIONS' not in config
+            else:
+                assert config['OPTIONS'] == options
 
     def test_email_url_value(self):
         email_config = self.env.email_url()

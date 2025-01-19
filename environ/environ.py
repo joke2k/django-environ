@@ -689,18 +689,27 @@ class Env:
             else:
                 config['LOCATION'] = locations
 
+        if backend:
+            config['BACKEND'] = backend
+
         if url.query:
             config_options = {}
+            # Django Redis cache backend expects options in lower case
+            # while "django_redis" expects them in upper case
+            backend = config['BACKEND']
+            if backend == 'django.core.cache.backends.redis.RedisCache':
+                key_modifier = 'lower'
+            else:
+                key_modifier = 'upper'
+
             for k, v in parse_qs(url.query).items():
-                opt = {k.upper(): _cast(v[0])}
+                key = getattr(k, key_modifier)()
+                opt = {key: _cast(v[0])}
                 if k.upper() in cls._CACHE_BASE_OPTIONS:
                     config.update(opt)
                 else:
                     config_options.update(opt)
             config['OPTIONS'] = config_options
-
-        if backend:
-            config['BACKEND'] = backend
 
         return config
 
