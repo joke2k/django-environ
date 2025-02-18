@@ -148,6 +148,8 @@ class Env:
         'rediscache': REDIS_DRIVER,
         'redis': REDIS_DRIVER,
         'rediss': REDIS_DRIVER,
+        'valkey': REDIS_DRIVER,
+        'valkeys': REDIS_DRIVER,
     }
     _CACHE_BASE_OPTIONS = [
         'TIMEOUT',
