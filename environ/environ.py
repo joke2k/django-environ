@@ -214,13 +214,19 @@ class Env:
     def __contains__(self, var):
         return var in self.ENVIRON
 
-    def str(self, var, default=NOTSET, multiline=False):
+    def str(self, var, default=NOTSET, multiline=False, choices=NOTSET):
         """
         :rtype: str
         """
         value = self.get_value(var, cast=str, default=default)
         if multiline:
             return re.sub(r'(\\r)?\\n', r'\n', value)
+        if choices is not self.NOTSET:
+            # if choices is provided, check that the value is in choices
+            if value not in choices:
+                raise ImproperlyConfigured(
+                    f"Invalid value: {value} not in {choices}"
+                )
         return value
 
     def bytes(self, var, default=NOTSET, encoding='utf8'):

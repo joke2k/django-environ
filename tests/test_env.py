@@ -111,22 +111,31 @@ class TestEnv:
         assert 'I_AM_NOT_A_VAR' not in self.env
 
     @pytest.mark.parametrize(
-        'var,val,multiline',
+        'var,val,multiline,choices',
         [
-            ('STR_VAR', 'bar', False),
-            ('MULTILINE_STR_VAR', 'foo\\nbar', False),
-            ('MULTILINE_STR_VAR', 'foo\nbar', True),
-            ('MULTILINE_QUOTED_STR_VAR', '---BEGIN---\\r\\n---END---', False),
-            ('MULTILINE_QUOTED_STR_VAR', '---BEGIN---\n---END---', True),
-            ('MULTILINE_ESCAPED_STR_VAR', '---BEGIN---\\\\n---END---', False),
-            ('MULTILINE_ESCAPED_STR_VAR', '---BEGIN---\\\n---END---', True),
+            ('STR_VAR', 'bar', False, Env.NOTSET),
+            ('STR_VAR', 'bar', False, ['foo', 'bar']),
+            ('STR_VAR', 'bar', False, ['pow', 'foo']),
+            ('MULTILINE_STR_VAR', 'foo\\nbar', False, Env.NOTSET),
+            ('MULTILINE_STR_VAR', 'foo\\nbar', False, ['foo\\nbar', '***']),
+            ('MULTILINE_STR_VAR', 'foo\\nbar', False, ['***', '***']),
+            ('MULTILINE_STR_VAR', 'foo\nbar', True, Env.NOTSET),
+            ('MULTILINE_QUOTED_STR_VAR', '---BEGIN---\\r\\n---END---', False, Env.NOTSET),
+            ('MULTILINE_QUOTED_STR_VAR', '---BEGIN---\n---END---', True, Env.NOTSET),
+            ('MULTILINE_ESCAPED_STR_VAR', '---BEGIN---\\\\n---END---', False, Env.NOTSET),
+            ('MULTILINE_ESCAPED_STR_VAR', '---BEGIN---\\\n---END---', True, Env.NOTSET),
         ],
     )
-    def test_str(self, var, val, multiline):
-        assert isinstance(self.env(var), str)
-        if not multiline:
-            assert self.env(var) == val
-        assert self.env.str(var, multiline=multiline) == val
+    def test_str(self, var, val, multiline, choices):
+        if choices is Env.NOTSET or val in choices:
+            assert isinstance(self.env(var), str)
+            if not multiline:
+                assert self.env(var) == val
+            assert self.env.str(var, multiline=multiline) == val
+        else:
+            with pytest.raises(ImproperlyConfigured) as excinfo:
+                self.env.str(var, multiline=multiline, choices=choices)
+            assert str(excinfo.value) == f"Invalid value: {val} not in {choices}"
 
     @pytest.mark.parametrize(
         'var,val,default',
