@@ -42,10 +42,10 @@ from environ.compat import DJANGO_POSTGRES
          'secret',
          5431),
         # postgres://user:password@host:port,host:port,host:port/dbname
-        ('postgres://username:p@ss:12,wor:34d@host1:111,22.55.44.88:222,[2001:db8::1234]:333/db',
+        ('postgres://username:p@ss:12,wor:34d@host1:111,22.55.44.88:222,2001:db8::1234:333/db',
          DJANGO_POSTGRES,
          'db',
-         'host1,22.55.44.88,[2001:db8::1234]',
+         'host1,22.55.44.88,2001:db8::1234',
          'username',
          'p@ss:12,wor:34d',
          '111,222,333'
