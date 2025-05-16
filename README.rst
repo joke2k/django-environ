@@ -128,7 +128,7 @@ the code on `GitHub <https://github.com/joke2k/django-environ>`_,
 and the latest release on `PyPI <https://pypi.org/project/django-environ/>`_.
 
 It’s rigorously tested on Python 3.9+, and officially supports
-Django 2.2, 3.0, 3.1, 3.2, 4.0, 4.1, 4.2, 5.0, and 5.1.
+Django 2.2, 3.0, 3.1, 3.2, 4.0, 4.1, 4.2, 5.0, 5.1 and 5.2.
 
 If you'd like to contribute to ``django-environ`` you're most welcome!
 
