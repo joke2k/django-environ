@@ -141,7 +141,7 @@ from environ.compat import DJANGO_POSTGRES
          'enigma',
          'secret',
          12345),
-         # mysql://user:password@host:port/dbname
+        # mysql://user:password@host:port/dbname
         ('mysql://enigma:><{~!@#$%^&*}[]@example.com:1234/dbname',
          'django.db.backends.mysql',
          'dbname',

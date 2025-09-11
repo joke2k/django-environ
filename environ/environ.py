@@ -7,7 +7,7 @@
 # the LICENSE.txt file that was distributed with this source code.
 
 """
-Django-environ allows you to utilize 12factor inspired environment
+Django-environ allows you to utilize 12-factor inspired environment
 variables to configure your Django application.
 """
 
@@ -566,13 +566,16 @@ class Env:
                 path += f':{url.port}'
 
         user_host = url.netloc.rsplit('@', 1)
-        if url.scheme in cls.POSTGRES_FAMILY and ',' in user_host[-1]:
+        if (url.scheme in cls.POSTGRES_FAMILY and
+                (',' in user_host[-1] or '%2C' in user_host[-1])):
             # Parsing postgres cluster dsn
+            # Handle both raw and URL-encoded commas
+            host_part = unquote_plus(user_host[-1])
             hinfo = list(
                 itertools.zip_longest(
                     *(
                         host.rsplit(':', 1)
-                        for host in user_host[-1].split(',')
+                        for host in host_part.split(',')
                     )
                 )
             )
@@ -580,7 +583,17 @@ class Env:
             port = ','.join(filter(None, hinfo[1])) if len(hinfo) == 2 else ''
         else:
             hostname = url.hostname
-            port = url.port
+            # Only access url.port if we're not dealing with a cluster URL
+            # that might have been URL-encoded
+            try:
+                port = url.port
+            except ValueError:
+                # Handle case where port parsing fails due to URL encoding
+                # Extract port manually from netloc
+                if ':' in user_host[-1]:
+                    port = user_host[-1].split(':')[-1]
+                else:
+                    port = ''
 
         # Update with environment configuration.
         config.update({
@@ -924,7 +937,8 @@ class Env:
 
         Refs:
 
-        * https://wellfire.co/learn/easier-12-factor-django
+        * 12-factor Django guide (archived):
+          https://web.archive.org/web/20250522195250/https://wellfire.co/learn/easier-12-factor-django/
 
         :param env_file: The path to the ``.env`` file your application should
             use. If a path is not provided, `read_env` will attempt to import
@@ -937,7 +951,7 @@ class Env:
         :param \**overrides: Any additional keyword arguments provided directly
             to read_env will be added to the environment. If the key matches an
             existing environment variable, the value will be overridden.
-        """
+        """  # NoQA: E501
         if env_file is None:
             # pylint: disable=protected-access
             frame = sys._getframe()

@@ -13,9 +13,9 @@ import pytest
 import environ.compat
 from environ import Env
 from environ.compat import (
-    ImproperlyConfigured,
     PYMEMCACHE_DRIVER,
     REDIS_DRIVER,
+    ImproperlyConfigured,
 )
 
 
@@ -133,6 +133,7 @@ def test_rediscache_compat(django_version, django_redis_installed):
                 assert driver == django_new
             else:
                 assert driver == redis_cache
+
 
 def test_redis_parsing():
     url = ('rediscache://127.0.0.1:6379/1?client_class='

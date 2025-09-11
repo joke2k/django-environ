@@ -24,6 +24,12 @@ include tox.ini
 # from the sdist.
 global-exclude *.py[cod]
 
+# Exclude build artifacts and temporary files
+global-exclude build/*
+global-exclude dist/*
+global-exclude *.egg-info/*
+global-exclude tmp_rovodev_*
+
 # Documentation
 include docs/docutils.conf docs/Makefile
 recursive-include docs *.png

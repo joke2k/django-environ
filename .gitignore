@@ -1,6 +1,6 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
+# Copyright (c) 2021-2025, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -18,6 +18,8 @@
 /.tox
 /build
 /dist
+/dist_*
+/test_*
 /*.egg-info
 /htmlcov
 /docs/_build
@@ -29,3 +31,6 @@ __pycache__
 # Ignore codecoverage stuff.
 .coverage*
 coverage.xml
+
+# Generated files
+README_COMBINED.rst

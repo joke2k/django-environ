@@ -20,7 +20,7 @@ Thank you to all our backers!
 
 |ocbackerimage|
 
-.. |ocsponsor0| image:: https://opencollective.com/django-environ/sponsor/0/avatar.svg
+.. |ocsponsor0| image:: https://images.opencollective.com/static/images/become_sponsor.svg
     :target: https://opencollective.com/triplebyte
     :alt: Sponsor
 .. |ocsponsor1| image:: https://images.opencollective.com/static/images/become_sponsor.svg
