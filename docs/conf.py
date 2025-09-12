@@ -117,6 +117,8 @@ linkcheck_ignore = [
     r"https://github.com/joke2k/django-environ/compare/.*",
 ]
 
+linkcheck_timeout = 60  # Default of 30 seconds failed in CI
+
 #
 # -- Options for nitpick -----------------------------------------------------
 #
