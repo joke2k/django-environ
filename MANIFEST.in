@@ -10,7 +10,7 @@
 # or remove some set of files from the sdist.
 
 # Include all files matching any of the listed patterns.
-include *.rst LICENSE.txt *.yml
+include *.rst LICENSE.txt *.yml setup_helpers.py
 graft .github
 
 # The contents of the directory tree tests will first be added to the sdist.
@@ -23,6 +23,12 @@ include tox.ini
 # All files in the sdist with a .pyc, .pyo, or .pyd extension will be removed
 # from the sdist.
 global-exclude *.py[cod]
+
+# Exclude build artifacts and temporary files
+global-exclude build/*
+global-exclude dist/*
+global-exclude *.egg-info/*
+global-exclude tmp_rovodev_*
 
 # Documentation
 include docs/docutils.conf docs/Makefile

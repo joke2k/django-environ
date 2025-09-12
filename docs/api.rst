@@ -5,15 +5,6 @@ API Reference
 .. currentmodule:: environ
 
 
-The ``__init__`` module
-=======================
-
-.. automodule:: environ
-    :members:
-    :special-members:
-    :no-undoc-members:
-
-
 The ``compat`` module
 ======================
 

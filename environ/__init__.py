@@ -15,8 +15,16 @@ Refer to the `documentation <https://django-environ.readthedocs.io/en/latest/>`_
 for details on the use of this package.
 """  # noqa: E501
 
-from .environ import *
+from .environ import Env, FileAwareEnv, NoValue, Path
+from .fileaware_mapping import FileAwareMapping
 
+__all__ = [
+    'Env',
+    'FileAwareEnv',
+    'FileAwareMapping',
+    'NoValue',
+    'Path',
+]
 
 __copyright__ = 'Copyright (C) 2013-2023 Daniele Faraglia'
 """The copyright notice of the package."""
@@ -43,5 +51,5 @@ __url__ = 'https://django-environ.readthedocs.org'
 """The URL of the package."""
 
 # pylint: disable=line-too-long
-__description__ = 'A package that allows you to utilize 12factor inspired environment variables to configure your Django application.'  # noqa: E501
+__description__ = 'A package that allows you to utilize 12-factor inspired environment variables to configure your Django application.'  # noqa: E501
 """The description of the package."""

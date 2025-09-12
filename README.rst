@@ -1,29 +1,34 @@
-.. raw:: html
+================
+django-environ
+================
 
-    <h1 align="center">django-environ</h1>
-    <p align="center">
-        <a href="https://pypi.python.org/pypi/django-environ">
-            <img src="https://img.shields.io/pypi/v/django-environ.svg" alt="Latest version released on PyPi" />
-        </a>
-        <a href="https://coveralls.io/github/joke2k/django-environ">
-            <img src="https://coveralls.io/repos/github/joke2k/django-environ/badge.svg" alt="Coverage Status" />
-        </a>
-        <a href="https://github.com/joke2k/django-environ/actions?workflow=CI">
-            <img src="https://github.com/joke2k/django-environ/workflows/CI/badge.svg?branch=develop" alt="CI Status" />
-        </a>
-        <a href="https://opencollective.com/django-environ">
-            <img src="https://opencollective.com/django-environ/sponsors/badge.svg" alt="Sponsors on Open Collective" />
-        </a>
-        <a href="https://opencollective.com/django-environ">
-            <img src="https://opencollective.com/django-environ/backers/badge.svg" alt="Backers on Open Collective" />
-        </a>
-        <a href="https://saythanks.io/to/joke2k">
-            <img src="https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg" alt="Say Thanks!" />
-        </a>
-        <a href="https://raw.githubusercontent.com/joke2k/django-environ/main/LICENSE.txt">
-            <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Package license" />
-        </a>
-    </p>
+.. image:: https://img.shields.io/pypi/v/django-environ.svg
+   :target: https://pypi.python.org/pypi/django-environ
+   :alt: Latest version released on PyPi
+
+.. image:: https://coveralls.io/repos/github/joke2k/django-environ/badge.svg
+   :target: https://coveralls.io/github/joke2k/django-environ
+   :alt: Coverage Status
+
+.. image:: https://github.com/joke2k/django-environ/workflows/CI/badge.svg?branch=develop
+   :target: https://github.com/joke2k/django-environ/actions?workflow=CI
+   :alt: CI Status
+
+.. image:: https://opencollective.com/django-environ/sponsors/badge.svg
+   :target: https://opencollective.com/django-environ
+   :alt: Sponsors on Open Collective
+
+.. image:: https://opencollective.com/django-environ/backers/badge.svg
+   :target: https://opencollective.com/django-environ
+   :alt: Backers on Open Collective
+
+.. image:: https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg
+   :target: https://saythanks.io/to/joke2k
+   :alt: Say Thanks!
+
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+   :target: https://raw.githubusercontent.com/joke2k/django-environ/main/LICENSE.txt
+   :alt: Package license
 
 .. -teaser-begin-
 
@@ -92,14 +97,14 @@ environment variables obtained from an environment file and provided by the OS:
 
 The idea of this package is to unify a lot of packages that make the same stuff:
 Take a string from ``os.environ``, parse and cast it to some of useful python
-typed variables. To do that and to use the `12factor <https://www.12factor.net/>`_
+typed variables. To do that and to use the `12-factor <https://www.12factor.net/>`_
 approach, some connection strings are expressed as url, so this package can parse
 it and return a ``urllib.parse.ParseResult``. These strings from ``os.environ``
 are loaded from a ``.env`` file and filled in ``os.environ`` with ``setdefault``
 method, to avoid to overwrite the real environ.
 A similar approach is used in
 `Two Scoops of Django <https://web.archive.org/web/20240121133956/https://www.feldroy.com/books/two-scoops-of-django-3-x>`_
-book and explained in `12factor-django <https://wellfire.co/learn/easier-12-factor-django>`_
+book and explained in `12-factor-django <https://web.archive.org/web/20250522195250/https://wellfire.co/learn/easier-12-factor-django/>`_
 article.
 
 

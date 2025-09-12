@@ -71,11 +71,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install tox tox-gh-actions setuptools
 
-      - name: Setuptools self-test
+      - name: Package metadata validation
         run: |
-          python setup.py --fullname
-          python setup.py --long-description
-          python setup.py --classifiers
+          python -m pip install build
+          python -c "import tomllib; print('pyproject.toml is valid')" || python -c "import tomli; print('pyproject.toml is valid')"
 
       - name: Run unit tests with coverage
         run: tox

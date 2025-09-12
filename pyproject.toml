@@ -1,0 +1,85 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-environ"
+dynamic = ["version", "readme"]
+description = "A package that allows you to utilize 12-factor inspired environment variables to configure your Django application."
+license = "MIT"
+authors = [
+    {name = "Daniele Faraglia", email = "daniele.faraglia@gmail.com"}
+]
+maintainers = [
+    {name = "Serghei Iakovlev", email = "oss@serghei.pl"}
+]
+keywords = ["environment", "django", "variables", "12factor"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Django",
+    "Framework :: Django :: 2.2",
+    "Framework :: Django :: 3.0",
+    "Framework :: Django :: 3.1",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.0",
+    "Framework :: Django :: 4.1",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+]
+requires-python = ">=3.9"
+dependencies = []
+
+[project.optional-dependencies]
+testing = [
+    "coverage[toml]>=5.0a4",
+    "pytest>=4.6.11",
+    "setuptools>=71.0.0",
+]
+docs = [
+    "furo>=2024.8.6",
+    "sphinx>=5.0",
+    "sphinx-notfound-page",
+]
+develop = [
+    "coverage[toml]>=5.0a4",
+    "pytest>=4.6.11",
+    "setuptools>=71.0.0",
+    "furo>=2024.8.6",
+    "sphinx>=5.0",
+    "sphinx-notfound-page",
+]
+
+[tool.setuptools]
+platforms = ["any"]
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.packages.find]
+exclude = ["tests.*", "tests", "build.*", "build", "docs.*", "docs"]
+
+[project.urls]
+Documentation = "https://django-environ.readthedocs.org"
+Funding = "https://opencollective.com/django-environ"
+"Say Thanks!" = "https://saythanks.io/to/joke2k"
+Changelog = "https://django-environ.readthedocs.io/en/latest/changelog.html"
+"Bug Tracker" = "https://github.com/joke2k/django-environ/issues"
+"Source Code" = "https://github.com/joke2k/django-environ"
+
+[tool.setuptools.dynamic]
+version = {attr = "environ.__version__"}
+readme = {file = "README_COMBINED.rst", content-type = "text/x-rst"}

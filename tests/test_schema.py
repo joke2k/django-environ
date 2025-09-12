@@ -9,6 +9,7 @@
 import os
 
 from environ import Env
+
 from .fixtures import FakeEnv
 
 _old_environ = None
@@ -28,6 +29,7 @@ def teardown_module():
 
     assert _old_environ is not None
     os.environ = _old_environ
+    _old_environ = None
 
 
 def test_schema():
