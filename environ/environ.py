@@ -931,10 +931,6 @@ class Env:
         by the file content. ``overwrite=True`` will force an overwrite of
         existing environment variables.
 
-        Refs:
-
-        * https://wellfire.co/learn/easier-12-factor-django
-
         :param env_file: The path to the ``.env`` file your application should
             use. If a path is not provided, `read_env` will attempt to import
             the Django settings module from the Django project root.

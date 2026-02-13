@@ -17,6 +17,7 @@ Fixed
   objects when DEBUG logging is enabled
   `#571 <https://github.com/joke2k/django-environ/issues/571>`_.
 
+
 `v0.12.0`_ - 8-November-2024
 -----------------------------
 Fixed
