@@ -7,6 +7,8 @@
 # the LICENSE.txt file that was distributed with this source code.
 
 from environ import Env
+import pytest
+from environ.compat import ImproperlyConfigured
 
 
 def test_channels_parsing():
@@ -23,3 +25,14 @@ def test_channels_parsing():
     result = Env.channels_url_config(url)
     assert result["BACKEND"] == "channels_redis.pubsub.RedisPubSubChannelLayer"
     assert result["CONFIG"]["hosts"][0] == "redis://user:password@localhost:6379/0"
+
+
+def test_channels_backend_override():
+    result = Env.channels_url_config("unsupported://", backend="custom.backend")
+    assert result["BACKEND"] == "custom.backend"
+
+
+def test_channels_invalid_schema():
+    with pytest.raises(ImproperlyConfigured) as exc:
+        Env.channels_url_config("unsupported://")
+    assert 'Invalid channels schema unsupported' == str(exc.value)

@@ -9,6 +9,7 @@
 import os
 import tempfile
 import logging
+import io
 from urllib.parse import quote
 
 import pytest
@@ -431,6 +432,37 @@ class TestEnv:
             self.env('not_present')
         assert str(excinfo.value) == 'Set the PREFIX_not_present environment variable'
         assert excinfo.value.__cause__ is not None
+
+    def test_read_env_with_file_like_object(self):
+        env_cls = type(self.env)
+        env_cls.ENVIRON = {}
+        self.env.read_env(io.StringIO('FROM_FILELIKE=value\n'))
+        assert env_cls.ENVIRON['FROM_FILELIKE'] == 'value'
+
+    def test_read_env_without_path_logs_when_missing(self, monkeypatch, caplog):
+        monkeypatch.setattr(os.path, 'exists', lambda *_: False)
+        with caplog.at_level(logging.INFO, logger='environ.environ'):
+            self.env.read_env()
+        assert any("doesn't exist" in message for message in caplog.messages)
+
+    def test_read_env_missing_file_logs_and_returns(self, caplog):
+        env_file = '/tmp/definitely-missing-django-environ.env'
+        with caplog.at_level(logging.INFO, logger='environ.environ'):
+            self.env.read_env(env_file)
+        assert any("not found - if you're not configuring your " in message
+                   for message in caplog.messages)
+
+    def test_read_env_invalid_line_warns(self, caplog):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            env_path = os.path.join(temp_dir, '.env')
+            with open(env_path, 'w') as file_handle:
+                file_handle.write('INVALID LINE\n')
+
+            with caplog.at_level(logging.WARNING, logger='environ.environ'):
+                self.env.read_env(env_path)
+
+        assert any('Invalid line: INVALID LINE' in message
+                   for message in caplog.messages)
 
 
 class TestFileEnv(TestEnv):
