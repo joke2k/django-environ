@@ -37,7 +37,7 @@ from .compat import (
 )
 from .fileaware_mapping import FileAwareMapping
 
-Openable = (str, os.PathLike)
+OPENABLE = (str, os.PathLike)
 logger = logging.getLogger(__name__)
 
 
@@ -961,7 +961,7 @@ class Env:
                 return
 
         try:
-            if isinstance(env_file, Openable):
+            if isinstance(env_file, OPENABLE):
                 # Python 3.5 support (wrap path with str).
                 with open(str(env_file), encoding=encoding) as f:
                     content = f.read()
