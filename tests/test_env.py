@@ -8,6 +8,7 @@
 
 import os
 import tempfile
+import logging
 from urllib.parse import quote
 
 import pytest
@@ -399,6 +400,23 @@ class TestEnv:
             default=True)
         assert self.env.get_value('INT_VAR', default=1) == 42
         assert self.env.get_value('FLOAT_VAR', default=1.2) == 33.3
+
+    def test_get_value_debug_log_does_not_eval_lazy_default(self, caplog):
+        class LazyDefault:
+            def __init__(self):
+                self.was_evaluated = False
+
+            def __str__(self):
+                self.was_evaluated = True
+                return 'lazy-default'
+
+        lazy_default = LazyDefault()
+
+        with caplog.at_level(logging.DEBUG, logger='environ.environ'):
+            value = self.env.get_value('MISSING_VAR', default=lazy_default)
+
+        assert value is lazy_default
+        assert not lazy_default.was_evaluated
 
     def test_exported(self):
         assert self.env('EXPORTED_VAR') == FakeEnv.EXPORTED

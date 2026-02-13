@@ -224,6 +224,23 @@ def test_postgres_complex_db_name_parsing():
     assert url['PORT'] == ''
 
 
+def test_postgres_cluster_with_ipv6_parsing():
+    """Parse postgres cluster URLs containing bracketed IPv6 hosts."""
+    env_url = (
+        'postgres://username:p@ss:12,wor:34d@'
+        'host1:111,22.55.44.88:222,[2001:db8::1234]:333/db'
+    )
+
+    url = Env.db_url_config(env_url)
+
+    assert url['ENGINE'] == DJANGO_POSTGRES
+    assert url['NAME'] == 'db'
+    assert url['HOST'] == 'host1,22.55.44.88,[2001:db8::1234]'
+    assert url['USER'] == 'username'
+    assert url['PASSWORD'] == 'p@ss:12,wor:34d'
+    assert url['PORT'] == '111,222,333'
+
+
 @pytest.mark.parametrize(
     'scheme',
     ['postgres', 'postgresql', 'psql', 'pgsql', 'postgis'],

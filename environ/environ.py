@@ -380,8 +380,8 @@ class Env:
         """
 
         logger.debug(
-            "get '%s' casted as '%s' with default '%s'",
-            var, cast, default)
+            "get %r casted as %r with default type %s",
+            var, cast, type(default).__name__)
 
         var_name = f'{self.prefix}{var}'
         if var_name in self.scheme:
@@ -566,16 +566,25 @@ class Env:
                 path += f':{url.port}'
 
         user_host = url.netloc.rsplit('@', 1)
-        if url.scheme in cls.POSTGRES_FAMILY and ',' in user_host[-1]:
+        db_netloc = unquote(user_host[-1])
+        if url.scheme in cls.POSTGRES_FAMILY and ',' in db_netloc:
             # Parsing postgres cluster dsn
-            hinfo = list(
-                itertools.zip_longest(
-                    *(
-                        host.rsplit(':', 1)
-                        for host in user_host[-1].split(',')
-                    )
-                )
-            )
+            host_parts = []
+            for host in db_netloc.split(','):
+                if host.startswith('['):
+                    end = host.find(']')
+                    if end != -1 and host[end + 1:end + 2] == ':':
+                        host_parts.append((host[:end + 1], host[end + 2:]))
+                    else:
+                        host_parts.append((host, ''))
+                else:
+                    hparts = host.rsplit(':', 1)
+                    if len(hparts) == 2 and hparts[1].isdigit():
+                        host_parts.append(tuple(hparts))
+                    else:
+                        host_parts.append((host, ''))
+
+            hinfo = list(itertools.zip_longest(*host_parts))
             hostname = ','.join(hinfo[0])
             port = ','.join(filter(None, hinfo[1])) if len(hinfo) == 2 else ''
         else:
