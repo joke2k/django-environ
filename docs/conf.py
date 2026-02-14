@@ -117,6 +117,7 @@ linkcheck_ignore = [
     # Do not check links to compare tags.
     r"https://github.com/joke2k/django-environ/compare/.*",
 ]
+linkcheck_timeout = 60
 
 #
 # -- Options for nitpick -----------------------------------------------------
