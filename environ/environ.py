@@ -73,6 +73,10 @@ class NoValue:
         return f'<{self.__class__.__name__}>'
 
 
+class DefaultValueWarning(UserWarning):
+    """Warning used when returning an explicit default value."""
+
+
 class Env:
     """Provide scheme-based lookups of environment variables so that each
     caller doesn't have to pass in ``cast`` and ``default`` parameters.
@@ -216,11 +220,16 @@ class Env:
         "rediss+pubsub": "channels_redis.pubsub.RedisPubSubChannelLayer",
     }
 
-    def __init__(self, **scheme):
+    def __init__(self, warn_on_default=False, **scheme):
         self.smart_cast = True
         self.escape_proxy = False
+        self.warn_on_default = warn_on_default
         self.prefix = ""
         self.scheme = scheme
+
+    def warn_on_default_value_usage(self, enabled=True):
+        """Enable warnings when defaults are used for missing variables."""
+        self.warn_on_default = enabled
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
         return self.get_value(
@@ -470,6 +479,13 @@ class Env:
                 raise ImproperlyConfigured(error_msg) from exc
 
             value = default
+            if self.warn_on_default:
+                warnings.warn(
+                    f'{var_name} environment variable not set; '
+                    'using default value',
+                    DefaultValueWarning,
+                    stacklevel=2,
+                )
 
         # Resolve any proxied values
         prefix = b'$' if isinstance(value, bytes) else '$'

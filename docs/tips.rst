@@ -129,6 +129,29 @@ To disable it use ``env.smart_cast = False``.
    The next major release will disable it by default.
 
 
+Warn when defaults are used
+===========================
+
+If you want visibility when a missing environment variable falls back to a
+default value, enable warnings on the ``Env`` instance:
+
+.. code-block:: python
+
+   import environ
+
+   env = environ.Env(warn_on_default=True)
+   value = env("MISSING_VAR", default="fallback")
+
+You can also toggle it later:
+
+.. code-block:: python
+
+   env.warn_on_default_value_usage(True)
+
+When enabled, ``django-environ`` emits ``DefaultValueWarning`` for missing
+variables that return an explicit default.
+
+
 Multiple redis cache locations
 ==============================
 

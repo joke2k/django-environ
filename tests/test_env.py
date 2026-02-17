@@ -12,11 +12,12 @@ import tempfile
 from unittest import mock
 import logging
 import io
+import warnings
 from urllib.parse import quote
 
 import pytest
 
-from environ import Env, Path
+from environ import DefaultValueWarning, Env, Path
 from environ.compat import (
     DJANGO_POSTGRES,
     ImproperlyConfigured,
@@ -102,6 +103,19 @@ class TestEnv:
 
     def test_not_present_with_default(self):
         assert self.env('not_present', default=3) == 3
+
+    def test_not_present_with_default_warning_disabled(self):
+        with warnings.catch_warnings(record=True) as warns:
+            warnings.simplefilter('always')
+            assert self.env('not_present', default=3) == 3
+        assert warns == []
+
+    def test_not_present_with_default_warning_enabled(self):
+        self.env.warn_on_default_value_usage(True)
+        with pytest.warns(
+                DefaultValueWarning,
+                match='not_present environment variable not set'):
+            assert self.env('not_present', default=3) == 3
 
     def test_not_present_without_default(self):
         with pytest.raises(ImproperlyConfigured) as excinfo:
