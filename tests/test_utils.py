@@ -1,12 +1,14 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2024-present, Daniele Faraglia <daniele.faraglia@gmail.com>
+# Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
 # the LICENSE.txt file that was distributed with this source code.
 
 import pytest
+
 from environ.environ import _cast, _cast_urlstr
 
 
@@ -20,6 +22,7 @@ def test_cast(literal):
 
     See https://github.com/joke2k/django-environ/issues/200 for details."""
     assert _cast(literal) == literal
+
 
 @pytest.mark.parametrize(
     "quoted_url_str,expected_unquoted_str",

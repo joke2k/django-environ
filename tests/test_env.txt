@@ -1,4 +1,5 @@
 DICT_VAR=foo=bar,test=on
+DICT_WITH_EQ_VAR=key1=sub_key1=sub_value1,key2=value2
 
 # Database variables
 DATABASE_MYSQL_URL=mysql://bea6eb0:69772142@us-cdbr-east.cleardb.com/heroku_97681?reconnect=true
@@ -41,7 +42,8 @@ ESCAPED_VAR=\$baz
 EMPTY_LIST=
 EMPTY_INT_VAR=
 INT_VAR=42
-STR_LIST_WITH_SPACES= foo,  bar
+STR_LIST_WITH_SPACES= foo,  spaces
+STR_LIST_WITH_SPACES_QUOTED=' foo','  quoted'
 STR_VAR=bar
 MULTILINE_STR_VAR=foo\nbar
 MULTILINE_QUOTED_STR_VAR="---BEGIN---\r\n---END---"

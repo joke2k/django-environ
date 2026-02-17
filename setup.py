@@ -2,7 +2,8 @@
 #
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2024-present, Daniele Faraglia <daniele.faraglia@gmail.com>
+# Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -13,6 +14,18 @@ import re
 from os import path
 
 from setuptools import find_packages, setup
+
+# Use this code block for future deprecations of Python version:
+#
+# import warnings
+# import sys
+#
+# if sys.version_info < (3, 6):
+#    warnings.warn(
+#        "Support of Python < 3.6 is deprecated"
+#        "and will be removed in a future release.",
+#        DeprecationWarning
+#    )
 
 
 def read_file(filepath):
@@ -110,7 +123,7 @@ def get_version_string():
     return version_string
 
 
-# What does this project relate to.
+# What does this project relate to?
 KEYWORDS = [
     'environment',
     'django',
@@ -123,14 +136,17 @@ CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
 
     'Framework :: Django',
-    'Framework :: Django :: 1.11',
-    'Framework :: Django :: 2.0',
-    'Framework :: Django :: 2.1',
     'Framework :: Django :: 2.2',
     'Framework :: Django :: 3.0',
     'Framework :: Django :: 3.1',
     'Framework :: Django :: 3.2',
     'Framework :: Django :: 4.0',
+    'Framework :: Django :: 4.1',
+    'Framework :: Django :: 4.2',
+    'Framework :: Django :: 5.0',
+    'Framework :: Django :: 5.1',
+    'Framework :: Django :: 5.2',
+    'Framework :: Django :: 6.0',
 
     'Operating System :: OS Independent',
 
@@ -139,20 +155,18 @@ CLASSIFIERS = [
 
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.4',
-    'Programming Language :: Python :: 3.5',
-    'Programming Language :: Python :: 3.6',
-    'Programming Language :: Python :: 3.7',
-    'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+    'Programming Language :: Python :: 3.14',
     'Programming Language :: Python :: Implementation :: CPython',
     'Programming Language :: Python :: Implementation :: PyPy',
 
     'Topic :: Software Development :: Libraries :: Python Modules',
     'Topic :: Utilities',
 
-    'License :: OSI Approved :: MIT License',
 ]
 
 # Dependencies that are downloaded by pip on installation and why.
@@ -170,11 +184,12 @@ EXTRAS_REQUIRE = {
     'testing': [
         'coverage[toml]>=5.0a4',  # Code coverage measurement for Python
         'pytest>=4.6.11',  # Our tests framework
+        'setuptools>=71.0.0',  # Needed as a dependency for some tests
     ],
     # Dependencies that are required to build documentation
     'docs': [
-        'furo>=2021.8.17b43,==2021.8.*',  # Sphinx documentation theme
-        'sphinx>=3.5.0',  # Python documentation generator
+        'furo>=2024.8.6',  # Sphinx documentation theme
+        'sphinx>=5.0',  # Python documentation generator
         'sphinx-notfound-page',  # Create a custom 404 page
     ],
 }
@@ -217,7 +232,7 @@ if __name__ == '__main__':
         platforms=['any'],
         include_package_data=True,
         zip_safe=False,
-        python_requires='>=3.4,<4',
+        python_requires='>=3.9,<4',
         install_requires=INSTALL_REQUIRES,
         dependency_links=DEPENDENCY_LINKS,
         extras_require=EXTRAS_REQUIRE,

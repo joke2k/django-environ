@@ -1,6 +1,7 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2024-present, Daniele Faraglia <daniele.faraglia@gmail.com>
+# Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -25,6 +26,7 @@ class FakeEnv:
     EMAIL = 'smtps://user@domain.com:password@smtp.example.com:587'
     JSON = dict(one='bar', two=2, three=33.44)
     DICT = dict(foo='bar', test='on')
+    DICT_WITH_EQ = dict(key1='sub_key1=sub_value1', key2='value2')
     PATH = '/home/dev'
     EXPORTED = 'exported var'
     SAML_ATTRIBUTE_MAPPING = dict(
@@ -37,6 +39,8 @@ class FakeEnv:
     @classmethod
     def generate_data(cls):
         return dict(STR_VAR='bar',
+                    STR_QUOTED_IGNORE_COMMENT='foo',
+                    STR_QUOTED_INCLUDE_HASH='foo # with hash',
                     MULTILINE_STR_VAR='foo\\nbar',
                     MULTILINE_QUOTED_STR_VAR='---BEGIN---\\r\\n---END---',
                     MULTILINE_ESCAPED_STR_VAR='---BEGIN---\\\\n---END---',
@@ -49,12 +53,14 @@ class FakeEnv:
                     BOOL_TRUE_STRING_LIKE_INT='1',
                     BOOL_TRUE_INT=1,
                     BOOL_TRUE_STRING_LIKE_BOOL='True',
+                    BOOL_TRUE_STRING_LIKE_BOOL_WITH_COMMENT='True',
                     BOOL_TRUE_STRING_1='on',
                     BOOL_TRUE_STRING_2='ok',
                     BOOL_TRUE_STRING_3='yes',
                     BOOL_TRUE_STRING_4='y',
                     BOOL_TRUE_STRING_5='true',
                     BOOL_TRUE_BOOL=True,
+                    BOOL_TRUE_BOOL_WITH_COMMENT=True,
                     BOOL_FALSE_STRING_LIKE_INT='0',
                     BOOL_FALSE_INT=0,
                     BOOL_FALSE_STRING_LIKE_BOOL='False',
@@ -64,9 +70,11 @@ class FakeEnv:
                     INT_LIST='42,33',
                     INT_TUPLE='(42,33)',
                     MIX_TUPLE='(42,Test)',
-                    STR_LIST_WITH_SPACES=' foo,  bar',
+                    STR_LIST_WITH_SPACES=' foo,  spaces',
+                    STR_LIST_WITH_SPACES_QUOTED="' foo', '  quoted'",
                     EMPTY_LIST='',
                     DICT_VAR='foo=bar,test=on',
+                    DICT_WITH_EQ_VAR='key1=sub_key1=sub_value1,key2=value2',
                     DATABASE_URL=cls.POSTGRES,
                     DATABASE_MYSQL_URL=cls.MYSQL,
                     DATABASE_MYSQL_GIS_URL=cls.MYSQLGIS,

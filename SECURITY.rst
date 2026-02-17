@@ -6,5 +6,5 @@ Reporting a Vulnerability
 -------------------------
 
 If you discover a security vulnerability within ``django-environ``, please
-send an e-mail to Serghei Iakovlev via egrep@protonmail.ch. All security
+send an e-mail to Daniele Faraglia via daniele.faraglia+oss@gmail.com. All security
 vulnerabilities will be promptly addressed.

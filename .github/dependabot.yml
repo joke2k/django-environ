@@ -5,8 +5,16 @@ updates:
   - package-ecosystem: pip
     # setup.py stored in repository root.
     directory: '/'
+    # Raise pull requests for version updates
+    # to pip against the `develop` branch
+    target-branch: develop
     schedule:
-      interval: daily
+      # Check for updates managed by pip once a week
+      interval: weekly
+    # Specify labels for npm pull requests
+    labels:
+      - pip
+      - dependencies
     assignees:
       - sergeyklay
 
@@ -14,7 +22,15 @@ updates:
     # Workflow files stored in the
     # default location of `.github/workflows`
     directory: '/'
+    # Raise pull requests for version updates
+    # to pip against the `develop` branch
+    target-branch: develop
     schedule:
-      interval: daily
+      # Check for updates for GitHub actions once a week
+      interval: weekly
+    # Specify labels for npm pull requests
+    labels:
+      - github_actions
+      - dependencies
     assignees:
       - sergeyklay

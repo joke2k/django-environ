@@ -1,6 +1,7 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2024-present, Daniele Faraglia <daniele.faraglia@gmail.com>
+# Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -12,11 +13,9 @@
 
 import codecs
 import os
-import sys
 import re
-
+import sys
 from datetime import date
-
 
 PROJECT_DIR = os.path.abspath('..')
 sys.path.insert(0, PROJECT_DIR)
@@ -71,7 +70,7 @@ templates_path = ["_templates"]
 # The suffix of source filenames.
 source_suffix = ".rst"
 
-# Allow non-local URIs so we can have images in CHANGELOG etc.
+# Allow non-local URIs, so we can have images in CHANGELOG etc.
 suppress_warnings = [
     "image.nonlocal_uri",
 ]
@@ -118,6 +117,7 @@ linkcheck_ignore = [
     # Do not check links to compare tags.
     r"https://github.com/joke2k/django-environ/compare/.*",
 ]
+linkcheck_timeout = 60
 
 #
 # -- Options for nitpick -----------------------------------------------------
@@ -126,6 +126,8 @@ linkcheck_ignore = [
 # In nitpick mode (-n), still ignore any of the following "broken" references
 # to non-types.
 nitpick_ignore = [
+    ('py:func', 'str.rfind'),
+    ('py:func', 'str.find'),
 ]
 
 #

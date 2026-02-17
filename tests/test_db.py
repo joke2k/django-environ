@@ -1,6 +1,7 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2024-present, Daniele Faraglia <daniele.faraglia@gmail.com>
+# Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -59,6 +60,14 @@ from environ.compat import DJANGO_POSTGRES
          '',
          ''
          ),
+        # cockroachdb://username:secret@test.example.com:26258/dbname
+        ('cockroachdb://username:secret@test.example.com:26258/dbname',
+         'django_cockroachdb',
+         'dbname',
+         'test.example.com',
+         'username',
+         'secret',
+         26258),
         # mysqlgis://user:password@host:port/dbname
         ('mysqlgis://enigma:secret@example.com:5431/dbname',
          'django.contrib.gis.db.backends.mysql',
@@ -118,7 +127,7 @@ from environ.compat import DJANGO_POSTGRES
         # mysql://user:password@host/dbname
         ('mssql://enigma:secret@example.com/dbname'
          '?driver=ODBC Driver 13 for SQL Server',
-         'sql_server.pyodbc',
+         'mssql',
          'dbname',
          'example.com',
          'enigma',
@@ -127,12 +136,28 @@ from environ.compat import DJANGO_POSTGRES
         # mysql://user:password@host:port/dbname
         ('mssql://enigma:secret@amazonaws.com\\insnsnss:12345/dbname'
          '?driver=ODBC Driver 13 for SQL Server',
-         'sql_server.pyodbc',
+         'mssql',
          'dbname',
          'amazonaws.com\\insnsnss',
          'enigma',
          'secret',
          12345),
+         # mysql://user:password@host:port/dbname
+        ('mysql://enigma:><{~!@#$%^&*}[]@example.com:1234/dbname',
+         'django.db.backends.mysql',
+         'dbname',
+         'example.com',
+         'enigma',
+         '><{~!@#$%^&*}[]',
+         1234),
+        # mysql://user:password@host/dbname
+        ('mysql://enigma:]password]@example.com/dbname',
+         'django.db.backends.mysql',
+         'dbname',
+         'example.com',
+         'enigma',
+         ']password]',
+         ''),
     ],
     ids=[
         'postgres',
@@ -140,6 +165,7 @@ from environ.compat import DJANGO_POSTGRES
         'postgis',
         'postgres_cluster',
         'postgres_no_ports',
+        'cockroachdb',
         'mysqlgis',
         'cleardb',
         'mysql_no_password',
@@ -149,6 +175,8 @@ from environ.compat import DJANGO_POSTGRES
         'ldap',
         'mssql',
         'mssql_port',
+        'mysql_password_special_chars',
+        'mysql_invalid_ipv6_password',
     ],
 )
 def test_db_parsing(url, engine, name, host, user, passwd, port):
@@ -168,7 +196,16 @@ def test_db_parsing(url, engine, name, host, user, passwd, port):
 
     if host == 'reconnect.com':
         assert config['OPTIONS'] == {'reconnect': 'true'}
-        
+
+
+def test_custom_db_engine():
+    """Override ENGINE determined from schema."""
+    env_url = 'postgres://enigma:secret@example.com:5431/dbname'
+
+    engine = 'mypackage.backends.whatever'
+    url = Env.db_url_config(env_url, engine=engine)
+
+    assert url['ENGINE'] == engine
 
 
 def test_postgres_complex_db_name_parsing():
@@ -186,6 +223,37 @@ def test_postgres_complex_db_name_parsing():
     assert url['USER'] == 'user'
     assert url['PASSWORD'] == 'password'
     assert url['PORT'] == ''
+
+
+def test_postgres_cluster_with_ipv6_parsing():
+    """Parse postgres cluster URLs containing bracketed IPv6 hosts."""
+    env_url = (
+        'postgres://username:p@ss:12,wor:34d@'
+        'host1:111,22.55.44.88:222,[2001:db8::1234]:333/db'
+    )
+
+    url = Env.db_url_config(env_url)
+
+    assert url['ENGINE'] == DJANGO_POSTGRES
+    assert url['NAME'] == 'db'
+    assert url['HOST'] == 'host1,22.55.44.88,[2001:db8::1234]'
+    assert url['USER'] == 'username'
+    assert url['PASSWORD'] == 'p@ss:12,wor:34d'
+    assert url['PORT'] == '111,222,333'
+
+
+def test_postgres_cluster_with_ipv6_without_port_parsing():
+    """Keep bracketed IPv6 hosts in cluster URLs even when port is omitted."""
+    env_url = 'postgres://user:pass@host1:111,[2001:db8::1234],host3:333/db'
+
+    url = Env.db_url_config(env_url)
+
+    assert url['ENGINE'] == DJANGO_POSTGRES
+    assert url['NAME'] == 'db'
+    assert url['HOST'] == 'host1,[2001:db8::1234],host3'
+    assert url['USER'] == 'user'
+    assert url['PASSWORD'] == 'pass'
+    assert url['PORT'] == '111,333'
 
 
 @pytest.mark.parametrize(
@@ -231,6 +299,19 @@ def test_memory_sqlite_url_warns_about_netloc(recwarn):
     assert url['NAME'] == ':memory:'
 
 
+def test_ldap_url_with_port():
+    """Keep LDAP host and include port in NAME when explicitly provided."""
+    env_url = 'ldap://cn=admin,dc=nodomain,dc=org:secret@example.com:1234'
+    url = Env.db_url_config(env_url)
+
+    assert url['ENGINE'] == 'ldapdb.backends.ldap'
+    assert url['NAME'] == 'ldap://example.com:1234'
+    assert url['HOST'] == 'example.com'
+    assert url['USER'] == 'cn=admin,dc=nodomain,dc=org'
+    assert url['PASSWORD'] == 'secret'
+    assert url['PORT'] == 1234
+
+
 def test_database_options_parsing():
     url = 'postgres://user:pass@host:1234/dbname?conn_max_age=600'
     url = Env.db_url_config(url)
@@ -249,3 +330,11 @@ def test_database_options_parsing():
     assert url['OPTIONS'] == {
         'init_command': 'SET storage_engine=INNODB',
     }
+
+
+def test_unknown_engine_warns_and_returns_empty_dict(recwarn):
+    result = Env.db_url_config('localhost')
+
+    assert result == {}
+    assert len(recwarn) == 1
+    assert recwarn.pop(UserWarning)
