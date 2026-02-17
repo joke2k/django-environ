@@ -25,6 +25,14 @@ The ``compat`` module
 The ``environ`` module
 ======================
 
+.. autoclass:: environ.NoValue
+    :members:
+    :no-undoc-members:
+
+.. autoclass:: environ.DefaultValueWarning
+    :members:
+    :no-undoc-members:
+
 .. autoclass:: environ.Env
     :members:
     :no-undoc-members:
