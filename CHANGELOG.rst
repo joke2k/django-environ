@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+`v0.12.1`_ - 13-February-2026
+-----------------------------
+Fixed
++++++
+- Fixed PostgreSQL cluster URL parsing with bracketed IPv6 hosts in recent
+  Python versions, preventing failures in runtime URL parsing and related
+  regression tests
+  `#574 <https://github.com/joke2k/django-environ/issues/574>`_.
+- Fixed debug logging in ``Env.get_value()`` to avoid evaluating lazy default
+  objects when DEBUG logging is enabled
+  `#571 <https://github.com/joke2k/django-environ/issues/571>`_.
+
+
 `v0.12.0`_ - 8-November-2024
 -----------------------------
 Fixed
@@ -421,6 +434,7 @@ Added
 - Initial release.
 
 
+.. _v0.12.1: https://github.com/joke2k/django-environ/compare/v0.12.0...v0.12.1
 .. _v0.12.0: https://github.com/joke2k/django-environ/compare/v0.11.2...v0.12.0
 .. _v0.11.2: https://github.com/joke2k/django-environ/compare/v0.11.1...v0.11.2
 .. _v0.11.1: https://github.com/joke2k/django-environ/compare/v0.11.0...v0.11.1

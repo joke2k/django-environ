@@ -1,5 +1,6 @@
 # This file is part of the django-environ.
 #
+# Copyright (c) 2024-present, Daniele Faraglia <daniele.faraglia@gmail.com>
 # Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
@@ -37,7 +38,7 @@ from .compat import (
 )
 from .fileaware_mapping import FileAwareMapping
 
-Openable = (str, os.PathLike)
+OPENABLE = (str, os.PathLike)
 logger = logging.getLogger(__name__)
 
 
@@ -194,7 +195,9 @@ class Env:
     CHANNELS_SCHEMES = {
         "inmemory": "channels.layers.InMemoryChannelLayer",
         "redis": "channels_redis.core.RedisChannelLayer",
-        "redis+pubsub": "channels_redis.pubsub.RedisPubSubChannelLayer"
+        "rediss": "channels_redis.core.RedisChannelLayer",
+        "redis+pubsub": "channels_redis.pubsub.RedisPubSubChannelLayer",
+        "rediss+pubsub": "channels_redis.pubsub.RedisPubSubChannelLayer",
     }
 
     def __init__(self, **scheme):
@@ -380,8 +383,8 @@ class Env:
         """
 
         logger.debug(
-            "get '%s' casted as '%s' with default '%s'",
-            var, cast, default)
+            "get %r casted as %r with default type %s",
+            var, cast, type(default).__name__)
 
         var_name = f'{self.prefix}{var}'
         if var_name in self.scheme:
@@ -566,16 +569,25 @@ class Env:
                 path += f':{url.port}'
 
         user_host = url.netloc.rsplit('@', 1)
-        if url.scheme in cls.POSTGRES_FAMILY and ',' in user_host[-1]:
+        db_netloc = unquote(user_host[-1])
+        if url.scheme in cls.POSTGRES_FAMILY and ',' in db_netloc:
             # Parsing postgres cluster dsn
-            hinfo = list(
-                itertools.zip_longest(
-                    *(
-                        host.rsplit(':', 1)
-                        for host in user_host[-1].split(',')
-                    )
-                )
-            )
+            host_parts = []
+            for host in db_netloc.split(','):
+                if host.startswith('['):
+                    end = host.find(']')
+                    if end != -1 and host[end + 1:end + 2] == ':':
+                        host_parts.append((host[:end + 1], host[end + 2:]))
+                    else:
+                        host_parts.append((host, ''))
+                else:
+                    hparts = host.rsplit(':', 1)
+                    if len(hparts) == 2 and hparts[1].isdigit():
+                        host_parts.append(tuple(hparts))
+                    else:
+                        host_parts.append((host, ''))
+
+            hinfo = list(itertools.zip_longest(*host_parts))
             hostname = ','.join(hinfo[0])
             port = ','.join(filter(None, hinfo[1])) if len(hinfo) == 2 else ''
         else:
@@ -786,9 +798,10 @@ class Env:
             raise ImproperlyConfigured(f"Invalid channels schema {url.scheme}")
         else:
             config["BACKEND"] = cls.CHANNELS_SCHEMES[url.scheme]
-            if url.scheme in ("redis", "redis+pubsub"):
+            if url.scheme.startswith("redis"):
+                redis_scheme, *_ = url.scheme.split("+")
                 config["CONFIG"] = {
-                    "hosts": [url._replace(scheme="redis").geturl()]
+                    "hosts": [url._replace(scheme=redis_scheme).geturl()]
                 }
 
         return config
@@ -931,10 +944,6 @@ class Env:
         by the file content. ``overwrite=True`` will force an overwrite of
         existing environment variables.
 
-        Refs:
-
-        * https://wellfire.co/learn/easier-12-factor-django
-
         :param env_file: The path to the ``.env`` file your application should
             use. If a path is not provided, `read_env` will attempt to import
             the Django settings module from the Django project root.
@@ -961,7 +970,7 @@ class Env:
                 return
 
         try:
-            if isinstance(env_file, Openable):
+            if isinstance(env_file, OPENABLE):
                 # Python 3.5 support (wrap path with str).
                 with open(str(env_file), encoding=encoding) as f:
                     content = f.read()

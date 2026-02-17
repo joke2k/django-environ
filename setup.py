@@ -2,6 +2,7 @@
 #
 # This file is part of the django-environ.
 #
+# Copyright (c) 2024-present, Daniele Faraglia <daniele.faraglia@gmail.com>
 # Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
@@ -144,6 +145,8 @@ CLASSIFIERS = [
     'Framework :: Django :: 4.2',
     'Framework :: Django :: 5.0',
     'Framework :: Django :: 5.1',
+    'Framework :: Django :: 5.2',
+    'Framework :: Django :: 6.0',
 
     'Operating System :: OS Independent',
 
@@ -157,13 +160,13 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
     'Programming Language :: Python :: 3.13',
+    'Programming Language :: Python :: 3.14',
     'Programming Language :: Python :: Implementation :: CPython',
     'Programming Language :: Python :: Implementation :: PyPy',
 
     'Topic :: Software Development :: Libraries :: Python Modules',
     'Topic :: Utilities',
 
-    'License :: OSI Approved :: MIT License',
 ]
 
 # Dependencies that are downloaded by pip on installation and why.

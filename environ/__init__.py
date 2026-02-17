@@ -1,5 +1,6 @@
 # This file is part of the django-environ.
 #
+# Copyright (c) 2024-present, Daniele Faraglia <daniele.faraglia@gmail.com>
 # Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
@@ -18,10 +19,10 @@ for details on the use of this package.
 from .environ import *
 
 
-__copyright__ = 'Copyright (C) 2013-2023 Daniele Faraglia'
+__copyright__ = 'Copyright (C) 2013-2026 Daniele Faraglia'
 """The copyright notice of the package."""
 
-__version__ = '0.12.0'
+__version__ = '0.12.1'
 """The version of the package."""
 
 __license__ = 'MIT'
@@ -33,10 +34,10 @@ __author__ = 'Daniele Faraglia'
 __author_email__ = 'daniele.faraglia@gmail.com'
 """The email of the author of the package."""
 
-__maintainer__ = 'Serghei Iakovlev'
+__maintainer__ = 'Daniele Faraglia'
 """The maintainer of the package."""
 
-__maintainer_email__ = 'oss@serghei.pl'
+__maintainer_email__ = 'daniele.faraglia@gmail.com'
 """The email of the maintainer of the package."""
 
 __url__ = 'https://django-environ.readthedocs.org'
