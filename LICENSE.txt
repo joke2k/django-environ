@@ -1,3 +1,4 @@
+Copyright (c) 2024-present, Daniele Faraglia <daniele.faraglia@gmail.com>
 Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 

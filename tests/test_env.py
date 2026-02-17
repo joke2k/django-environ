@@ -1,5 +1,6 @@
 # This file is part of the django-environ.
 #
+# Copyright (c) 2024-present, Daniele Faraglia <daniele.faraglia@gmail.com>
 # Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
@@ -8,6 +9,9 @@
 
 import os
 import tempfile
+from unittest import mock
+import logging
+import io
 from urllib.parse import quote
 
 import pytest
@@ -361,26 +365,40 @@ class TestEnv:
             (Env.DEFAULT_CACHE_ENV,
              'django.core.cache.backends.memcached.MemcachedCache',
              '127.0.0.1:11211', None),
-            ('CACHE_REDIS', REDIS_DRIVER,
+            ('CACHE_REDIS',
+             'django.core.cache.backends.redis.RedisCache',
+             'redis://127.0.0.1:6379/1',
+             {'client_class': 'django_redis.client.DefaultClient',
+              'password': 'secret'}),
+            ('CACHE_REDIS',
+             'django_redis.cache.RedisCache',
              'redis://127.0.0.1:6379/1',
              {'CLIENT_CLASS': 'django_redis.client.DefaultClient',
               'PASSWORD': 'secret'}),
         ],
         ids=[
             'memcached',
-            'redis',
+            'django',  # Django Redis cache backend
+            'redis_django',  # django_redis backend
         ],
     )
     def test_cache_url_value(self, var, backend, location, options):
-        config = self.env.cache_url(var)
+        mocked_cache_schemes = Env.CACHE_SCHEMES.copy()
+        mocked_cache_schemes.update({
+            'rediscache': backend,
+            'redis': backend,
+            'rediss': backend,
+        })
+        with mock.patch.object(Env, 'CACHE_SCHEMES', mocked_cache_schemes):
+            config = self.env.cache_url(var)
 
-        assert config['BACKEND'] == backend
-        assert config['LOCATION'] == location
+            assert config['BACKEND'] == backend
+            assert config['LOCATION'] == location
 
-        if options is None:
-            assert 'OPTIONS' not in config
-        else:
-            assert config['OPTIONS'] == options
+            if options is None:
+                assert 'OPTIONS' not in config
+            else:
+                assert config['OPTIONS'] == options
 
     def test_email_url_value(self):
         email_config = self.env.email_url()
@@ -409,6 +427,23 @@ class TestEnv:
         assert self.env.get_value('INT_VAR', default=1) == 42
         assert self.env.get_value('FLOAT_VAR', default=1.2) == 33.3
 
+    def test_get_value_debug_log_does_not_eval_lazy_default(self, caplog):
+        class LazyDefault:
+            def __init__(self):
+                self.was_evaluated = False
+
+            def __str__(self):
+                self.was_evaluated = True
+                return 'lazy-default'
+
+        lazy_default = LazyDefault()
+
+        with caplog.at_level(logging.DEBUG, logger='environ.environ'):
+            value = self.env.get_value('MISSING_VAR', default=lazy_default)
+
+        assert value is lazy_default
+        assert not lazy_default.was_evaluated
+
     def test_exported(self):
         assert self.env('EXPORTED_VAR') == FakeEnv.EXPORTED
 
@@ -422,6 +457,37 @@ class TestEnv:
             self.env('not_present')
         assert str(excinfo.value) == 'Set the PREFIX_not_present environment variable'
         assert excinfo.value.__cause__ is not None
+
+    def test_read_env_with_file_like_object(self):
+        env_cls = type(self.env)
+        env_cls.ENVIRON = {}
+        self.env.read_env(io.StringIO('FROM_FILELIKE=value\n'))
+        assert env_cls.ENVIRON['FROM_FILELIKE'] == 'value'
+
+    def test_read_env_without_path_logs_when_missing(self, monkeypatch, caplog):
+        monkeypatch.setattr(os.path, 'exists', lambda *_: False)
+        with caplog.at_level(logging.INFO, logger='environ.environ'):
+            self.env.read_env()
+        assert any("doesn't exist" in message for message in caplog.messages)
+
+    def test_read_env_missing_file_logs_and_returns(self, caplog):
+        env_file = '/tmp/definitely-missing-django-environ.env'
+        with caplog.at_level(logging.INFO, logger='environ.environ'):
+            self.env.read_env(env_file)
+        assert any("not found - if you're not configuring your " in message
+                   for message in caplog.messages)
+
+    def test_read_env_invalid_line_warns(self, caplog):
+        with tempfile.TemporaryDirectory() as temp_dir:
+            env_path = os.path.join(temp_dir, '.env')
+            with open(env_path, 'w') as file_handle:
+                file_handle.write('INVALID LINE\n')
+
+            with caplog.at_level(logging.WARNING, logger='environ.environ'):
+                self.env.read_env(env_path)
+
+        assert any('Invalid line: INVALID LINE' in message
+                   for message in caplog.messages)
 
 
 class TestFileEnv(TestEnv):
