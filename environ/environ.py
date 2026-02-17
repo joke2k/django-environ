@@ -233,7 +233,7 @@ class Env:
     def __contains__(self, var):
         return var in self.ENVIRON
 
-      def str(
+    def str(
             self,
             var,
             default: Union[str, NoValue] = NOTSET,
