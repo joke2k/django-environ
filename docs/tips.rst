@@ -139,14 +139,9 @@ default value, enable warnings on the ``Env`` instance:
 
    import environ
 
-   env = environ.Env(warn_on_default=True)
+   env = environ.Env()
+   env.warn_on_default = True
    value = env("MISSING_VAR", default="fallback")
-
-You can also toggle it later:
-
-.. code-block:: python
-
-   env.warn_on_default_value_usage(True)
 
 When enabled, ``django-environ`` emits ``DefaultValueWarning`` for missing
 variables that return an explicit default.

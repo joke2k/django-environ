@@ -220,16 +220,12 @@ class Env:
         "rediss+pubsub": "channels_redis.pubsub.RedisPubSubChannelLayer",
     }
 
-    def __init__(self, warn_on_default=False, **scheme):
+    def __init__(self, **scheme):
         self.smart_cast = True
         self.escape_proxy = False
-        self.warn_on_default = warn_on_default
+        self.warn_on_default = False
         self.prefix = ""
         self.scheme = scheme
-
-    def warn_on_default_value_usage(self, enabled=True):
-        """Enable warnings when defaults are used for missing variables."""
-        self.warn_on_default = enabled
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
         return self.get_value(

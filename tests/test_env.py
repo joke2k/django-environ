@@ -111,7 +111,7 @@ class TestEnv:
         assert warns == []
 
     def test_not_present_with_default_warning_enabled(self):
-        self.env.warn_on_default_value_usage(True)
+        self.env.warn_on_default = True
         with pytest.warns(
                 DefaultValueWarning,
                 match='not_present environment variable not set'):
