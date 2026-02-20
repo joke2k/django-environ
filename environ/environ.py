@@ -118,8 +118,8 @@ class Env:
         'psql',
         'pgsql',
         'postgis',
-        'prometheus_postgresql',
-        'prometheus_postgis',
+        'prometheus-postgresql',
+        'prometheus-postgis',
     ]
 
     DEFAULT_DATABASE_ENV = 'DATABASE_URL'
@@ -129,22 +129,22 @@ class Env:
         'psql': DJANGO_POSTGRES,
         'pgsql': DJANGO_POSTGRES,
         'postgis': 'django.contrib.gis.db.backends.postgis',
-        'prometheus_postgresql': 'django_prometheus.db.backends.postgresql',
-        'prometheus_postgis': 'django_prometheus.db.backends.postgis',
+        'prometheus-postgresql': 'django_prometheus.db.backends.postgresql',
+        'prometheus-postgis': 'django_prometheus.db.backends.postgis',
         'cockroachdb': 'django_cockroachdb',
         'mysql': 'django.db.backends.mysql',
         'mysql2': 'django.db.backends.mysql',
         'mysql-connector': 'mysql.connector.django',
         'mysqlgis': 'django.contrib.gis.db.backends.mysql',
-        'prometheus_mysql': 'django_prometheus.db.backends.mysql',
+        'prometheus-mysql': 'django_prometheus.db.backends.mysql',
         'mssql': 'mssql',
         'oracle': 'django.db.backends.oracle',
         'pyodbc': 'sql_server.pyodbc',
         'redshift': 'django_redshift_backend',
         'spatialite': 'django.contrib.gis.db.backends.spatialite',
-        'prometheus_spatialite': 'django_prometheus.db.backends.spatialite',
+        'prometheus-spatialite': 'django_prometheus.db.backends.spatialite',
         'sqlite': 'django.db.backends.sqlite3',
-        'prometheus_sqlite': 'django_prometheus.db.backends.sqlite3',
+        'prometheus-sqlite': 'django_prometheus.db.backends.sqlite3',
         'ldap': 'ldapdb.backends.ldap',
     }
     _DB_BASE_OPTIONS = [

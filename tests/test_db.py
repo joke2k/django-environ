@@ -7,6 +7,7 @@
 # For the full copyright and license information, please view
 # the LICENSE.txt file that was distributed with this source code.
 
+import re
 import warnings
 
 import pytest
@@ -124,6 +125,38 @@ from environ.compat import DJANGO_POSTGRES
          'cn=admin,dc=nodomain,dc=org',
          'secret',
          ''),
+        # prometheus-postgresql://user:password@host:port/dbname
+        ('prometheus-postgresql://enigma:secret@example.com:5431/dbname',
+         'django_prometheus.db.backends.postgresql',
+         'dbname',
+         'example.com',
+         'enigma',
+         'secret',
+         5431),
+        # prometheus-postgis://user:password@host:port/dbname
+        ('prometheus-postgis://enigma:secret@example.com:5431/dbname',
+         'django_prometheus.db.backends.postgis',
+         'dbname',
+         'example.com',
+         'enigma',
+         'secret',
+         5431),
+        # prometheus-mysql://user:password@host:port/dbname
+        ('prometheus-mysql://enigma:secret@example.com:3306/dbname',
+         'django_prometheus.db.backends.mysql',
+         'dbname',
+         'example.com',
+         'enigma',
+         'secret',
+         3306),
+        # prometheus-sqlite:////absolute/path/to/db/file
+        ('prometheus-sqlite:////full/path/to/your/file.sqlite',
+         'django_prometheus.db.backends.sqlite3',
+         '/full/path/to/your/file.sqlite',
+         '',
+         '',
+         '',
+         ''),
         # mysql://user:password@host/dbname
         ('mssql://enigma:secret@example.com/dbname'
          '?driver=ODBC Driver 13 for SQL Server',
@@ -173,6 +206,10 @@ from environ.compat import DJANGO_POSTGRES
         'sqlite_file',
         'sqlite_memory',
         'ldap',
+        'prometheus-postgresql',
+        'prometheus-postgis',
+        'prometheus-mysql',
+        'prometheus-sqlite',
         'mssql',
         'mssql_port',
         'mysql_password_special_chars',
@@ -338,3 +375,14 @@ def test_unknown_engine_warns_and_returns_empty_dict(recwarn):
     assert result == {}
     assert len(recwarn) == 1
     assert recwarn.pop(UserWarning)
+
+
+def test_db_schemes_are_valid_url_schemes():
+    """All DB_SCHEMES keys must be valid URL schemes per RFC 3986."""
+    # RFC 3986: scheme = ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
+    scheme_re = re.compile(r'^[a-zA-Z][a-zA-Z0-9+\-.]*$')
+    for scheme in Env.DB_SCHEMES:
+        assert scheme_re.match(scheme), (
+            f"DB_SCHEMES key {scheme!r} is not a valid URL scheme "
+            f"(RFC 3986 allows only letters, digits, '+', '-', '.')"
+        )
