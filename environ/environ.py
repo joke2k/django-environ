@@ -17,6 +17,7 @@ import itertools
 import logging
 import os
 import re
+import shlex
 import sys
 import warnings
 from typing import Dict, List, Tuple, Union
@@ -1085,7 +1086,20 @@ class Env:
                 # val:  abc#def
                 key, val = m1.group(1), m1.group(2)
 
-                if not parse_comments:
+                # Parse shell-quoted single-token values, such as:
+                # "Tom"="Jerry" or shlex.quote() output with "'\"'\"'" chunks.
+                parsed_single = None
+                if (not parse_comments) and ('"' in val or "'" in val):
+                    try:
+                        parts = shlex.split(val, comments=parse_comments)
+                    except ValueError:
+                        parts = None
+                    if parts and len(parts) == 1:
+                        parsed_single = parts[0]
+
+                if parsed_single is not None:
+                    val = parsed_single
+                elif not parse_comments:
                     # Default behavior
                     #
                     # Look for value in single quotes
@@ -1105,11 +1119,13 @@ class Env:
                         if m2a:
                             val = m2a.group(1)
 
-                # Look for value in double quotes
-                m3 = re.match(r'\A"(.*)"\Z', val)
-                if m3:
-                    val = re.sub(r'\\(.)', _keep_escaped_format_characters,
-                                 m3.group(1))
+                    # Look for value in double quotes
+                    m3 = re.match(r'\A"(.*)"\Z', val)
+                    if m3:
+                        val = re.sub(
+                            r'\\(.)', _keep_escaped_format_characters,
+                            m3.group(1)
+                        )
 
                 overrides[key] = str(val)
             elif not line or line.startswith('#'):

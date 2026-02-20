@@ -80,6 +80,29 @@ def test_parse_comments(variable, value, raw_value, parse_comments):
     os.environ = old_environ
 
 
+def test_read_env_parses_shell_quoted_single_token_values():
+    old_environ = os.environ
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        env_path = os.path.join(temp_dir, '.env')
+
+        with open(env_path, 'w') as f:
+            f.write('MY_DICTIONARY="Tom"="Jerry"\n')
+            f.write("MY_OTHER_DICTIONARY='Tom'='Jerry'\n")
+            f.write('MYTEST=\'Hello\'"\'"\'World\'\n')
+            f.flush()
+
+            env = Env()
+            Env.ENVIRON = {}
+            env.read_env(env_path)
+
+            assert env.dict('MY_DICTIONARY') == {'Tom': 'Jerry'}
+            assert env.dict('MY_OTHER_DICTIONARY') == {'Tom': 'Jerry'}
+            assert env('MYTEST') == "Hello'World"
+
+    os.environ = old_environ
+
+
 class TestEnv:
     def setup_method(self, method):
         """
