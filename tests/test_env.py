@@ -103,6 +103,26 @@ def test_read_env_parses_shell_quoted_single_token_values():
     os.environ = old_environ
 
 
+def test_read_env_keeps_json_object_value_for_json_cast():
+    old_environ = os.environ
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        env_path = os.path.join(temp_dir, '.env')
+
+        with open(env_path, 'w') as f:
+            f.write('MY_JSON={"a":"b"}\n')
+            f.flush()
+
+            env = Env()
+            Env.ENVIRON = {}
+            env.read_env(env_path)
+
+            assert env('MY_JSON') == '{"a":"b"}'
+            assert env.json('MY_JSON') == {'a': 'b'}
+
+    os.environ = old_environ
+
+
 class TestEnv:
     def setup_method(self, method):
         """

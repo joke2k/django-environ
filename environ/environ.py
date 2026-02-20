@@ -1089,7 +1089,22 @@ class Env:
                 # Parse shell-quoted single-token values, such as:
                 # "Tom"="Jerry" or shlex.quote() output with "'\"'\"'" chunks.
                 parsed_single = None
-                if (not parse_comments) and ('"' in val or "'" in val):
+                val_stripped = val.strip()
+                is_json_object = (
+                    val_stripped.startswith('{') and val_stripped.endswith('}')
+                )
+                looks_like_quoted_assignment = (
+                    '=' in val and ('"' in val or "'" in val)
+                )
+                has_shell_quote_chunks = (
+                    '"\'"\'"' in val or "'\"'\"'" in val
+                )
+                if (
+                        not parse_comments
+                        and not is_json_object
+                        and (looks_like_quoted_assignment
+                             or has_shell_quote_chunks)
+                ):
                     try:
                         parts = shlex.split(val, comments=parse_comments)
                     except ValueError:
@@ -1119,13 +1134,13 @@ class Env:
                         if m2a:
                             val = m2a.group(1)
 
-                    # Look for value in double quotes
-                    m3 = re.match(r'\A"(.*)"\Z', val)
-                    if m3:
-                        val = re.sub(
-                            r'\\(.)', _keep_escaped_format_characters,
-                            m3.group(1)
-                        )
+                # Look for value in double quotes
+                m3 = re.match(r'\A"(.*)"\Z', val)
+                if m3:
+                    val = re.sub(
+                        r'\\(.)', _keep_escaped_format_characters,
+                        m3.group(1)
+                    )
 
                 overrides[key] = str(val)
             elif not line or line.startswith('#'):
