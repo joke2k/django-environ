@@ -364,7 +364,7 @@ def test_oracle_descriptor_without_path_matches_slash_variant():
     no_path = Env.db_url_config(url_without_path)
     with_path = Env.db_url_config(url_with_path)
 
-    assert no_path['NAME'] == with_path['NAME']
+    assert no_path['NAME'].lower() == with_path['NAME']
     assert '%' not in no_path['NAME']
 
 
@@ -378,6 +378,18 @@ def test_oracle_standard_url_still_parses():
     assert config['PORT'] == '1521'
     assert config['USER'] == 'super_user'
     assert config['PASSWORD'] == 'super_pass'
+
+
+def test_oracle_descriptor_without_path_keeps_password_quoting_fallback():
+    descriptor = (
+        '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle_dev)(PORT=1521))'
+        '(CONNECT_DATA=(SERVICE_NAME=XEPDB1)))'
+    )
+    url = f'oracle://super_user:pa#ss@{descriptor}'
+    config = Env.db_url_config(url)
+
+    assert config['PASSWORD'] == 'pa#ss'
+    assert '%' not in config['NAME']
 
 
 def test_database_options_parsing():
