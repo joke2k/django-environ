@@ -226,6 +226,7 @@ class Env:
         self.warn_on_default = False
         self.prefix = ""
         self.scheme = scheme
+        self.unresolved_proxy = []
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
         return self.get_value(
@@ -496,7 +497,16 @@ class Env:
         escape = rb'\$' if isinstance(value, bytes) else r'\$'
         if hasattr(value, 'startswith') and value.startswith(prefix):
             value = value.lstrip(prefix)
+            if value in self.unresolved_proxy:
+                raise ImproperlyConfigured(
+                    'Circular reference detected while resolving variables. '
+                    f'Variable {var_name} references {value} which is '
+                    'currently being resolved.'
+                )
+            self.unresolved_proxy.append(var_name)
             value = self.get_value(value, cast=cast, default=default)
+
+        self.unresolved_proxy.clear()
 
         if self.escape_proxy and hasattr(value, 'replace'):
             value = value.replace(escape, prefix)
