@@ -129,6 +129,50 @@ To disable it use ``env.smart_cast = False``.
    The next major release will disable it by default.
 
 
+Callable defaults (lazy evaluation)
+====================================
+
+The ``default`` argument accepts any callable (a function, lambda, or class
+that implements ``__call__``). When the environment variable is absent the
+callable is invoked with no arguments and its return value is used as the
+default. The callable is **not** invoked when the variable is present in the
+environment.
+
+This is useful when generating a default value has side-effects (e.g.
+creating a temporary directory) and you only want that to happen when the
+variable is truly missing.
+
+.. code-block:: python
+
+   import tempfile
+   import environ
+
+   env = environ.Env()
+
+   # tempfile.mkdtemp() is called only when MEDIA_ROOT is not set
+   MEDIA_ROOT = env('MEDIA_ROOT', default=tempfile.mkdtemp)
+
+Callable defaults also work in the scheme passed to the :class:`.environ.Env`
+constructor:
+
+.. code-block:: python
+
+   import tempfile
+   import environ
+
+   env = environ.Env(
+       MEDIA_ROOT=(str, tempfile.mkdtemp),
+   )
+
+   MEDIA_ROOT = env('MEDIA_ROOT')
+
+.. note::
+
+   When ``smart_cast`` is enabled (the default), the cast type is **not**
+   inferred from a callable default. Provide an explicit ``cast`` or a type
+   in the scheme tuple if you need type coercion.
+
+
 Warn when defaults are used
 ===========================
 
