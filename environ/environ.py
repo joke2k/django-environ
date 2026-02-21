@@ -1015,6 +1015,7 @@ class Env:
         return config
 
     @classmethod
+    # pylint: disable=too-many-statements
     def read_env(cls, env_file=None, overwrite=False, parse_comments=False,
                  encoding='utf8', **overrides):
         r"""Read a .env file into os.environ.
