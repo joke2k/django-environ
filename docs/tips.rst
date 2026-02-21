@@ -152,20 +152,6 @@ variable is truly missing.
    # tempfile.mkdtemp() is called only when MEDIA_ROOT is not set
    MEDIA_ROOT = env('MEDIA_ROOT', default=tempfile.mkdtemp)
 
-Callable defaults also work in the scheme passed to the :class:`.environ.Env`
-constructor:
-
-.. code-block:: python
-
-   import tempfile
-   import environ
-
-   env = environ.Env(
-       MEDIA_ROOT=(str, tempfile.mkdtemp),
-   )
-
-   MEDIA_ROOT = env('MEDIA_ROOT')
-
 .. note::
 
    When ``smart_cast`` is enabled (the default), the cast type is **not**
