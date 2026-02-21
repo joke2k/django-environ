@@ -241,6 +241,24 @@ class TestEnv:
         self.env.escape_proxy = False
         assert self.env('ESCAPED_VAR') == r'\$baz'
 
+    def test_proxied_circular_reference(self):
+        with pytest.raises(ImproperlyConfigured) as excinfo:
+            self.env('PROXIED_CIRCLE')
+        expected_exc = (
+            'Circular reference detected while resolving variables. '
+            'Variable PROXIED_CIRCLE references PROXIED_CIRCLE which is currently being resolved.'
+        )
+        assert str(excinfo.value) == expected_exc
+
+    def test_proxied_circular_indirect_reference(self):
+        with pytest.raises(ImproperlyConfigured) as excinfo:
+            self.env('PROXIED_CIRCLE_1')
+        expected_exc = (
+            'Circular reference detected while resolving variables. '
+            'Variable PROXIED_CIRCLE_2 references PROXIED_CIRCLE_1 which is currently being resolved.'
+        )
+        assert str(excinfo.value) == expected_exc
+
     def test_int_list(self):
         assert_type_and_value(list, [42, 33], self.env('INT_LIST', cast=[int]))
         assert_type_and_value(list, [42, 33], self.env.list('INT_LIST', int))
