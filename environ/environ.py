@@ -436,7 +436,9 @@ class Env:
         :param collections.abc.Callable or None cast:
             Type to cast return value as.
         :param default:
-             If var not present in environ, return this instead.
+             If var not present in environ, return this instead. If
+             ``default`` is a callable, it is called with no arguments to
+             obtain the actual default value.
         :param bool parse_default:
             Force to parse default.
         :returns: Value from environment or default (if set).
@@ -476,7 +478,7 @@ class Env:
                 error_msg = f'Set the {var_name} environment variable'
                 raise ImproperlyConfigured(error_msg) from exc
 
-            value = default
+            value = default() if callable(default) else default
             if self.warn_on_default:
                 warnings.warn(
                     f'{var_name} environment variable not set; '
@@ -498,7 +500,7 @@ class Env:
         # Smart casting
         if self.smart_cast:
             if cast is None and default is not None and \
-                    not isinstance(default, NoValue):
+                    not isinstance(default, NoValue) and not callable(default):
                 cast = type(default)
 
         value = None if default is None and value == '' else value

@@ -104,6 +104,26 @@ class TestEnv:
     def test_not_present_with_default(self):
         assert self.env('not_present', default=3) == 3
 
+    def test_not_present_with_callable_default(self):
+        factory_called = []
+
+        def factory():
+            factory_called.append(True)
+            return 'lazy-value'
+
+        assert self.env('not_present', default=factory) == 'lazy-value'
+        assert len(factory_called) == 1
+
+    def test_present_with_callable_default_not_called(self):
+        factory_called = []
+
+        def factory():
+            factory_called.append(True)
+            return 'lazy-value'
+
+        assert self.env('STR_VAR', default=factory) == 'bar'
+        assert len(factory_called) == 0
+
     def test_not_present_with_default_warning_disabled(self):
         with warnings.catch_warnings(record=True) as warns:
             warnings.simplefilter('always')
