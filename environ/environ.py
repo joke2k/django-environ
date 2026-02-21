@@ -635,7 +635,7 @@ class Env:
         config = {}
 
         # handle unexpected URL schemes with special characters
-        if not url.path:
+        if not url.path and url.scheme != 'oracle':
             url = _urlparse_quote(urlunparse(url))
         # Remove query strings.
         path = url.path[1:]

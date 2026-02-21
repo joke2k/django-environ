@@ -349,6 +349,37 @@ def test_ldap_url_with_port():
     assert url['PORT'] == 1234
 
 
+def test_oracle_descriptor_without_path_matches_slash_variant():
+    base_descriptor = (
+        '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle_dev)(PORT=1521))'
+        '(CONNECT_DATA=(SERVICE_NAME=XEPDB1)))'
+    )
+    url_without_path = (
+        f'oracle://super_user:super_pass@{base_descriptor}'
+    )
+    url_with_path = (
+        f'oracle://super_user:super_pass@{base_descriptor}/'
+    )
+
+    no_path = Env.db_url_config(url_without_path)
+    with_path = Env.db_url_config(url_with_path)
+
+    assert no_path['NAME'] == with_path['NAME']
+    assert '%' not in no_path['NAME']
+
+
+def test_oracle_standard_url_still_parses():
+    url = 'oracle://super_user:super_pass@oracle_dev:1521/XEPDB1'
+    config = Env.db_url_config(url)
+
+    assert config['ENGINE'] == 'django.db.backends.oracle'
+    assert config['NAME'] == 'XEPDB1'
+    assert config['HOST'] == 'oracle_dev'
+    assert config['PORT'] == '1521'
+    assert config['USER'] == 'super_user'
+    assert config['PASSWORD'] == 'super_pass'
+
+
 def test_database_options_parsing():
     url = 'postgres://user:pass@host:1234/dbname?conn_max_age=600'
     url = Env.db_url_config(url)
