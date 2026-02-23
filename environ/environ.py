@@ -16,10 +16,11 @@ import ast
 import itertools
 import logging
 import os
+import pathlib
 import re
 import sys
 import warnings
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, TypeAlias, Union
 from urllib.parse import (
     parse_qs,
     ParseResult,
@@ -41,6 +42,11 @@ from .fileaware_mapping import FileAwareMapping
 
 OPENABLE = (str, os.PathLike)
 logger = logging.getLogger(__name__)
+
+# These type names are also method names of "Env",
+# so use these for type hinting within "Env"
+_bool: TypeAlias = bool  # pylint: disable=invalid-name
+_str: TypeAlias = str  # pylint: disable=invalid-name
 
 
 def _cast(value):
@@ -227,7 +233,12 @@ class Env:
         self.prefix = ""
         self.scheme = scheme
 
-    def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
+    def __call__(
+            self,
+            var: _str,
+            cast=None,
+            default=NOTSET,
+            parse_default: _bool = False):
         return self.get_value(
             var,
             cast=cast,
@@ -235,15 +246,15 @@ class Env:
             parse_default=parse_default
         )
 
-    def __contains__(self, var):
+    def __contains__(self, var: _str):
         return var in self.ENVIRON
 
     def str(
             self,
-            var,
-            default: Union[str, NoValue] = NOTSET,
-            multiline=False,
-            choices=NOTSET) -> str:
+            var: _str,
+            default: Union[_str, NoValue] = NOTSET,
+            multiline: _bool = False,
+            choices=NOTSET) -> _str:
         """
         :rtype: str
         """
@@ -260,7 +271,7 @@ class Env:
 
     def bytes(
             self,
-            var,
+            var: _str,
             default: Union[bytes, NoValue] = NOTSET,
             encoding='utf8') -> bytes:
         """
@@ -271,31 +282,33 @@ class Env:
             return value.encode(encoding)
         return value
 
-    def bool(self, var, default: Union[bool, NoValue] = NOTSET) -> bool:
+    def bool(self, var: _str, default: Union[bool, NoValue] = NOTSET) -> bool:
         """
         :rtype: bool
         """
         return self.get_value(var, cast=bool, default=default)
 
-    def int(self, var, default: Union[int, NoValue] = NOTSET) -> int:
+    def int(self, var: _str, default: Union[int, NoValue] = NOTSET) -> int:
         """
         :rtype: int
         """
         return self.get_value(var, cast=int, default=default)
 
-    def float(self, var, default: Union[float, NoValue] = NOTSET) -> float:
+    def float(self,
+              var: _str,
+              default: Union[float, NoValue] = NOTSET) -> float:
         """
         :rtype: float
         """
         return self.get_value(var, cast=float, default=default)
 
-    def json(self, var, default=NOTSET):
+    def json(self, var: _str, default=NOTSET):
         """
         :returns: Json parsed
         """
         return self.get_value(var, cast=json.loads, default=default)
 
-    def list(self, var, cast=None, default=NOTSET) -> List:
+    def list(self, var: _str, cast=None, default=NOTSET) -> List:
         """
         :rtype: list
         """
@@ -305,7 +318,7 @@ class Env:
             default=default
         )
 
-    def tuple(self, var, cast=None, default=NOTSET) -> Tuple:
+    def tuple(self, var: _str, cast=None, default=NOTSET) -> Tuple:
         """
         :rtype: tuple
         """
@@ -315,13 +328,13 @@ class Env:
             default=default
         )
 
-    def dict(self, var, cast=dict, default=NOTSET) -> Dict:
+    def dict(self, var: _str, cast=dict, default=NOTSET) -> Dict:
         """
         :rtype: dict
         """
         return self.get_value(var, cast=cast, default=default)
 
-    def url(self, var, default=NOTSET) -> ParseResult:
+    def url(self, var: _str, default=NOTSET) -> ParseResult:
         """
         :rtype: urllib.parse.ParseResult
         """
@@ -402,7 +415,7 @@ class Env:
 
     def channels_url(
             self,
-            var=DEFAULT_CHANNELS_ENV,
+            var: _str = DEFAULT_CHANNELS_ENV,
             default: Union[Dict, NoValue] = NOTSET,
             backend=None) -> Dict:
         """Returns a config dictionary, defaulting to CHANNELS_URL.
@@ -418,7 +431,7 @@ class Env:
 
     def path(
             self,
-            var,
+            var: _str,
             default: Union['Path', NoValue] = NOTSET,
             **kwargs) -> 'Path':
         """
@@ -426,7 +439,12 @@ class Env:
         """
         return Path(self.get_value(var, default=default), **kwargs)
 
-    def get_value(self, var, cast=None, default=NOTSET, parse_default=False):
+    def get_value(
+            self,
+            var: _str,
+            cast=None,
+            default=NOTSET,
+            parse_default: _bool = False):
         """Return value for given environment variable.
 
         :param str var:
@@ -998,8 +1016,14 @@ class Env:
         return config
 
     @classmethod
-    def read_env(cls, env_file=None, overwrite=False, parse_comments=False,
-                 encoding='utf8', **overrides):
+    # pylint: disable=too-many-statements
+    def read_env(
+            cls,
+            env_file: Optional[Union[_str, pathlib.Path]] = None,
+            overwrite: _bool = False,
+            parse_comments: _bool = False,
+            encoding: _str = 'utf8',
+            **overrides):
         r"""Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack
@@ -1037,8 +1061,7 @@ class Env:
 
         try:
             if isinstance(env_file, OPENABLE):
-                # Python 3.5 support (wrap path with str).
-                with open(str(env_file), encoding=encoding) as f:
+                with open(env_file, encoding=encoding) as f:
                     content = f.read()
             else:
                 with env_file as f:
