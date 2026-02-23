@@ -40,3 +40,6 @@ jobs:
 
       - name: Lint with tox
         run: tox -e lint
+
+      - name: Check types with tox
+        run: tox -e type
