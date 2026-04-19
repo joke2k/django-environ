@@ -20,9 +20,9 @@ def test_str(volume):
     root = Path('/home')
 
     if sys.platform == 'win32':
-        assert str(root) == '{}home'.format(volume)
-        assert str(root()) == '{}home'.format(volume)
-        assert str(root('dev')) == '{}home\\dev'.format(volume)
+        assert str(root) == f'{volume}home'
+        assert str(root()) == f'{volume}home'
+        assert str(root('dev')) == f'{volume}home\\dev'
     else:
         assert str(root) == '/home'
         assert str(root()) == '/home'
@@ -44,7 +44,7 @@ def test_path_class():
 def test_repr(volume):
     root = Path('/home')
     if sys.platform == 'win32':
-        assert root.__repr__() == '<Path:{}home>'.format(volume)
+        assert root.__repr__() == f'<Path:{volume}home>'
     else:
         assert root.__repr__() == '<Path:/home>'
 
@@ -65,8 +65,8 @@ def test_comparison(volume):
     assert ~Path('/home') == Path('/')
 
     if sys.platform == 'win32':
-        assert Path('/home') == '{}home'.format(volume)
-        assert '{}home'.format(volume) == Path('/home')
+        assert Path('/home') == f'{volume}home'
+        assert f'{volume}home' == Path('/home')
     else:
         assert Path('/home') == '/home'
         assert '/home' == Path('/home')
@@ -114,10 +114,10 @@ def test_complex_manipulation(volume):
     assets, scripts = public.path('assets'), public.path('assets', 'scripts')
 
     if sys.platform == 'win32':
-        assert public.__repr__() == '<Path:{}home\\public>'.format(volume)
-        assert str(public.root) == '{}home\\public'.format(volume)
-        assert str(public('styles')) == '{}home\\public\\styles'.format(volume)
-        assert str(assets.root) == '{}home\\public\\assets'.format(volume)
+        assert public.__repr__() == f'<Path:{volume}home\\public>'
+        assert str(public.root) == f'{volume}home\\public'
+        assert str(public('styles')) == f'{volume}home\\public\\styles'
+        assert str(assets.root) == f'{volume}home\\public\\assets'
         assert str(scripts.root) == '{}home\\public\\assets\\scripts'.format(
             volume
         )
@@ -126,10 +126,10 @@ def test_complex_manipulation(volume):
             volume
         )
         assert str(assets + 'styles') == (
-            '{}home\\public\\assets\\styles'.format(volume)
+            f'{volume}home\\public\\assets\\styles'
         )
         assert (assets + 'styles').__repr__() == (
-            '<Path:{}home\\public\\assets\\styles>'.format(volume)
+            f'<Path:{volume}home\\public\\assets\\styles>'
         )
     else:
         assert public.__repr__() == '<Path:/home/public>'
