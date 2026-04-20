@@ -225,6 +225,7 @@ class Env:
     def __init__(self, **scheme):
         self.smart_cast = True
         self.escape_proxy = False
+        self.interpolate = True
         self.warn_on_default = False
         self.prefix = ""
         self.scheme = scheme
@@ -496,7 +497,8 @@ class Env:
         # Resolve any proxied values
         prefix = b'$' if isinstance(value, bytes) else '$'
         escape = rb'\$' if isinstance(value, bytes) else r'\$'
-        if hasattr(value, 'startswith') and value.startswith(prefix):
+        if self.interpolate and \
+                hasattr(value, 'startswith') and value.startswith(prefix):
             value = value.lstrip(prefix)
             value = self.get_value(value, cast=cast, default=default)
 

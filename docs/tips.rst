@@ -361,19 +361,29 @@ You can restrict ``env.str()`` to an allowed list of values using
 Proxy value
 ===========
 
-Values that begin with a ``$`` may be interpolated. Pass ``interpolate=True`` to
-``environ.Env()`` to enable this feature:
+Values that begin with a ``$`` may be interpolated. This feature is enabled by
+default:
 
 .. code-block:: python
 
    import environ
 
-   env = environ.Env(interpolate=True)
+   env = environ.Env()
 
    # BAR=FOO
    # PROXY=$BAR
-   >>> print(env.str('PROXY'))
-   FOO
+   assert env.str('PROXY') == 'FOO'
+
+To disable proxy interpolation and read the raw value instead, set
+``env.interpolate = False``:
+
+.. code-block:: python
+
+   env = environ.Env()
+   env.interpolate = False
+
+   # PROXY=$BAR
+   assert env.str('PROXY') == '$BAR'
 
 
 Escape Proxy
