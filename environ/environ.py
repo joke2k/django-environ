@@ -18,6 +18,7 @@ import json
 import logging
 import os
 import re
+import shlex
 import sys
 import warnings
 from typing import Dict, List, Tuple, Union
@@ -1051,6 +1052,7 @@ class Env:
         return config
 
     @classmethod
+    # pylint: disable=too-many-statements
     def read_env(cls, env_file=None, overwrite=False, parse_comments=False,
                  encoding='utf8', **overrides):
         r"""Read a .env file into os.environ.
@@ -1122,7 +1124,35 @@ class Env:
                 # val:  abc#def
                 key, val = m1.group(1), m1.group(2)
 
-                if not parse_comments:
+                # Parse shell-quoted single-token values, such as:
+                # "Tom"="Jerry" or shlex.quote() output with "'\"'\"'" chunks.
+                parsed_single = None
+                val_stripped = val.strip()
+                is_json_object = (
+                    val_stripped.startswith('{') and val_stripped.endswith('}')
+                )
+                looks_like_quoted_assignment = (
+                    '=' in val and ('"' in val or "'" in val)
+                )
+                has_shell_quote_chunks = (
+                    '"\'"\'"' in val or "'\"'\"'" in val
+                )
+                if (
+                        not parse_comments
+                        and not is_json_object
+                        and (looks_like_quoted_assignment
+                             or has_shell_quote_chunks)
+                ):
+                    try:
+                        parts = shlex.split(val, comments=parse_comments)
+                    except ValueError:
+                        parts = None
+                    if parts and len(parts) == 1:
+                        parsed_single = parts[0]
+
+                if parsed_single is not None:
+                    val = parsed_single
+                elif not parse_comments:
                     # Default behavior
                     #
                     # Look for value in single quotes
@@ -1145,8 +1175,10 @@ class Env:
                 # Look for value in double quotes
                 m3 = re.match(r'\A"(.*)"\Z', val)
                 if m3:
-                    val = re.sub(r'\\(.)', _keep_escaped_format_characters,
-                                 m3.group(1))
+                    val = re.sub(
+                        r'\\(.)', _keep_escaped_format_characters,
+                        m3.group(1)
+                    )
 
                 overrides[key] = str(val)
             elif not line or line.startswith('#'):
