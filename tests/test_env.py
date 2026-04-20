@@ -110,15 +110,15 @@ def test_read_env_keeps_json_object_value_for_json_cast():
         env_path = os.path.join(temp_dir, '.env')
 
         with open(env_path, 'w') as f:
-            f.write('MY_JSON={"a":"b"}\n')
+            f.write('MY_JSON={"a":"b=c"}\n')
             f.flush()
 
             env = Env()
             Env.ENVIRON = {}
             env.read_env(env_path)
 
-            assert env('MY_JSON') == '{"a":"b"}'
-            assert env.json('MY_JSON') == {'a': 'b'}
+            assert env('MY_JSON') == '{"a":"b=c"}'
+            assert env.json('MY_JSON') == {'a': 'b=c'}
 
     os.environ = old_environ
 
