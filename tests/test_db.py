@@ -380,7 +380,7 @@ def test_oracle_standard_url_still_parses():
     assert config['PASSWORD'] == 'super_pass'
 
 
-def test_oracle_descriptor_without_path_keeps_password_quoting_fallback():
+def test_oracle_descriptor_without_path_preserves_password_reserved_chars():
     descriptor = (
         '(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle_dev)(PORT=1521))'
         '(CONNECT_DATA=(SERVICE_NAME=XEPDB1)))'
@@ -388,6 +388,8 @@ def test_oracle_descriptor_without_path_keeps_password_quoting_fallback():
     url = f'oracle://super_user:pa#ss@{descriptor}'
     config = Env.db_url_config(url)
 
+    assert config['ENGINE'] == 'django.db.backends.oracle'
+    assert config['USER'] == 'super_user'
     assert config['PASSWORD'] == 'pa#ss'
     assert '%' not in config['NAME']
 
