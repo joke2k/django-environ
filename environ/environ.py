@@ -701,7 +701,7 @@ class Env:
             config['HOST'], config['NAME'] = path.rsplit('/', 1)
 
         if url.scheme == 'oracle' and path == '':
-            config['NAME'] = config['HOST']
+            config['NAME'] = unquote(config['HOST'])
             config['HOST'] = ''
 
         if url.scheme == 'oracle':
