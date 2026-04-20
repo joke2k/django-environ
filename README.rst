@@ -52,7 +52,7 @@ environment variables obtained from an environment file and provided by the OS:
    BASE_DIR = Path(__file__).resolve().parent.parent
 
    # Take environment variables from .env file
-   environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+   environ.Env.read_env(BASE_DIR / '.env')
 
    # False if not in os.environ because of casting above
    DEBUG = env('DEBUG')
