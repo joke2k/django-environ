@@ -223,7 +223,7 @@ class Env:
         "rediss+pubsub": "channels_redis.pubsub.RedisPubSubChannelLayer",
     }
 
-    def __init__(self, **scheme: dict[str, Any]):
+    def __init__(self, **scheme: tuple[type[Any], Any]):
         self.smart_cast = True
         self.escape_proxy = False
         self.interpolate = True
