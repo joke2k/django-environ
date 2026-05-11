@@ -21,7 +21,7 @@ import re
 import shlex
 import sys
 import warnings
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union, Any, TypeVar
 from urllib.parse import (
     parse_qs,
     ParseResult,
@@ -44,6 +44,7 @@ from .fileaware_mapping import FileAwareMapping
 OPENABLE = (str, os.PathLike)
 logger = logging.getLogger(__name__)
 
+T = TypeVar("T")
 
 def _cast(value):
     # Safely evaluate an expression node or a string containing a Python
@@ -222,7 +223,7 @@ class Env:
         "rediss+pubsub": "channels_redis.pubsub.RedisPubSubChannelLayer",
     }
 
-    def __init__(self, **scheme):
+    def __init__(self, **scheme: dict[str, Any]):
         self.smart_cast = True
         self.escape_proxy = False
         self.interpolate = True
@@ -230,7 +231,7 @@ class Env:
         self.prefix = ""
         self.scheme = scheme
 
-    def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
+    def __call__(self, var: str, cast: type[T] | None = None, default: Any = NOTSET, parse_default: bool = False) -> T:
         return self.get_value(
             var,
             cast=cast,
@@ -1055,8 +1056,7 @@ class Env:
 
     @classmethod
     # pylint: disable=too-many-statements
-    def read_env(cls, env_file=None, overwrite=False, parse_comments=False,
-                 encoding='utf8', **overrides):
+    def read_env(cls, env_file: str | None = None, overwrite: bool = False, parse_comments: bool = False, encoding: str = "utf8", **overrides: Any) -> None:
         r"""Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack
