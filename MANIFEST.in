@@ -14,6 +14,10 @@
 include *.rst LICENSE.txt *.yml
 graft .github
 
+# PEP 561 marker so mypy/pyright pick up the inline type hints shipped
+# in environ/environ.py (cf. #567).
+include environ/py.typed
+
 # The contents of the directory tree tests will first be added to the sdist.
 # Many OS distributions prefers provide an ability run the tests
 # during the package installation.

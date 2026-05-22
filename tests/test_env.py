@@ -103,6 +103,24 @@ def test_read_env_parses_shell_quoted_single_token_values():
     os.environ = old_environ
 
 
+def test_pep561_py_typed_marker_is_shipped():
+    """Regression test for #567 (PEP 561 marker).
+
+    Static type checkers (mypy, pyright/Pylance, pyre, ...) only honour
+    inline type hints if the package ships a ``py.typed`` marker file
+    inside its top-level distribution. Without it, downstream code gets
+    ``import-untyped`` errors even though django-environ has had inline
+    annotations since #546.
+    """
+    import environ as environ_pkg
+    pkg_dir = os.path.dirname(environ_pkg.__file__)
+    marker = os.path.join(pkg_dir, 'py.typed')
+    assert os.path.isfile(marker), (
+        f"Expected PEP 561 marker at {marker}; without it, downstream "
+        "mypy/pyright users do not see django-environ's inline type hints."
+    )
+
+
 def test_read_env_keeps_json_object_value_for_json_cast():
     old_environ = os.environ
 
