@@ -551,7 +551,11 @@ class Env:
                         value_cast_by_key.get(kv[0], value_cast)
                     )
                 ),
-                [val.split('=') for val in value.split(';') if val]
+                # Limit to a single split so values that themselves contain
+                # '=' (e.g. base64 padding, JWTs, query strings) are preserved.
+                # This matches the simple-dict path below which already uses
+                # ``split('=', 1)`` (cf. #565).
+                [val.split('=', 1) for val in value.split(';') if val]
             ))
         elif cast is dict:
             value = dict([v.split('=', 1) for v in value.split(',') if v])
