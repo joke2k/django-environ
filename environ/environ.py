@@ -790,7 +790,7 @@ class Env:
             config.update({
                 'LOCATION': 'unix:' + url.path,
             })
-        elif url.scheme.startswith('redis'):
+        elif url.scheme.startswith(('redis', 'valkey')):
             if url.hostname:
                 scheme = url.scheme.replace('cache', '')
             else:
@@ -920,7 +920,7 @@ class Env:
             raise ImproperlyConfigured(f"Invalid channels schema {url.scheme}")
         else:
             config["BACKEND"] = cls.CHANNELS_SCHEMES[url.scheme]
-            if url.scheme.startswith("redis"):
+            if url.scheme.startswith(("redis", "valkey")):
                 redis_scheme, *_ = url.scheme.split("+")
                 config["CONFIG"] = {
                     "hosts": [url._replace(scheme=redis_scheme).geturl()]
