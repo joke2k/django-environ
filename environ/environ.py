@@ -222,13 +222,16 @@ class Env:
         "rediss+pubsub": "channels_redis.pubsub.RedisPubSubChannelLayer",
     }
 
-    def __init__(self, **scheme):
+    REMOVE_WHITESPACE = False
+
+    def __init__(self, REMOVE_WHITESPACE: bool = False, **scheme):
         self.smart_cast = True
         self.escape_proxy = False
         self.interpolate = True
         self.warn_on_default = False
         self.prefix = ""
         self.scheme = scheme
+        self.REMOVE_WHITESPACE = REMOVE_WHITESPACE
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
         return self.get_value(
@@ -515,6 +518,9 @@ class Env:
 
         if value != default or (parse_default and value is not None):
             value = self.parse_value(value, cast)
+
+        if self.REMOVE_WHITESPACE and isinstance(value, str):
+            value = value.strip()
 
         return value
 
