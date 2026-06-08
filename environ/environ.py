@@ -222,8 +222,6 @@ class Env:
         "rediss+pubsub": "channels_redis.pubsub.RedisPubSubChannelLayer",
     }
 
-    REMOVE_WHITESPACE = False
-
     def __init__(self, REMOVE_WHITESPACE: bool = False, **scheme):
         self.smart_cast = True
         self.escape_proxy = False
@@ -249,11 +247,12 @@ class Env:
             var,
             default: Union[str, NoValue] = NOTSET,
             multiline=False,
-            choices=NOTSET) -> str:
+            choices=NOTSET,
+            REMOVE_WHITESPACE: bool = None) -> str:
         """
         :rtype: str
         """
-        value = self.get_value(var, cast=str, default=default)
+        value = self.get_value(var, cast=str, default=default, REMOVE_WHITESPACE=REMOVE_WHITESPACE)
         if multiline:
             return re.sub(r'(\\r)?\\n', r'\n', value)
         if choices is not self.NOTSET:
@@ -268,66 +267,69 @@ class Env:
             self,
             var,
             default: Union[bytes, NoValue] = NOTSET,
-            encoding='utf8') -> bytes:
+            encoding='utf8',
+            REMOVE_WHITESPACE: bool = False) -> bytes:
         """
         :rtype: bytes
         """
-        value = self.get_value(var, cast=str, default=default)
+        value = self.get_value(var, cast=str, default=default, REMOVE_WHITESPACE=REMOVE_WHITESPACE)
         if hasattr(value, 'encode'):
             return value.encode(encoding)
         return value
 
-    def bool(self, var, default: Union[bool, NoValue] = NOTSET) -> bool:
+    def bool(self, var, default: Union[bool, NoValue] = NOTSET, REMOVE_WHITESPACE: bool = False) -> bool:
         """
         :rtype: bool
         """
-        return self.get_value(var, cast=bool, default=default)
+        return self.get_value(var, cast=bool, default=default, REMOVE_WHITESPACE=REMOVE_WHITESPACE)
 
-    def int(self, var, default: Union[int, NoValue] = NOTSET) -> int:
+    def int(self, var, default: Union[int, NoValue] = NOTSET, REMOVE_WHITESPACE: bool = False) -> int:
         """
         :rtype: int
         """
-        return self.get_value(var, cast=int, default=default)
+        return self.get_value(var, cast=int, default=default, REMOVE_WHITESPACE=REMOVE_WHITESPACE)
 
-    def float(self, var, default: Union[float, NoValue] = NOTSET) -> float:
+    def float(self, var, default: Union[float, NoValue] = NOTSET, REMOVE_WHITESPACE: bool = False) -> float:
         """
         :rtype: float
         """
-        return self.get_value(var, cast=float, default=default)
+        return self.get_value(var, cast=float, default=default, REMOVE_WHITESPACE=REMOVE_WHITESPACE)
 
-    def json(self, var, default=NOTSET):
+    def json(self, var, default=NOTSET, REMOVE_WHITESPACE: bool = False):
         """
         :returns: Json parsed
         """
-        return self.get_value(var, cast=json.loads, default=default)
+        return self.get_value(var, cast=json.loads, default=default, REMOVE_WHITESPACE=REMOVE_WHITESPACE)
 
-    def list(self, var, cast=None, default=NOTSET) -> List:
+    def list(self, var, cast=None, default=NOTSET, REMOVE_WHITESPACE: bool = False) -> List:
         """
         :rtype: list
         """
         return self.get_value(
             var,
             cast=list if not cast else [cast],
-            default=default
+            default=default,
+            REMOVE_WHITESPACE=REMOVE_WHITESPACE
         )
 
-    def tuple(self, var, cast=None, default=NOTSET) -> Tuple:
+    def tuple(self, var, cast=None, default=NOTSET, REMOVE_WHITESPACE: bool = False) -> Tuple:
         """
         :rtype: tuple
         """
         return self.get_value(
             var,
             cast=tuple if not cast else (cast,),
-            default=default
+            default=default,
+            REMOVE_WHITESPACE=REMOVE_WHITESPACE
         )
 
-    def dict(self, var, cast=dict, default=NOTSET) -> Dict:
+    def dict(self, var, cast=dict, default=NOTSET, REMOVE_WHITESPACE: bool = False) -> Dict:
         """
         :rtype: dict
         """
-        return self.get_value(var, cast=cast, default=default)
+        return self.get_value(var, cast=cast, default=default, REMOVE_WHITESPACE=REMOVE_WHITESPACE)
 
-    def url(self, var, default=NOTSET) -> ParseResult:
+    def url(self, var, default=NOTSET, REMOVE_WHITESPACE: bool = False) -> ParseResult:
         """
         :rtype: urllib.parse.ParseResult
         """
@@ -335,7 +337,8 @@ class Env:
             var,
             cast=urlparse,
             default=default,
-            parse_default=True
+            parse_default=True,
+            REMOVE_WHITESPACE=REMOVE_WHITESPACE
         )
 
     # pylint: disable=too-many-arguments,too-many-positional-arguments
@@ -438,7 +441,7 @@ class Env:
         """
         return Path(self.get_value(var, default=default), **kwargs)
 
-    def get_value(self, var, cast=None, default=NOTSET, parse_default=False):
+    def get_value(self, var, cast=None, default=NOTSET, parse_default=False, REMOVE_WHITESPACE: bool = None):
         """Return value for given environment variable.
 
         :param str var:
@@ -497,6 +500,11 @@ class Env:
                     stacklevel=2,
                 )
 
+        # Trims whitespace if REMOVE_WHITESPACE is True and value is a string
+        REMOVE_WHITESPACE = self.none_to_bool(REMOVE_WHITESPACE)
+        if REMOVE_WHITESPACE:
+            value = value.strip()
+            
         # Resolve any proxied values
         prefix = b'$' if isinstance(value, bytes) else '$'
         escape = rb'\$' if isinstance(value, bytes) else r'\$'
@@ -518,9 +526,6 @@ class Env:
 
         if value != default or (parse_default and value is not None):
             value = self.parse_value(value, cast)
-
-        if self.REMOVE_WHITESPACE and isinstance(value, str):
-            value = value.strip()
 
         return value
 
@@ -1209,7 +1214,18 @@ class Env:
         for key, value in overrides.items():
             setenv(key, value)
 
-
+    def none_to_bool(self, value):
+        """Helper method for remove whitespace logic.
+        
+        If value is None, return value of instance level REMOVE_WHITESPACE. Otherwise, return bool value.
+        
+        :param value: The value to evaluate.
+        :return: The evaluated boolean value.
+        
+        """
+        if value is None:
+            return self.REMOVE_WHITESPACE
+        return value
 class FileAwareEnv(Env):
     """
     First look for environment variables with ``_FILE`` appended. If found,
