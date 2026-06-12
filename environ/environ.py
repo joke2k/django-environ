@@ -239,6 +239,10 @@ class Env:
             cast=None,
             default=NOTSET,
             parse_default: _bool = False):
+        """
+        :param str var:
+        :param bool parse_default:
+        """
         return self.get_value(
             var,
             cast=cast,
@@ -247,6 +251,9 @@ class Env:
         )
 
     def __contains__(self, var: _str):
+        """
+        :param str var:
+        """
         return var in self.ENVIRON
 
     def str(
@@ -256,6 +263,9 @@ class Env:
             multiline: _bool = False,
             choices=NOTSET) -> _str:
         """
+        :param str var:
+        :param str or NoValue default:
+        :param bool multiline:
         :rtype: str
         """
         value = self.get_value(var, cast=str, default=default)
@@ -275,6 +285,8 @@ class Env:
             default: Union[bytes, NoValue] = NOTSET,
             encoding='utf8') -> bytes:
         """
+        :param str var:
+        :param bytes or NoValue default:
         :rtype: bytes
         """
         value = self.get_value(var, cast=str, default=default)
@@ -284,12 +296,16 @@ class Env:
 
     def bool(self, var: _str, default: Union[bool, NoValue] = NOTSET) -> bool:
         """
+        :param str var:
+        :param bool or NoValue default:
         :rtype: bool
         """
         return self.get_value(var, cast=bool, default=default)
 
     def int(self, var: _str, default: Union[int, NoValue] = NOTSET) -> int:
         """
+        :param str var:
+        :param int or NoValue default:
         :rtype: int
         """
         return self.get_value(var, cast=int, default=default)
@@ -298,18 +314,22 @@ class Env:
               var: _str,
               default: Union[float, NoValue] = NOTSET) -> float:
         """
+        :param str var:
+        :param float or NoValue default:
         :rtype: float
         """
         return self.get_value(var, cast=float, default=default)
 
     def json(self, var: _str, default=NOTSET):
         """
+        :param str var:
         :returns: Json parsed
         """
         return self.get_value(var, cast=json.loads, default=default)
 
     def list(self, var: _str, cast=None, default=NOTSET) -> List:
         """
+        :param str var:
         :rtype: list
         """
         return self.get_value(
@@ -320,6 +340,7 @@ class Env:
 
     def tuple(self, var: _str, cast=None, default=NOTSET) -> Tuple:
         """
+        :param str var:
         :rtype: tuple
         """
         return self.get_value(
@@ -330,12 +351,14 @@ class Env:
 
     def dict(self, var: _str, cast=dict, default=NOTSET) -> Dict:
         """
+        :param str var:
         :rtype: dict
         """
         return self.get_value(var, cast=cast, default=default)
 
     def url(self, var: _str, default=NOTSET) -> ParseResult:
         """
+        :param str var:
         :rtype: urllib.parse.ParseResult
         """
         return self.get_value(
@@ -420,6 +443,8 @@ class Env:
             backend=None) -> Dict:
         """Returns a config dictionary, defaulting to CHANNELS_URL.
 
+        :param str var:
+        :param dict or NoValue default:
         :rtype: dict
         """
         return self.channels_url_config(
@@ -435,6 +460,8 @@ class Env:
             default: Union['Path', NoValue] = NOTSET,
             **kwargs) -> 'Path':
         """
+        :param str var:
+        :param Path or NoValue default:
         :rtype: Path
         """
         return Path(self.get_value(var, default=default), **kwargs)
@@ -1034,14 +1061,16 @@ class Env:
         by the file content. ``overwrite=True`` will force an overwrite of
         existing environment variables.
 
-        :param env_file: The path to the ``.env`` file your application should
-            use. If a path is not provided, `read_env` will attempt to import
-            the Django settings module from the Django project root.
-        :param overwrite: ``overwrite=True`` will force an overwrite of
+        :param str or pathlib.Path or None env_file: The path to the ``.env``
+            file your application should use. If a path is not provided,
+            `read_env` will attempt to import the Django settings module from
+            the Django project root.
+        :param bool overwrite: ``overwrite=True`` will force an overwrite of
             existing environment variables.
-        :param parse_comments: Determines whether to recognize and ignore
+        :param bool parse_comments: Determines whether to recognize and ignore
            inline comments in the .env file. Default is False.
-        :param encoding: The encoding to use when reading the environment file.
+        :param str encoding: The encoding to use when reading the environment
+            file.
         :param \**overrides: Any additional keyword arguments provided directly
             to read_env will be added to the environment. If the key matches an
             existing environment variable, the value will be overridden.
