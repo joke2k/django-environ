@@ -49,7 +49,7 @@ def find_version(meta_file):
 # General information about the project.
 project = "django-environ"
 copyright = f'2013-{date.today().year}, Daniele Faraglia and other contributors'
-author = u"Daniele Faraglia \\and Serghei Iakovlev"
+author = "Daniele Faraglia \\and Serghei Iakovlev"
 
 #
 # -- General configuration ---------------------------------------------------
@@ -82,7 +82,7 @@ master_doc = "index"
 # The version info
 # The short X.Y version.
 release = find_version(os.path.join("environ", "__init__.py"))
-version = release.rsplit(u".", 1)[0]
+version = release.rsplit(".", 1)[0]
 # The full version, including alpha/beta/rc tags.
 
 # List of patterns, relative to source directory, that match files and

@@ -82,7 +82,7 @@ def load_long_description():
         return '\n'.join(contents)
     except (RuntimeError, FileNotFoundError) as read_error:
         message = 'Long description could not be read from README.rst'
-        raise RuntimeError('%s: %s' % (message, read_error)) from read_error
+        raise RuntimeError(f'{message}: {read_error}') from read_error
 
 
 def is_canonical_version(version):
@@ -97,7 +97,7 @@ def is_canonical_version(version):
 def find_meta(meta):
     """Extract __*meta*__ from META_CONTENTS."""
     meta_match = re.search(
-        r"^__{meta}__\s+=\s+['\"]([^'\"]*)['\"]".format(meta=meta),
+        fr"^__{meta}__\s+=\s+['\"]([^'\"]*)['\"]",
         META_CONTENTS,
         re.M
     )

@@ -261,7 +261,7 @@ def test_cache_url_password_using_sub_delims(monkeypatch, chars):
     """Ensure CACHE_URL passwords may contains some unsafe characters.
 
     See: https://github.com/joke2k/django-environ/issues/200 for details."""
-    url = 'rediss://enigma:secret{}@ondigitalocean.com:25061/2'.format(chars)
+    url = f'rediss://enigma:secret{chars}@ondigitalocean.com:25061/2'
     monkeypatch.setenv('CACHE_URL', url)
     env = Env()
 
@@ -273,7 +273,7 @@ def test_cache_url_password_using_sub_delims(monkeypatch, chars):
     assert result['BACKEND'] == REDIS_DRIVER
     assert result['LOCATION'] == url
 
-    url = 'rediss://enigma:sec{}ret@ondigitalocean.com:25061/2'.format(chars)
+    url = f'rediss://enigma:sec{chars}ret@ondigitalocean.com:25061/2'
     monkeypatch.setenv('CACHE_URL', url)
     env = Env()
 
@@ -285,7 +285,7 @@ def test_cache_url_password_using_sub_delims(monkeypatch, chars):
     assert result['BACKEND'] == REDIS_DRIVER
     assert result['LOCATION'] == url
 
-    url = 'rediss://enigma:{}secret@ondigitalocean.com:25061/2'.format(chars)
+    url = f'rediss://enigma:{chars}secret@ondigitalocean.com:25061/2'
     monkeypatch.setenv('CACHE_URL', url)
     env = Env()
 
@@ -305,7 +305,7 @@ def test_cache_url_password_using_gen_delims(monkeypatch, chars):
     """Ensure CACHE_URL passwords may contains %-encoded characters.
 
     See: https://github.com/joke2k/django-environ/issues/200 for details."""
-    url = 'rediss://enigma:secret{}@ondigitalocean.com:25061/2'.format(chars)
+    url = f'rediss://enigma:secret{chars}@ondigitalocean.com:25061/2'
     monkeypatch.setenv('CACHE_URL', url)
     env = Env()
 
@@ -313,7 +313,7 @@ def test_cache_url_password_using_gen_delims(monkeypatch, chars):
     assert result['BACKEND'] == REDIS_DRIVER
     assert result['LOCATION'] == url
 
-    url = 'rediss://enigma:sec{}ret@ondigitalocean.com:25061/2'.format(chars)
+    url = f'rediss://enigma:sec{chars}ret@ondigitalocean.com:25061/2'
     monkeypatch.setenv('CACHE_URL', url)
     env = Env()
 
@@ -321,7 +321,7 @@ def test_cache_url_password_using_gen_delims(monkeypatch, chars):
     assert result['BACKEND'] == REDIS_DRIVER
     assert result['LOCATION'] == url
 
-    url = 'rediss://enigma:{}secret@ondigitalocean.com:25061/2'.format(chars)
+    url = f'rediss://enigma:{chars}secret@ondigitalocean.com:25061/2'
     monkeypatch.setenv('CACHE_URL', url)
     env = Env()
 

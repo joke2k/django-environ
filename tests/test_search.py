@@ -23,7 +23,7 @@ def test_solr_parsing(solr_url):
 def test_solr_multicore_parsing(solr_url):
     timeout = 360
     index = 'solr_index'
-    url = '{}/{}?TIMEOUT={}'.format(solr_url, index, timeout)
+    url = f'{solr_url}/{index}?TIMEOUT={timeout}'
     url = Env.search_url_config(url)
 
     assert url['ENGINE'] == 'haystack.backends.solr_backend.SolrEngine'
@@ -75,10 +75,10 @@ def test_solr_multicore_parsing(solr_url):
 def test_elasticsearch_parsing(url, engine, scheme):
     """Ensure all supported Elasticsearch engines are recognized."""
     timeout = 360
-    url = '{}?TIMEOUT={}'.format(url, timeout)
+    url = f'{url}?TIMEOUT={timeout}'
     url = Env.search_url_config(url)
 
-    assert url['ENGINE'] == 'haystack.backends.{}'.format(engine)
+    assert url['ENGINE'] == f'haystack.backends.{engine}'
     assert 'INDEX_NAME' in url.keys()
     assert url['INDEX_NAME'] == 'index'
     assert 'TIMEOUT' in url.keys()
@@ -100,7 +100,7 @@ def test_custom_search_engine():
 @pytest.mark.parametrize('storage', ['file', 'ram'])
 def test_whoosh_parsing(whoosh_url, storage):
     post_limit = 128 * 1024 * 1024
-    url = '{}?STORAGE={}&POST_LIMIT={}'.format(whoosh_url, storage, post_limit)
+    url = f'{whoosh_url}?STORAGE={storage}&POST_LIMIT={post_limit}'
     url = Env.search_url_config(url)
 
     assert url['ENGINE'] == 'haystack.backends.whoosh_backend.WhooshEngine'
@@ -115,7 +115,7 @@ def test_whoosh_parsing(whoosh_url, storage):
 
 @pytest.mark.parametrize('flags', ['myflags'])
 def test_xapian_parsing(xapian_url, flags):
-    url = '{}?FLAGS={}'.format(xapian_url, flags)
+    url = f'{xapian_url}?FLAGS={flags}'
     url = Env.search_url_config(url)
 
     assert url['ENGINE'] == 'haystack.backends.xapian_backend.XapianEngine'

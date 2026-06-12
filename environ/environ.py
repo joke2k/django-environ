@@ -21,7 +21,7 @@ import re
 import shlex
 import sys
 import warnings
-from typing import Dict, List, Tuple, Union
+from typing import Union
 from urllib.parse import (
     parse_qs,
     ParseResult,
@@ -298,7 +298,7 @@ class Env:
         """
         return self.get_value(var, cast=json.loads, default=default)
 
-    def list(self, var, cast=None, default=NOTSET) -> List:
+    def list(self, var, cast=None, default=NOTSET) -> list:
         """
         :rtype: list
         """
@@ -308,7 +308,7 @@ class Env:
             default=default
         )
 
-    def tuple(self, var, cast=None, default=NOTSET) -> Tuple:
+    def tuple(self, var, cast=None, default=NOTSET) -> tuple:
         """
         :rtype: tuple
         """
@@ -318,7 +318,7 @@ class Env:
             default=default
         )
 
-    def dict(self, var, cast=dict, default=NOTSET) -> Dict:
+    def dict(self, var, cast=dict, default=NOTSET) -> dict:
         """
         :rtype: dict
         """
@@ -342,7 +342,7 @@ class Env:
             default=NOTSET,
             engine=None,
             options_cast=None,
-            extra_options=None) -> Dict:
+            extra_options=None) -> dict:
         """Returns a config dictionary, defaulting to DATABASE_URL.
 
         The db method is an alias for db_url.
@@ -363,7 +363,7 @@ class Env:
             self,
             var=DEFAULT_CACHE_ENV,
             default=NOTSET,
-            backend=None) -> Dict:
+            backend=None) -> dict:
         """Returns a config dictionary, defaulting to CACHE_URL.
 
         The cache method is an alias for cache_url.
@@ -381,7 +381,7 @@ class Env:
             self,
             var=DEFAULT_EMAIL_ENV,
             default=NOTSET,
-            backend=None) -> Dict:
+            backend=None) -> dict:
         """Returns a config dictionary, defaulting to EMAIL_URL.
 
         The email method is an alias for email_url.
@@ -398,8 +398,8 @@ class Env:
     def search_url(
             self,
             var=DEFAULT_SEARCH_ENV,
-            default: Union[Dict, NoValue] = NOTSET,
-            engine=None) -> Dict:
+            default: Union[dict, NoValue] = NOTSET,
+            engine=None) -> dict:
         """Returns a config dictionary, defaulting to SEARCH_URL.
 
         :rtype: dict
@@ -412,8 +412,8 @@ class Env:
     def channels_url(
             self,
             var=DEFAULT_CHANNELS_ENV,
-            default: Union[Dict, NoValue] = NOTSET,
-            backend=None) -> Dict:
+            default: Union[dict, NoValue] = NOTSET,
+            backend=None) -> dict:
         """Returns a config dictionary, defaulting to CHANNELS_URL.
 
         :rtype: dict
