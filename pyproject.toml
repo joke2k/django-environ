@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools>=71.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [tool.mypy]
 files = [
   "environ",
