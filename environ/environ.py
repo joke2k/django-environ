@@ -21,6 +21,7 @@ import re
 import shlex
 import sys
 import warnings
+from collections.abc import MutableMapping
 from typing import Dict, List, Tuple, Union
 from urllib.parse import (
     parse_qs,
@@ -109,7 +110,7 @@ class Env:
         SMTP_LOGIN = env('SMTP_LOGIN')
     """
 
-    ENVIRON = os.environ
+    ENVIRON: MutableMapping = os.environ
     NOTSET = NoValue()
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = ParseResult
