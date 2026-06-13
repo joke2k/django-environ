@@ -373,6 +373,12 @@ class TestEnv:
             ('a=uname;c=http://www.google.com;b=True',
              dict(value=str, cast=dict(b=bool)),
              {'a': "uname", 'c': "http://www.google.com", 'b': True}),
+            # Regression for #565: complex dict cast must preserve '=' inside
+            # values (e.g. base64 padding, query strings, JWT segments). Prior
+            # to the fix, ``b`` was truncated to ``"v"`` instead of ``"v=more"``.
+            ('a=1;b=v=more',
+             dict(value=str),
+             {'a': '1', 'b': 'v=more'}),
         ],
         ids=[
             'dict',
@@ -382,6 +388,7 @@ class TestEnv:
             'dict_int_list',
             'dict_int_cast',
             'dict_str_cast',
+            'dict_value_contains_equal_sign',
         ],
     )
     def test_dict_parsing(self, value, cast, expected):
