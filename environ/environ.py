@@ -231,6 +231,53 @@ class Env:
         self.prefix = ""
         self.scheme = scheme
 
+    @classmethod
+    # pylint: disable=too-many-arguments
+    def configured(
+            cls, env_file=None, scheme=None, *, overwrite=False,
+            parse_comments=False, encoding='utf8', smart_cast=True,
+            escape_proxy=False, interpolate=True, warn_on_default=False,
+            prefix="", **overrides):
+        r"""Create a configured Env instance.
+
+        This keeps ``Env.__init__`` reserved for schema declarations while
+        making it possible to configure instance flags in one step. If
+        ``env_file`` is provided, the file is read after the instance is
+        configured.
+
+        :param env_file: The path to the ``.env`` file your application should
+            use. When omitted, no env file is read.
+        :param scheme: An optional mapping of schema declarations passed to
+            ``Env.__init__``.
+        :param overwrite: ``overwrite=True`` will force an overwrite of
+            existing environment variables.
+        :param parse_comments: Determines whether to recognize and ignore
+           inline comments in the .env file. Default is False.
+        :param encoding: The encoding to use when reading the environment file.
+        :param smart_cast: Enable or disable smart casting.
+        :param escape_proxy: Enable or disable escaped proxy values.
+        :param interpolate: Enable or disable proxy value interpolation.
+        :param warn_on_default: Enable or disable warnings for default values.
+        :param prefix: A prefix to prepend to variables read by the instance.
+        :param \**overrides: Any additional keyword arguments provided directly
+            to read_env will be added to the environment.
+        """
+        env = cls(**(scheme or {}))
+        env.smart_cast = smart_cast
+        env.escape_proxy = escape_proxy
+        env.interpolate = interpolate
+        env.warn_on_default = warn_on_default
+        env.prefix = prefix
+        if env_file is not None or overrides:
+            env.read_env(
+                env_file,
+                overwrite=overwrite,
+                parse_comments=parse_comments,
+                encoding=encoding,
+                **overrides
+            )
+        return env
+
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
         return self.get_value(
             var,
