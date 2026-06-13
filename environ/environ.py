@@ -1186,8 +1186,11 @@ class Env:
         if env_file is None:
             # pylint: disable=protected-access
             frame = sys._getframe()
+            caller_frame = frame.f_back
+            if caller_frame is None:  # pragma: no cover
+                raise RuntimeError('Unable to determine caller frame')
             env_file = os.path.join(
-                os.path.dirname(frame.f_back.f_code.co_filename),
+                os.path.dirname(caller_frame.f_code.co_filename),
                 '.env'
             )
             if not os.path.exists(env_file):
