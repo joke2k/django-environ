@@ -595,6 +595,66 @@ class TestEnv:
         assert any('Invalid line: INVALID LINE' in message
                    for message in caplog.messages)
 
+    def test_from_env_file_reads_file_and_configures_flags(self, tmp_path):
+        env_path = tmp_path / '.env'
+        env_path.write_text(
+            'APP_VALUE=42\n'
+            r'APP_ESCAPED=\$APP_VALUE'
+            '\n',
+            encoding='utf-8',
+        )
+
+        env = Env.from_env_file(
+            env_path,
+            scheme={'APP_VALUE': int},
+            overwrite=True,
+            smart_cast=False,
+            escape_proxy=True,
+            interpolate=False,
+            warn_on_default=True,
+            prefix='APP_',
+        )
+
+        assert env('VALUE') == 42
+        assert env('ESCAPED') == '$APP_VALUE'
+        assert not env.smart_cast
+        assert env.escape_proxy
+        assert not env.interpolate
+        assert env.warn_on_default
+        assert env.prefix == 'APP_'
+
+    def test_from_env_file_passes_read_env_options(self, tmp_path):
+        env_path = tmp_path / '.env'
+        env_path.write_text('FROM_ENV_FILE=loaded # comment\n',
+                            encoding='utf-8')
+
+        Env.ENVIRON['FROM_ENV_FILE'] = 'existing'
+
+        env = Env.from_env_file(
+            env_path,
+            overwrite=False,
+            parse_comments=True,
+            FROM_ENV_OVERRIDE='override',
+        )
+        assert env('FROM_ENV_FILE') == 'existing'
+        assert env('FROM_ENV_OVERRIDE') == 'override'
+
+        env = Env.from_env_file(env_path, overwrite=True,
+                                parse_comments=True)
+        assert env('FROM_ENV_FILE') == 'loaded '
+
+    def test_from_env_file_returns_subclass_instance(self, tmp_path):
+        class CustomEnv(Env):
+            pass
+
+        env_path = tmp_path / '.env'
+        env_path.write_text('SUBCLASS_VALUE=value\n', encoding='utf-8')
+
+        env = CustomEnv.from_env_file(env_path, overwrite=True)
+
+        assert isinstance(env, CustomEnv)
+        assert env('SUBCLASS_VALUE') == 'value'
+
 
 class TestFileEnv(TestEnv):
     def setup_method(self, method):

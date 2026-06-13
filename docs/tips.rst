@@ -478,6 +478,38 @@ an existing set environment variable, use the ``overwrite=True`` argument of
    env.read_env(BASE_DIR('.env'), overwrite=True)
 
 
+Create and read an Env in one step
+----------------------------------
+
+Use :meth:`.environ.Env.from_env_file` to create an ``Env`` instance, configure
+its flags, and read an environment file in a single call:
+
+.. code-block:: python
+
+   env = environ.Env.from_env_file(
+       BASE_DIR('.env'),
+       overwrite=True,
+       parse_comments=True,
+       prefix='DJANGO_',
+       smart_cast=False,
+   )
+
+   env.bool('DEBUG', default=False)
+
+The regular ``Env`` constructor remains reserved for schema declarations. Pass
+schemas with the ``scheme`` argument when using ``from_env_file``:
+
+.. code-block:: python
+
+   env = environ.Env.from_env_file(
+       BASE_DIR('.env'),
+       scheme={
+           'DEBUG': (bool, False),
+           'DATABASE_URL': str,
+       },
+   )
+
+
 Handling prefixes
 =================
 
