@@ -233,19 +233,20 @@ class Env:
 
     @classmethod
     # pylint: disable=too-many-arguments
-    def from_env_file(
+    def configured(
             cls, env_file=None, scheme=None, *, overwrite=False,
             parse_comments=False, encoding='utf8', smart_cast=True,
             escape_proxy=False, interpolate=True, warn_on_default=False,
             prefix="", **overrides):
-        r"""Create an Env instance and read a .env file.
+        r"""Create a configured Env instance.
 
         This keeps ``Env.__init__`` reserved for schema declarations while
-        making it possible to configure instance flags and load an env file in
-        one step.
+        making it possible to configure instance flags in one step. If
+        ``env_file`` is provided, the file is read after the instance is
+        configured.
 
         :param env_file: The path to the ``.env`` file your application should
-            use.
+            use. When omitted, no env file is read.
         :param scheme: An optional mapping of schema declarations passed to
             ``Env.__init__``.
         :param overwrite: ``overwrite=True`` will force an overwrite of
@@ -267,13 +268,14 @@ class Env:
         env.interpolate = interpolate
         env.warn_on_default = warn_on_default
         env.prefix = prefix
-        env.read_env(
-            env_file,
-            overwrite=overwrite,
-            parse_comments=parse_comments,
-            encoding=encoding,
-            **overrides
-        )
+        if env_file is not None or overrides:
+            env.read_env(
+                env_file,
+                overwrite=overwrite,
+                parse_comments=parse_comments,
+                encoding=encoding,
+                **overrides
+            )
         return env
 
     def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
