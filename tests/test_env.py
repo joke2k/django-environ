@@ -524,7 +524,18 @@ class TestEnv:
         root = self.env.path('PATH_VAR')
         assert_type_and_value(Path, Path(FakeEnv.PATH), root)
 
-    def test_smart_cast(self):
+    def test_smart_cast_disabled_by_default(self):
+        self.env.ENVIRON['GOOGLE_ANALYTICS_KEY'] = 'UA-123456-78'
+        assert self.env.get_value('STR_VAR', default='string') == 'bar'
+        assert self.env.get_value(
+            'GOOGLE_ANALYTICS_KEY',
+            default=False,
+        ) == 'UA-123456-78'
+        assert self.env.get_value('INT_VAR', default=1) == '42'
+        assert self.env.get_value('FLOAT_VAR', default=1.2) == '33.3'
+
+    def test_smart_cast_can_be_enabled(self):
+        self.env.smart_cast = True
         assert self.env.get_value('STR_VAR', default='string') == 'bar'
         assert self.env.get_value('BOOL_TRUE_STRING_LIKE_INT', default=True)
         assert not self.env.get_value(

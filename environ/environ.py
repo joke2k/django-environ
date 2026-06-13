@@ -230,7 +230,7 @@ class Env:
     }
 
     def __init__(self, **scheme):
-        self.smart_cast = True
+        self.smart_cast = False
         self.escape_proxy = False
         self.interpolate = True
         self.warn_on_default = False
@@ -241,7 +241,7 @@ class Env:
     # pylint: disable=too-many-arguments
     def configured(
             cls, env_file=None, scheme=None, *, overwrite=False,
-            parse_comments=False, encoding='utf8', smart_cast=True,
+            parse_comments=False, encoding='utf8', smart_cast=False,
             escape_proxy=False, interpolate=True, warn_on_default=False,
             prefix="", **overrides):
         r"""Create a configured Env instance.

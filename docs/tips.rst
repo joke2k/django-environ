@@ -120,13 +120,16 @@ See https://perishablepress.com/stop-using-unsafe-characters-in-urls/ for refere
 Smart Casting
 =============
 
-django-environ has a "Smart-casting" enabled by default, if you don't provide a ``cast`` type, it will be detected from ``default`` type.
+Smart-casting is disabled by default. When enabled, if you do not provide a
+``cast`` type, it will be detected from the ``default`` type.
 This could raise side effects (see `#192 <https://github.com/joke2k/django-environ/issues/192>`_).
-To disable it use ``env.smart_cast = False``.
+To enable it use ``env.smart_cast = True``.
 
 .. note::
 
-   The next major release will disable it by default.
+   Smart casting was enabled by default before django-environ 1.0.0. It is now
+   opt-in so that default values do not implicitly coerce values read from the
+   environment.
 
 
 Callable defaults (lazy evaluation)
@@ -154,9 +157,9 @@ variable is truly missing.
 
 .. note::
 
-   When ``smart_cast`` is enabled (the default), the cast type is **not**
-   inferred from a callable default. Provide an explicit ``cast`` or a type
-   in the scheme tuple if you need type coercion.
+   Even when ``smart_cast`` is enabled, the cast type is **not** inferred from
+   a callable default. Provide an explicit ``cast`` or a type in the scheme
+   tuple if you need type coercion.
 
 
 Warn when defaults are used
