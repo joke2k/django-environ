@@ -117,6 +117,8 @@ linkcheck_ignore = [
     r"https://github.com/.*/(issues|pull)/\d+",
     # Do not check links to compare tags.
     r"https://github.com/joke2k/django-environ/compare/.*",
+    # OpenCollective blocks automated requests.
+    r"https://opencollective.com/.*",
 ]
 linkcheck_timeout = 60
 
