@@ -20,7 +20,7 @@ import pathlib
 import re
 import sys
 import warnings
-from typing import Dict, List, Optional, Tuple, TypeAlias, Union
+from typing import Dict, IO, List, Optional, Tuple, TypeAlias, Union
 from urllib.parse import (
     parse_qs,
     ParseResult,
@@ -1046,7 +1046,7 @@ class Env:
     # pylint: disable=too-many-statements
     def read_env(
             cls,
-            env_file: Optional[Union[_str, pathlib.Path]] = None,
+            env_file: Optional[Union[_str, pathlib.Path, IO[_str]]] = None,
             overwrite: _bool = False,
             parse_comments: _bool = False,
             encoding: _str = 'utf8',
@@ -1061,10 +1061,10 @@ class Env:
         by the file content. ``overwrite=True`` will force an overwrite of
         existing environment variables.
 
-        :param str or pathlib.Path or None env_file: The path to the ``.env``
-            file your application should use. If a path is not provided,
-            `read_env` will attempt to import the Django settings module from
-            the Django project root.
+        :param str or pathlib.Path or IO or None env_file: The path to the
+            ``.env`` file your application should use. If a path is not
+            provided, `read_env` will attempt to import the Django settings
+            module from the Django project root.
         :param bool overwrite: ``overwrite=True`` will force an overwrite of
             existing environment variables.
         :param bool parse_comments: Determines whether to recognize and ignore
@@ -1096,8 +1096,7 @@ class Env:
                 with open(env_file, encoding=encoding) as f:
                     content = f.read()
             else:
-                with env_file as f:
-                    content = f.read()
+                content = env_file.read()
         except OSError:
             logger.info(
                 "%s not found - if you're not configuring your "
