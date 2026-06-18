@@ -13,8 +13,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           target: main
-          exclude: develop # Don't prevent going from develop -> main
+          # Allow integration, release, and hotfix branches to target main.
+          exclude: "develop /^[^:]+:(?:release|hotfix)\\/.+$/"
           change-to: develop
           comment: |
-            Your PR was set to target `main`, PRs should be target `develop`
+            Your PR was set to target `main`. Only `develop`, `release/*`,
+            and `hotfix/*` branches may target `main`.
             The base branch of this PR has been automatically changed to `develop`, please check that there are no merge conflicts.
