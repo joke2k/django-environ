@@ -16,10 +16,15 @@ import ast
 import itertools
 import logging
 import os
+import pathlib
 import re
 import sys
 import warnings
-from typing import Dict, List, Tuple, Union
+from typing import Dict, IO, List, Optional, Tuple, Union
+try:
+    from typing import TypeAlias
+except ImportError:  # pragma: no cover
+    from typing_extensions import TypeAlias
 from urllib.parse import (
     parse_qs,
     ParseResult,
@@ -41,6 +46,11 @@ from .fileaware_mapping import FileAwareMapping
 
 OPENABLE = (str, os.PathLike)
 logger = logging.getLogger(__name__)
+
+# These type names are also method names of "Env",
+# so use these for type hinting within "Env"
+_bool: TypeAlias = bool  # pylint: disable=invalid-name
+_str: TypeAlias = str  # pylint: disable=invalid-name
 
 
 def _cast(value):
@@ -227,7 +237,16 @@ class Env:
         self.prefix = ""
         self.scheme = scheme
 
-    def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
+    def __call__(
+            self,
+            var: _str,
+            cast=None,
+            default=NOTSET,
+            parse_default: _bool = False):
+        """
+        :param str var:
+        :param bool parse_default:
+        """
         return self.get_value(
             var,
             cast=cast,
@@ -235,16 +254,22 @@ class Env:
             parse_default=parse_default
         )
 
-    def __contains__(self, var):
+    def __contains__(self, var: _str):
+        """
+        :param str var:
+        """
         return var in self.ENVIRON
 
     def str(
             self,
-            var,
-            default: Union[str, NoValue] = NOTSET,
-            multiline=False,
-            choices=NOTSET) -> str:
+            var: _str,
+            default: Union[_str, NoValue] = NOTSET,
+            multiline: _bool = False,
+            choices=NOTSET) -> _str:
         """
+        :param str var:
+        :param str or NoValue default:
+        :param bool multiline:
         :rtype: str
         """
         value = self.get_value(var, cast=str, default=default)
@@ -260,10 +285,12 @@ class Env:
 
     def bytes(
             self,
-            var,
+            var: _str,
             default: Union[bytes, NoValue] = NOTSET,
             encoding='utf8') -> bytes:
         """
+        :param str var:
+        :param bytes or NoValue default:
         :rtype: bytes
         """
         value = self.get_value(var, cast=str, default=default)
@@ -271,32 +298,42 @@ class Env:
             return value.encode(encoding)
         return value
 
-    def bool(self, var, default: Union[bool, NoValue] = NOTSET) -> bool:
+    def bool(self, var: _str, default: Union[bool, NoValue] = NOTSET) -> bool:
         """
+        :param str var:
+        :param bool or NoValue default:
         :rtype: bool
         """
         return self.get_value(var, cast=bool, default=default)
 
-    def int(self, var, default: Union[int, NoValue] = NOTSET) -> int:
+    def int(self, var: _str, default: Union[int, NoValue] = NOTSET) -> int:
         """
+        :param str var:
+        :param int or NoValue default:
         :rtype: int
         """
         return self.get_value(var, cast=int, default=default)
 
-    def float(self, var, default: Union[float, NoValue] = NOTSET) -> float:
+    def float(self,
+              var: _str,
+              default: Union[float, NoValue] = NOTSET) -> float:
         """
+        :param str var:
+        :param float or NoValue default:
         :rtype: float
         """
         return self.get_value(var, cast=float, default=default)
 
-    def json(self, var, default=NOTSET):
+    def json(self, var: _str, default=NOTSET):
         """
+        :param str var:
         :returns: Json parsed
         """
         return self.get_value(var, cast=json.loads, default=default)
 
-    def list(self, var, cast=None, default=NOTSET) -> List:
+    def list(self, var: _str, cast=None, default=NOTSET) -> List:
         """
+        :param str var:
         :rtype: list
         """
         return self.get_value(
@@ -305,8 +342,9 @@ class Env:
             default=default
         )
 
-    def tuple(self, var, cast=None, default=NOTSET) -> Tuple:
+    def tuple(self, var: _str, cast=None, default=NOTSET) -> Tuple:
         """
+        :param str var:
         :rtype: tuple
         """
         return self.get_value(
@@ -315,14 +353,16 @@ class Env:
             default=default
         )
 
-    def dict(self, var, cast=dict, default=NOTSET) -> Dict:
+    def dict(self, var: _str, cast=dict, default=NOTSET) -> Dict:
         """
+        :param str var:
         :rtype: dict
         """
         return self.get_value(var, cast=cast, default=default)
 
-    def url(self, var, default=NOTSET) -> ParseResult:
+    def url(self, var: _str, default=NOTSET) -> ParseResult:
         """
+        :param str var:
         :rtype: urllib.parse.ParseResult
         """
         return self.get_value(
@@ -402,11 +442,13 @@ class Env:
 
     def channels_url(
             self,
-            var=DEFAULT_CHANNELS_ENV,
+            var: _str = DEFAULT_CHANNELS_ENV,
             default: Union[Dict, NoValue] = NOTSET,
             backend=None) -> Dict:
         """Returns a config dictionary, defaulting to CHANNELS_URL.
 
+        :param str var:
+        :param dict or NoValue default:
         :rtype: dict
         """
         return self.channels_url_config(
@@ -418,15 +460,22 @@ class Env:
 
     def path(
             self,
-            var,
+            var: _str,
             default: Union['Path', NoValue] = NOTSET,
             **kwargs) -> 'Path':
         """
+        :param str var:
+        :param Path or NoValue default:
         :rtype: Path
         """
         return Path(self.get_value(var, default=default), **kwargs)
 
-    def get_value(self, var, cast=None, default=NOTSET, parse_default=False):
+    def get_value(
+            self,
+            var: _str,
+            cast=None,
+            default=NOTSET,
+            parse_default: _bool = False):
         """Return value for given environment variable.
 
         :param str var:
@@ -998,8 +1047,14 @@ class Env:
         return config
 
     @classmethod
-    def read_env(cls, env_file=None, overwrite=False, parse_comments=False,
-                 encoding='utf8', **overrides):
+    # pylint: disable=too-many-statements
+    def read_env(
+            cls,
+            env_file: Optional[Union[_str, pathlib.Path, IO[_str]]] = None,
+            overwrite: _bool = False,
+            parse_comments: _bool = False,
+            encoding: _str = 'utf8',
+            **overrides):
         r"""Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack
@@ -1010,14 +1065,16 @@ class Env:
         by the file content. ``overwrite=True`` will force an overwrite of
         existing environment variables.
 
-        :param env_file: The path to the ``.env`` file your application should
-            use. If a path is not provided, `read_env` will attempt to import
-            the Django settings module from the Django project root.
-        :param overwrite: ``overwrite=True`` will force an overwrite of
+        :param str or pathlib.Path or IO or None env_file: The path to the
+            ``.env`` file your application should use. If a path is not
+            provided, `read_env` will attempt to import the Django settings
+            module from the Django project root.
+        :param bool overwrite: ``overwrite=True`` will force an overwrite of
             existing environment variables.
-        :param parse_comments: Determines whether to recognize and ignore
+        :param bool parse_comments: Determines whether to recognize and ignore
            inline comments in the .env file. Default is False.
-        :param encoding: The encoding to use when reading the environment file.
+        :param str encoding: The encoding to use when reading the environment
+            file.
         :param \**overrides: Any additional keyword arguments provided directly
             to read_env will be added to the environment. If the key matches an
             existing environment variable, the value will be overridden.
@@ -1025,8 +1082,11 @@ class Env:
         if env_file is None:
             # pylint: disable=protected-access
             frame = sys._getframe()
+            caller_frame = frame.f_back
+            if caller_frame is None:  # pragma: no cover
+                raise RuntimeError('Unable to determine caller frame')
             env_file = os.path.join(
-                os.path.dirname(frame.f_back.f_code.co_filename),
+                os.path.dirname(caller_frame.f_code.co_filename),
                 '.env'
             )
             if not os.path.exists(env_file):
@@ -1037,12 +1097,10 @@ class Env:
 
         try:
             if isinstance(env_file, OPENABLE):
-                # Python 3.5 support (wrap path with str).
-                with open(str(env_file), encoding=encoding) as f:
+                with open(env_file, encoding=encoding) as f:
                     content = f.read()
             else:
-                with env_file as f:
-                    content = f.read()
+                content = env_file.read()
         except OSError:
             logger.info(
                 "%s not found - if you're not configuring your "
