@@ -128,6 +128,66 @@ For more detailed example see ":ref:`complex_dict_format`".
       SQLite connects to file based databases. URL schemas ``sqlite://`` or
       ``sqlite://:memory:`` means the database is in the memory (not a file on disk).
 
+Database query options in ``db_url``
+------------------------------------
+
+Query parameters from ``DATABASE_URL`` are mapped to Django database settings:
+
+- known base keys (for example ``conn_max_age``, ``autocommit``,
+  ``atomic_requests``) are promoted to top-level DB config keys;
+- all other query params are stored in ``OPTIONS``.
+
+For MySQL strict mode, for example:
+
+.. code-block:: shell
+
+   DATABASE_URL=mysql://user:password@host:3306/dbname?sql_mode=STRICT_TRANS_TABLES
+
+This produces:
+
+.. code-block:: python
+
+   {"OPTIONS": {"sql_mode": "STRICT_TRANS_TABLES"}}
+
+If a value needs explicit typing (for example booleans or JSON), use
+``options_cast`` with an explicit URL and expected result:
+
+.. code-block:: python
+
+   import json
+   import environ
+
+   url = (
+       "mysql://user:password@host:3306/dbname?"
+       "reconnect=true&ssl=%7B%22ca%22%3A%22%2Fapp%2Ffoo%2Fca.pem%22%7D"
+   )
+   config = environ.Env.db_url_config(
+       url,
+       options_cast={
+           "reconnect": bool,
+           "ssl": json.loads,
+       }
+   )
+
+   # {"OPTIONS": {"reconnect": True, "ssl": {"ca": "/app/foo/ca.pem"}}}
+
+Only mapped keys are cast with the provided type/callable. Unmapped options
+keep the default parsing behavior.
+
+For values that are not practical to pass in a URL query string (for example
+nested dictionaries like Django 5.1 PostgreSQL ``pool`` options), pass
+``extra_options`` and they will be merged into ``OPTIONS``:
+
+.. code-block:: python
+
+   config = environ.Env.db_url_config(
+       "postgres://user:password@host:5432/dbname",
+       extra_options={
+           "pool": {"min_size": 2, "max_size": 4, "timeout": 10},
+       },
+   )
+
+   # {"OPTIONS": {"pool": {"min_size": 2, "max_size": 4, "timeout": 10}}}
 
 .. _environ-env-cache-url:
 

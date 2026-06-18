@@ -15,12 +15,12 @@ import io
 import warnings
 from urllib.parse import quote
 
+from django.core.exceptions import ImproperlyConfigured
 import pytest
 
 from environ import DefaultValueWarning, Env, Path
 from environ.compat import (
     DJANGO_POSTGRES,
-    ImproperlyConfigured,
     REDIS_DRIVER,
 )
 from .asserts import assert_type_and_value
@@ -80,6 +80,67 @@ def test_parse_comments(variable, value, raw_value, parse_comments):
     os.environ = old_environ
 
 
+def test_read_env_parses_shell_quoted_single_token_values():
+    old_environ = os.environ
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        env_path = os.path.join(temp_dir, '.env')
+
+        with open(env_path, 'w') as f:
+            f.write('MY_DICTIONARY="Tom"="Jerry"\n')
+            f.write("MY_OTHER_DICTIONARY='Tom'='Jerry'\n")
+            f.write('MYTEST=\'Hello\'"\'"\'World\'\n')
+            f.flush()
+
+            env = Env()
+            Env.ENVIRON = {}
+            env.read_env(env_path)
+
+            assert env.dict('MY_DICTIONARY') == {'Tom': 'Jerry'}
+            assert env.dict('MY_OTHER_DICTIONARY') == {'Tom': 'Jerry'}
+            assert env('MYTEST') == "Hello'World"
+
+    os.environ = old_environ
+
+
+def test_pep561_py_typed_marker_is_shipped():
+    """Regression test for #567 (PEP 561 marker).
+
+    Static type checkers (mypy, pyright/Pylance, pyre, ...) only honour
+    inline type hints if the package ships a ``py.typed`` marker file
+    inside its top-level distribution. Without it, downstream code gets
+    ``import-untyped`` errors even though django-environ has had inline
+    annotations since #546.
+    """
+    import environ as environ_pkg
+    pkg_dir = os.path.dirname(environ_pkg.__file__)
+    marker = os.path.join(pkg_dir, 'py.typed')
+    assert os.path.isfile(marker), (
+        f"Expected PEP 561 marker at {marker}; without it, downstream "
+        "mypy/pyright users do not see django-environ's inline type hints."
+    )
+
+
+def test_read_env_keeps_json_object_value_for_json_cast():
+    old_environ = os.environ
+
+    with tempfile.TemporaryDirectory() as temp_dir:
+        env_path = os.path.join(temp_dir, '.env')
+
+        with open(env_path, 'w') as f:
+            f.write('MY_JSON={"a":"b=c"}\n')
+            f.flush()
+
+            env = Env()
+            Env.ENVIRON = {}
+            env.read_env(env_path)
+
+            assert env('MY_JSON') == '{"a":"b=c"}'
+            assert env.json('MY_JSON') == {'a': 'b=c'}
+
+    os.environ = old_environ
+
+
 class TestEnv:
     def setup_method(self, method):
         """
@@ -103,6 +164,26 @@ class TestEnv:
 
     def test_not_present_with_default(self):
         assert self.env('not_present', default=3) == 3
+
+    def test_not_present_with_callable_default(self):
+        factory_called = []
+
+        def factory():
+            factory_called.append(True)
+            return 'lazy-value'
+
+        assert self.env('not_present', default=factory) == 'lazy-value'
+        assert len(factory_called) == 1
+
+    def test_present_with_callable_default_not_called(self):
+        factory_called = []
+
+        def factory():
+            factory_called.append(True)
+            return 'lazy-value'
+
+        assert self.env('STR_VAR', default=factory) == 'bar'
+        assert len(factory_called) == 0
 
     def test_not_present_with_default_warning_disabled(self):
         with warnings.catch_warnings(record=True) as warns:
@@ -213,6 +294,10 @@ class TestEnv:
     def test_proxied_value(self):
         assert self.env('PROXIED_VAR') == 'bar'
 
+    def test_proxied_value_interpolate_disabled(self):
+        self.env.interpolate = False
+        assert self.env('PROXIED_VAR') == '$STR_VAR'
+
     def test_escaped_dollar_sign(self):
         self.env.escape_proxy = True
         assert self.env('ESCAPED_VAR') == '$baz'
@@ -288,6 +373,12 @@ class TestEnv:
             ('a=uname;c=http://www.google.com;b=True',
              dict(value=str, cast=dict(b=bool)),
              {'a': "uname", 'c': "http://www.google.com", 'b': True}),
+            # Regression for #565: complex dict cast must preserve '=' inside
+            # values (e.g. base64 padding, query strings, JWT segments). Prior
+            # to the fix, ``b`` was truncated to ``"v"`` instead of ``"v=more"``.
+            ('a=1;b=v=more',
+             dict(value=str),
+             {'a': '1', 'b': 'v=more'}),
         ],
         ids=[
             'dict',
@@ -297,6 +388,7 @@ class TestEnv:
             'dict_int_list',
             'dict_int_cast',
             'dict_str_cast',
+            'dict_value_contains_equal_sign',
         ],
     )
     def test_dict_parsing(self, value, cast, expected):
@@ -432,7 +524,18 @@ class TestEnv:
         root = self.env.path('PATH_VAR')
         assert_type_and_value(Path, Path(FakeEnv.PATH), root)
 
-    def test_smart_cast(self):
+    def test_smart_cast_disabled_by_default(self):
+        self.env.ENVIRON['GOOGLE_ANALYTICS_KEY'] = 'UA-123456-78'
+        assert self.env.get_value('STR_VAR', default='string') == 'bar'
+        assert self.env.get_value(
+            'GOOGLE_ANALYTICS_KEY',
+            default=False,
+        ) == 'UA-123456-78'
+        assert self.env.get_value('INT_VAR', default=1) == '42'
+        assert self.env.get_value('FLOAT_VAR', default=1.2) == '33.3'
+
+    def test_smart_cast_can_be_enabled(self):
+        self.env.smart_cast = True
         assert self.env.get_value('STR_VAR', default='string') == 'bar'
         assert self.env.get_value('BOOL_TRUE_STRING_LIKE_INT', default=True)
         assert not self.env.get_value(
@@ -502,6 +605,81 @@ class TestEnv:
 
         assert any('Invalid line: INVALID LINE' in message
                    for message in caplog.messages)
+
+    def test_configured_reads_file_and_configures_flags(self, tmp_path):
+        env_path = tmp_path / '.env'
+        env_path.write_text(
+            'APP_VALUE=42\n'
+            r'APP_ESCAPED=\$APP_VALUE'
+            '\n',
+            encoding='utf-8',
+        )
+
+        env = Env.configured(
+            env_path,
+            scheme={'APP_VALUE': int},
+            overwrite=True,
+            smart_cast=False,
+            escape_proxy=True,
+            interpolate=False,
+            warn_on_default=True,
+            prefix='APP_',
+        )
+
+        assert env('VALUE') == 42
+        assert env('ESCAPED') == '$APP_VALUE'
+        assert not env.smart_cast
+        assert env.escape_proxy
+        assert not env.interpolate
+        assert env.warn_on_default
+        assert env.prefix == 'APP_'
+
+    def test_configured_passes_read_env_options(self, tmp_path):
+        env_path = tmp_path / '.env'
+        env_path.write_text('FROM_ENV_FILE=loaded # comment\n',
+                            encoding='utf-8')
+
+        Env.ENVIRON['FROM_ENV_FILE'] = 'existing'
+
+        env = Env.configured(
+            env_path,
+            overwrite=False,
+            parse_comments=True,
+            FROM_ENV_OVERRIDE='override',
+        )
+        assert env('FROM_ENV_FILE') == 'existing'
+        assert env('FROM_ENV_OVERRIDE') == 'override'
+
+        env = Env.configured(env_path, overwrite=True, parse_comments=True)
+        assert env('FROM_ENV_FILE') == 'loaded '
+
+    def test_configured_without_file_only_configures_flags(self):
+        env = Env.configured(
+            smart_cast=False,
+            escape_proxy=True,
+            interpolate=False,
+            warn_on_default=True,
+            prefix='APP_',
+        )
+
+        assert env.scheme == {}
+        assert not env.smart_cast
+        assert env.escape_proxy
+        assert not env.interpolate
+        assert env.warn_on_default
+        assert env.prefix == 'APP_'
+
+    def test_configured_returns_subclass_instance(self, tmp_path):
+        class CustomEnv(Env):
+            pass
+
+        env_path = tmp_path / '.env'
+        env_path.write_text('SUBCLASS_VALUE=value\n', encoding='utf-8')
+
+        env = CustomEnv.configured(env_path, overwrite=True)
+
+        assert isinstance(env, CustomEnv)
+        assert env('SUBCLASS_VALUE') == 'value'
 
 
 class TestFileEnv(TestEnv):

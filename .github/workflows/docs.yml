@@ -2,18 +2,19 @@ name: Docs
 
 on:
   push:
-    branches-ignore:
-      # These should always correspond to pull requests, so ignore them for
-      # the push trigger and let them be triggered by the pull_request
-      # trigger, avoiding running the workflow twice.  This is a minor
-      # optimization so there's no need to ensure this is comprehensive.
-      - 'dependabot/**'
+    branches:
+      - develop
+      - main
 
   # The branches below must be a subset of the branches above
   pull_request:
     branches:
       - develop
       - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   docs:
@@ -26,7 +27,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v6.2.0
@@ -46,7 +47,7 @@ jobs:
 
       - name: Archive docs artifacts
         if: always()
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: docs
           path: docs

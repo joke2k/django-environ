@@ -1,8 +1,10 @@
 Credits
 =======
 
-``django-environ`` was initially created by `Daniele Faraglia <https://github.com/joke2k>`_
-and currently maintained by `Serghei Iakovlev <https://github.com/sergeyklay/>`_.
+``django-environ`` was created by `Daniele Faraglia <https://github.com/joke2k>`_,
+who is also the current maintainer.
+`Serghei Iakovlev <https://github.com/sergeyklay/>`_ served as maintainer from
+2021 to 2024.
 
 A full list of contributors can be found in `GitHub <https://github.com/joke2k/django-environ/graphs/contributors>`__.
 

@@ -10,11 +10,10 @@
 import os
 import sys
 
+from django.core.exceptions import ImproperlyConfigured
 import pytest
 
-
 from environ import Path
-from environ.compat import ImproperlyConfigured
 
 
 def test_str(volume):

@@ -120,13 +120,46 @@ See https://perishablepress.com/stop-using-unsafe-characters-in-urls/ for refere
 Smart Casting
 =============
 
-django-environ has a "Smart-casting" enabled by default, if you don't provide a ``cast`` type, it will be detected from ``default`` type.
+Smart-casting is disabled by default. When enabled, if you do not provide a
+``cast`` type, it will be detected from the ``default`` type.
 This could raise side effects (see `#192 <https://github.com/joke2k/django-environ/issues/192>`_).
-To disable it use ``env.smart_cast = False``.
+To enable it use ``env.smart_cast = True``.
 
 .. note::
 
-   The next major release will disable it by default.
+   Smart casting was enabled by default before django-environ 1.0.0. It is now
+   opt-in so that default values do not implicitly coerce values read from the
+   environment.
+
+
+Callable defaults (lazy evaluation)
+====================================
+
+The ``default`` argument accepts any callable (a function, lambda, or class
+that implements ``__call__``). When the environment variable is absent the
+callable is invoked with no arguments and its return value is used as the
+default. The callable is **not** invoked when the variable is present in the
+environment.
+
+This is useful when generating a default value has side-effects (e.g.
+creating a temporary directory) and you only want that to happen when the
+variable is truly missing.
+
+.. code-block:: python
+
+   import tempfile
+   import environ
+
+   env = environ.Env()
+
+   # tempfile.mkdtemp() is called only when MEDIA_ROOT is not set
+   MEDIA_ROOT = env('MEDIA_ROOT', default=tempfile.mkdtemp)
+
+.. note::
+
+   Even when ``smart_cast`` is enabled, the cast type is **not** inferred from
+   a callable default. Provide an explicit ``cast`` or a type in the scheme
+   tuple if you need type coercion.
 
 
 Warn when defaults are used
@@ -310,7 +343,7 @@ Restrict string values with choices
 
 You can restrict ``env.str()`` to an allowed list of values using
 ``choices``. If the value is not in the provided list,
-``ImproperlyConfigured`` is raised.
+``django.core.exceptions.ImproperlyConfigured`` is raised.
 
 .. code-block:: python
 
@@ -331,19 +364,29 @@ You can restrict ``env.str()`` to an allowed list of values using
 Proxy value
 ===========
 
-Values that begin with a ``$`` may be interpolated. Pass ``interpolate=True`` to
-``environ.Env()`` to enable this feature:
+Values that begin with a ``$`` may be interpolated. This feature is enabled by
+default:
 
 .. code-block:: python
 
    import environ
 
-   env = environ.Env(interpolate=True)
+   env = environ.Env()
 
    # BAR=FOO
    # PROXY=$BAR
-   >>> print(env.str('PROXY'))
-   FOO
+   assert env.str('PROXY') == 'FOO'
+
+To disable proxy interpolation and read the raw value instead, set
+``env.interpolate = False``:
+
+.. code-block:: python
+
+   env = environ.Env()
+   env.interpolate = False
+
+   # PROXY=$BAR
+   assert env.str('PROXY') == '$BAR'
 
 
 Escape Proxy
@@ -436,6 +479,48 @@ an existing set environment variable, use the ``overwrite=True`` argument of
 
    env = environ.Env()
    env.read_env(BASE_DIR('.env'), overwrite=True)
+
+
+Create a configured Env in one step
+-----------------------------------
+
+Use :meth:`.environ.Env.configured` to create an ``Env`` instance and configure
+its flags in a single call:
+
+.. code-block:: python
+
+   env = environ.Env.configured(
+       prefix='DJANGO_',
+       smart_cast=False,
+       warn_on_default=True,
+   )
+
+   env.bool('DEBUG', default=False)
+
+Pass an env file path to read it after the instance has been configured:
+
+.. code-block:: python
+
+   env = environ.Env.configured(
+       BASE_DIR('.env'),
+       overwrite=True,
+       parse_comments=True,
+       prefix='DJANGO_',
+       smart_cast=False,
+   )
+
+The regular ``Env`` constructor remains reserved for schema declarations. Pass
+schemas with the ``scheme`` argument when using ``configured``:
+
+.. code-block:: python
+
+   env = environ.Env.configured(
+       BASE_DIR('.env'),
+       scheme={
+           'DEBUG': (bool, False),
+           'DATABASE_URL': str,
+       },
+   )
 
 
 Handling prefixes

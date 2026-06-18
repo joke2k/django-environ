@@ -11,19 +11,7 @@
 
 from importlib.util import find_spec
 
-if find_spec('simplejson'):
-    import simplejson as json
-else:
-    import json
-
-if find_spec('django'):
-    from django import VERSION as DJANGO_VERSION
-    from django.core.exceptions import ImproperlyConfigured
-else:
-    DJANGO_VERSION = None
-
-    class ImproperlyConfigured(Exception):
-        """Django is somehow improperly configured"""
+import django
 
 
 def choose_rediscache_driver():
@@ -34,7 +22,7 @@ def choose_rediscache_driver():
         return 'django_redis.cache.RedisCache'
 
     # use built-in support if Django 4+
-    if DJANGO_VERSION is not None and DJANGO_VERSION >= (4, 0):
+    if django.VERSION >= (4, 0):
         return 'django.core.cache.backends.redis.RedisCache'
 
     # back compatibility with redis_cache package
@@ -43,15 +31,12 @@ def choose_rediscache_driver():
 
 def choose_postgres_driver():
     """Backward compatibility for postgresql driver."""
-    old_django = DJANGO_VERSION is not None and DJANGO_VERSION < (2, 0)
-    if old_django:
-        return 'django.db.backends.postgresql_psycopg2'
     return 'django.db.backends.postgresql'
 
 
 def choose_pymemcache_driver():
     """Backward compatibility for pymemcache."""
-    old_django = DJANGO_VERSION is not None and DJANGO_VERSION < (3, 2)
+    old_django = django.VERSION < (3, 2)
     if old_django or not find_spec('pymemcache'):
         # The original backend choice for the 'pymemcache' scheme is
         # unfortunately 'pylibmc'.

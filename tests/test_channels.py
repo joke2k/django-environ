@@ -9,7 +9,7 @@
 
 from environ import Env
 import pytest
-from environ.compat import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured
 
 
 def test_channels_parsing():

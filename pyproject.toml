@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=71.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.mypy]
+files = [
+  "environ",
+  "tests",
+]
+#check_untyped_defs = true
+show_error_codes = true
+#strict = true
+warn_redundant_casts = true
+warn_unused_configs = true
+warn_unused_ignores = true

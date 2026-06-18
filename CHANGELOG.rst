@@ -5,6 +5,61 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+`v1.0.0`_ - 18-June-2026
+------------------------
+Breaking changes
+++++++++++++++++
+- Disabled ``smart_cast`` by default to avoid implicit casts from default
+  values when an environment variable is present
+  `#192 <https://github.com/joke2k/django-environ/issues/192>`_.
+- Declared Django as a direct dependency with ``django>=2.2``. Projects that
+  installed django-environ without Django now need Django available at install
+  time
+  `#602 <https://github.com/joke2k/django-environ/pull/602>`_.
+
+Added
++++++
+- Added ``Env.configured(...)`` to create an ``Env`` instance with flags,
+  optional schema declarations, and optional env file loading in one step
+  `#626 <https://github.com/joke2k/django-environ/pull/626>`_.
+- Added ``options_cast`` support for per-option query casting in ``db_url()``
+  `#588 <https://github.com/joke2k/django-environ/pull/588>`_.
+- Added ``extra_options`` support for ``db_url()`` ``OPTIONS`` configuration
+  `#592 <https://github.com/joke2k/django-environ/pull/592>`_.
+- Added lazy callable default support in ``Env.get_value()``
+  `#590 <https://github.com/joke2k/django-environ/pull/590>`_.
+- Added an ``interpolate`` flag to allow disabling proxy value resolution
+  `#607 <https://github.com/joke2k/django-environ/pull/607>`_.
+- Added a PEP 561 ``py.typed`` marker and MyPy checks for downstream type
+  checkers
+  `#619 <https://github.com/joke2k/django-environ/pull/619>`_,
+  `#601 <https://github.com/joke2k/django-environ/pull/601>`_.
+
+Changed
++++++++
+- Removed ``simplejson`` compatibility usage in favor of the standard library
+  ``json`` module
+  `#599 <https://github.com/joke2k/django-environ/pull/599>`_.
+
+Fixed
++++++
+- Fixed Redis Unix socket cache URL database handling
+  `#591 <https://github.com/joke2k/django-environ/pull/591>`_.
+- Fixed Oracle descriptor DB URLs without a trailing slash
+  `#593 <https://github.com/joke2k/django-environ/pull/593>`_.
+- Fixed ``read_env()`` parsing for shell-quoted single-token values and
+  JSON-like quoted values
+  `#589 <https://github.com/joke2k/django-environ/pull/589>`_.
+- Fixed complex dictionary casts to preserve ``=`` inside values
+  `#618 <https://github.com/joke2k/django-environ/pull/618>`_.
+- Fixed Valkey cache URL parsing
+  `#620 <https://github.com/joke2k/django-environ/pull/620>`_.
+- Fixed django-prometheus database backend aliases
+  `#585 <https://github.com/joke2k/django-environ/pull/585>`_.
+- Fixed pathlib usage in README examples
+  `#609 <https://github.com/joke2k/django-environ/pull/609>`_.
+
+
 `v0.14.0`_ - 18-June-2026
 -------------------------
 Added
@@ -46,7 +101,7 @@ Added
 Changed
 +++++++
 - Declared support for Python 3.14
-  `#580 <https://github.com/joke2k/django-environ/pull/580>`_.
+  `#580 <https://github.com/joke2k/django-environ/pull/581>`_.
 - Declared support for Django 5.2 and Django 6.0
   `#578 <https://github.com/joke2k/django-environ/pull/578>`_.
 
@@ -487,6 +542,7 @@ Added
 - Initial release.
 
 
+.. _v1.0.0: https://github.com/joke2k/django-environ/compare/v0.14.0...v1.0.0
 .. _v0.14.0: https://github.com/joke2k/django-environ/compare/v0.13.0...v0.14.0
 .. _v0.13.0: https://github.com/joke2k/django-environ/compare/v0.12.1...v0.13.0
 .. _v0.12.1: https://github.com/joke2k/django-environ/compare/v0.12.0...v0.12.1

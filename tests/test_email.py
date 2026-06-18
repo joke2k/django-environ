@@ -7,9 +7,10 @@
 # For the full copyright and license information, please view
 # the LICENSE.txt file that was distributed with this source code.
 
-from environ import Env
-from environ.compat import ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured
 import pytest
+
+from environ import Env
 
 
 def test_smtp_parsing():

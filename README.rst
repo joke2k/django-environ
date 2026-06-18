@@ -41,18 +41,18 @@ environment variables obtained from an environment file and provided by the OS:
 .. code-block:: python
 
    import environ
-   import os
+   from pathlib import Path
 
    env = environ.Env(
        # set casting, default value
        DEBUG=(bool, False)
    )
 
-   # Set the project base directory
-   BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+   # Build paths inside the project like this: BASE_DIR / 'subdir'.
+   BASE_DIR = Path(__file__).resolve().parent.parent
 
    # Take environment variables from .env file
-   environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+   environ.Env.read_env(BASE_DIR / '.env')
 
    # False if not in os.environ because of casting above
    DEBUG = env('DEBUG')
@@ -127,7 +127,7 @@ its documentation lives at `Read the Docs <https://django-environ.readthedocs.io
 the code on `GitHub <https://github.com/joke2k/django-environ>`_,
 and the latest release on `PyPI <https://pypi.org/project/django-environ/>`_.
 
-It’s rigorously tested on Python 3.9+, and officially supports
+It’s rigorously tested on Python 3.10+, and officially supports
 Django 2.2, 3.0, 3.1, 3.2, 4.0, 4.1, 4.2, 5.0, 5.1, 5.2, and 6.0.
 
 If you'd like to contribute to ``django-environ`` you're most welcome!

@@ -16,7 +16,7 @@ updates:
       - pip
       - dependencies
     assignees:
-      - sergeyklay
+      - joke2k
 
   - package-ecosystem: github-actions
     # Workflow files stored in the
@@ -33,4 +33,4 @@ updates:
       - github_actions
       - dependencies
     assignees:
-      - sergeyklay
+      - joke2k

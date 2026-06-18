@@ -155,7 +155,6 @@ CLASSIFIERS = [
 
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
     'Programming Language :: Python :: 3.12',
@@ -171,8 +170,7 @@ CLASSIFIERS = [
 
 # Dependencies that are downloaded by pip on installation and why.
 INSTALL_REQUIRES = [
-    # Provides TypeAlias on Python 3.9.
-    'typing_extensions>=3.10.0;python_version<"3.10"',
+    'django>=2.2',
 ]
 
 DEPENDENCY_LINKS = []
@@ -187,7 +185,6 @@ EXTRAS_REQUIRE = {
     'testing': [
         'coverage[toml]>=5.0a4',  # Code coverage measurement for Python
         'pytest>=4.6.11',  # Our tests framework
-        'setuptools>=71.0.0',  # Needed as a dependency for some tests
     ],
     # Dependencies that are required to build documentation
     'docs': [
@@ -236,7 +233,7 @@ if __name__ == '__main__':
         platforms=['any'],
         include_package_data=True,
         zip_safe=False,
-        python_requires='>=3.9,<4',
+        python_requires='>=3.10,<4',
         install_requires=INSTALL_REQUIRES,
         dependency_links=DEPENDENCY_LINKS,
         extras_require=EXTRAS_REQUIRE,

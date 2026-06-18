@@ -14,17 +14,16 @@ variables to configure your Django application.
 
 import ast
 import itertools
+import json
 import logging
 import os
 import pathlib
 import re
+import shlex
 import sys
 import warnings
-from typing import Dict, IO, List, Optional, Tuple, Union
-try:
-    from typing import TypeAlias
-except ImportError:  # pragma: no cover
-    from typing_extensions import TypeAlias
+from collections.abc import MutableMapping
+from typing import Dict, IO, List, Optional, Tuple, TypeAlias, Union
 from urllib.parse import (
     parse_qs,
     ParseResult,
@@ -35,10 +34,10 @@ from urllib.parse import (
     urlunparse,
 )
 
+from django.core.exceptions import ImproperlyConfigured
+
 from .compat import (
     DJANGO_POSTGRES,
-    ImproperlyConfigured,
-    json,
     PYMEMCACHE_DRIVER,
     REDIS_DRIVER,
 )
@@ -117,7 +116,7 @@ class Env:
         SMTP_LOGIN = env('SMTP_LOGIN')
     """
 
-    ENVIRON = os.environ
+    ENVIRON: MutableMapping = os.environ
     NOTSET = NoValue()
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = ParseResult
@@ -128,8 +127,8 @@ class Env:
         'psql',
         'pgsql',
         'postgis',
-        'prometheus_postgresql',
-        'prometheus_postgis',
+        'prometheus-postgresql',
+        'prometheus-postgis',
     ]
 
     DEFAULT_DATABASE_ENV = 'DATABASE_URL'
@@ -139,22 +138,22 @@ class Env:
         'psql': DJANGO_POSTGRES,
         'pgsql': DJANGO_POSTGRES,
         'postgis': 'django.contrib.gis.db.backends.postgis',
-        'prometheus_postgresql': 'django_prometheus.db.backends.postgresql',
-        'prometheus_postgis': 'django_prometheus.db.backends.postgis',
+        'prometheus-postgresql': 'django_prometheus.db.backends.postgresql',
+        'prometheus-postgis': 'django_prometheus.db.backends.postgis',
         'cockroachdb': 'django_cockroachdb',
         'mysql': 'django.db.backends.mysql',
         'mysql2': 'django.db.backends.mysql',
         'mysql-connector': 'mysql.connector.django',
         'mysqlgis': 'django.contrib.gis.db.backends.mysql',
-        'prometheus_mysql': 'django_prometheus.db.backends.mysql',
+        'prometheus-mysql': 'django_prometheus.db.backends.mysql',
         'mssql': 'mssql',
         'oracle': 'django.db.backends.oracle',
         'pyodbc': 'sql_server.pyodbc',
         'redshift': 'django_redshift_backend',
         'spatialite': 'django.contrib.gis.db.backends.spatialite',
-        'prometheus_spatialite': 'django_prometheus.db.backends.spatialite',
+        'prometheus-spatialite': 'django_prometheus.db.backends.spatialite',
         'sqlite': 'django.db.backends.sqlite3',
-        'prometheus_sqlite': 'django_prometheus.db.backends.sqlite3',
+        'prometheus-sqlite': 'django_prometheus.db.backends.sqlite3',
         'ldap': 'ldapdb.backends.ldap',
     }
     _DB_BASE_OPTIONS = [
@@ -231,11 +230,59 @@ class Env:
     }
 
     def __init__(self, **scheme):
-        self.smart_cast = True
+        self.smart_cast = False
         self.escape_proxy = False
+        self.interpolate = True
         self.warn_on_default = False
         self.prefix = ""
         self.scheme = scheme
+
+    @classmethod
+    # pylint: disable=too-many-arguments
+    def configured(
+            cls, env_file=None, scheme=None, *, overwrite=False,
+            parse_comments=False, encoding='utf8', smart_cast=False,
+            escape_proxy=False, interpolate=True, warn_on_default=False,
+            prefix="", **overrides):
+        r"""Create a configured Env instance.
+
+        This keeps ``Env.__init__`` reserved for schema declarations while
+        making it possible to configure instance flags in one step. If
+        ``env_file`` is provided, the file is read after the instance is
+        configured.
+
+        :param env_file: The path to the ``.env`` file your application should
+            use. When omitted, no env file is read.
+        :param scheme: An optional mapping of schema declarations passed to
+            ``Env.__init__``.
+        :param overwrite: ``overwrite=True`` will force an overwrite of
+            existing environment variables.
+        :param parse_comments: Determines whether to recognize and ignore
+           inline comments in the .env file. Default is False.
+        :param encoding: The encoding to use when reading the environment file.
+        :param smart_cast: Enable or disable smart casting.
+        :param escape_proxy: Enable or disable escaped proxy values.
+        :param interpolate: Enable or disable proxy value interpolation.
+        :param warn_on_default: Enable or disable warnings for default values.
+        :param prefix: A prefix to prepend to variables read by the instance.
+        :param \**overrides: Any additional keyword arguments provided directly
+            to read_env will be added to the environment.
+        """
+        env = cls(**(scheme or {}))
+        env.smart_cast = smart_cast
+        env.escape_proxy = escape_proxy
+        env.interpolate = interpolate
+        env.warn_on_default = warn_on_default
+        env.prefix = prefix
+        if env_file is not None or overrides:
+            env.read_env(
+                env_file,
+                overwrite=overwrite,
+                parse_comments=parse_comments,
+                encoding=encoding,
+                **overrides
+            )
+        return env
 
     def __call__(
             self,
@@ -372,11 +419,14 @@ class Env:
             parse_default=True
         )
 
+    # pylint: disable=too-many-arguments,too-many-positional-arguments
     def db_url(
             self,
             var=DEFAULT_DATABASE_ENV,
             default=NOTSET,
-            engine=None) -> Dict:
+            engine=None,
+            options_cast=None,
+            extra_options=None) -> Dict:
         """Returns a config dictionary, defaulting to DATABASE_URL.
 
         The db method is an alias for db_url.
@@ -385,8 +435,11 @@ class Env:
         """
         return self.db_url_config(
             self.get_value(var, default=default),
-            engine=engine
+            engine=engine,
+            options_cast=options_cast,
+            extra_options=extra_options,
         )
+    # pylint: enable=too-many-arguments,too-many-positional-arguments
 
     db = db_url
 
@@ -483,7 +536,9 @@ class Env:
         :param collections.abc.Callable or None cast:
             Type to cast return value as.
         :param default:
-             If var not present in environ, return this instead.
+             If var not present in environ, return this instead. If
+             ``default`` is a callable, it is called with no arguments to
+             obtain the actual default value.
         :param bool parse_default:
             Force to parse default.
         :returns: Value from environment or default (if set).
@@ -523,7 +578,7 @@ class Env:
                 error_msg = f'Set the {var_name} environment variable'
                 raise ImproperlyConfigured(error_msg) from exc
 
-            value = default
+            value = default() if callable(default) else default
             if self.warn_on_default:
                 warnings.warn(
                     f'{var_name} environment variable not set; '
@@ -535,7 +590,8 @@ class Env:
         # Resolve any proxied values
         prefix = b'$' if isinstance(value, bytes) else '$'
         escape = rb'\$' if isinstance(value, bytes) else r'\$'
-        if hasattr(value, 'startswith') and value.startswith(prefix):
+        if self.interpolate and \
+                hasattr(value, 'startswith') and value.startswith(prefix):
             value = value.lstrip(prefix)
             value = self.get_value(value, cast=cast, default=default)
 
@@ -545,7 +601,7 @@ class Env:
         # Smart casting
         if self.smart_cast:
             if cast is None and default is not None and \
-                    not isinstance(default, NoValue):
+                    not isinstance(default, NoValue) and not callable(default):
                 cast = type(default)
 
         value = None if default is None and value == '' else value
@@ -588,7 +644,11 @@ class Env:
                         value_cast_by_key.get(kv[0], value_cast)
                     )
                 ),
-                [val.split('=') for val in value.split(';') if val]
+                # Limit to a single split so values that themselves contain
+                # '=' (e.g. base64 padding, JWTs, query strings) are preserved.
+                # This matches the simple-dict path below which already uses
+                # ``split('=', 1)`` (cf. #565).
+                [val.split('=', 1) for val in value.split(';') if val]
             ))
         elif cast is dict:
             value = dict([v.split('=', 1) for v in value.split(',') if v])
@@ -614,8 +674,18 @@ class Env:
         return value
 
     @classmethod
+    def _cast_db_option(cls, key, value, options_cast):
+        if options_cast and key in options_cast:
+            cast = options_cast[key]
+            if isinstance(cast, type):
+                return cls.parse_value(value, cast)
+            return cast(value)
+        return _cast_int(value)
+
+    @classmethod
     # pylint: disable=too-many-statements
-    def db_url_config(cls, url, engine=None):
+    def db_url_config(cls, url, engine=None, options_cast=None,
+                      extra_options=None):
         # pylint: enable-msg=too-many-statements
         """Parse an arbitrary database URL.
 
@@ -638,6 +708,12 @@ class Env:
             Database URL to parse.
         :param str or None engine:
             If None, the database engine is evaluates from the ``url``.
+        :param dict|None options_cast:
+            Optional per-option cast mapping for query-string-derived
+            ``OPTIONS`` values. Unmapped options keep default casting behavior.
+        :param dict|None extra_options:
+            Optional dictionary merged into ``OPTIONS`` after URL parsing.
+            Values in ``extra_options`` override query-string ``OPTIONS``.
         :return: Parsed database URL.
         :rtype: dict
         """
@@ -725,7 +801,7 @@ class Env:
             config['HOST'], config['NAME'] = path.rsplit('/', 1)
 
         if url.scheme == 'oracle' and path == '':
-            config['NAME'] = config['HOST']
+            config['NAME'] = unquote(config['HOST'])
             config['HOST'] = ''
 
         if url.scheme == 'oracle':
@@ -741,8 +817,13 @@ class Env:
                 if k.upper() in cls._DB_BASE_OPTIONS:
                     config.update({k.upper(): _cast(v[0])})
                 else:
-                    config_options.update({k: _cast_int(v[0])})
+                    config_options.update({
+                        k: cls._cast_db_option(k, v[0], options_cast)
+                    })
             config['OPTIONS'] = config_options
+        if extra_options:
+            config.setdefault('OPTIONS', {})
+            config['OPTIONS'].update(extra_options)
 
         if engine:
             config['ENGINE'] = engine
@@ -777,6 +858,8 @@ class Env:
         if url.scheme not in cls.CACHE_SCHEMES:
             raise ImproperlyConfigured(f'Invalid cache schema {url.scheme}')
 
+        parsed_query = parse_qs(url.query) if url.query else {}
+
         location = url.netloc.split(',')
         if len(location) == 1:
             location = location[0]
@@ -804,7 +887,7 @@ class Env:
             config.update({
                 'LOCATION': 'unix:' + url.path,
             })
-        elif url.scheme.startswith('redis'):
+        elif url.scheme.startswith(('redis', 'valkey')):
             if url.hostname:
                 scheme = url.scheme.replace('cache', '')
             else:
@@ -816,10 +899,12 @@ class Env:
             else:
                 config['LOCATION'] = locations
 
+            cls._redis_set_db_in_location(config, url, parsed_query, locations)
+
         if backend:
             config['BACKEND'] = backend
 
-        if url.query:
+        if parsed_query:
             config_options = {}
             # Django Redis cache backend expects options in lower case
             # while "django_redis" expects them in upper case
@@ -829,7 +914,7 @@ class Env:
             else:
                 key_modifier = 'upper'
 
-            for k, v in parse_qs(url.query).items():
+            for k, v in parsed_query.items():
                 key = getattr(k, key_modifier)()
                 opt = {key: _cast(v[0])}
                 if k.upper() in cls._CACHE_BASE_OPTIONS:
@@ -839,6 +924,25 @@ class Env:
             config['OPTIONS'] = config_options
 
         return config
+
+    @classmethod
+    def _redis_set_db_in_location(cls, config, url, parsed_query, locations):
+        if url.hostname:
+            return
+        db_values = None
+        for key in tuple(parsed_query):
+            if key.lower() == 'db':
+                db_values = parsed_query.pop(key)
+                break
+        if not db_values:
+            return
+        db_suffix = f'?db={db_values[0]}'
+        if len(locations) == 1:
+            config['LOCATION'] = f'{config["LOCATION"]}{db_suffix}'
+        else:
+            config['LOCATION'] = [
+                f'{location}{db_suffix}' for location in locations
+            ]
 
     @classmethod
     def email_url_config(cls, url, backend=None):
@@ -913,7 +1017,7 @@ class Env:
             raise ImproperlyConfigured(f"Invalid channels schema {url.scheme}")
         else:
             config["BACKEND"] = cls.CHANNELS_SCHEMES[url.scheme]
-            if url.scheme.startswith("redis"):
+            if url.scheme.startswith(("redis", "valkey")):
                 redis_scheme, *_ = url.scheme.split("+")
                 config["CONFIG"] = {
                     "hosts": [url._replace(scheme=redis_scheme).geturl()]
@@ -1127,7 +1231,35 @@ class Env:
                 # val:  abc#def
                 key, val = m1.group(1), m1.group(2)
 
-                if not parse_comments:
+                # Parse shell-quoted single-token values, such as:
+                # "Tom"="Jerry" or shlex.quote() output with "'\"'\"'" chunks.
+                parsed_single = None
+                val_stripped = val.strip()
+                is_json_object = (
+                    val_stripped.startswith('{') and val_stripped.endswith('}')
+                )
+                looks_like_quoted_assignment = (
+                    '=' in val and ('"' in val or "'" in val)
+                )
+                has_shell_quote_chunks = (
+                    '"\'"\'"' in val or "'\"'\"'" in val
+                )
+                if (
+                        not parse_comments
+                        and not is_json_object
+                        and (looks_like_quoted_assignment
+                             or has_shell_quote_chunks)
+                ):
+                    try:
+                        parts = shlex.split(val, comments=parse_comments)
+                    except ValueError:
+                        parts = None
+                    if parts and len(parts) == 1:
+                        parsed_single = parts[0]
+
+                if parsed_single is not None:
+                    val = parsed_single
+                elif not parse_comments:
                     # Default behavior
                     #
                     # Look for value in single quotes
@@ -1150,8 +1282,10 @@ class Env:
                 # Look for value in double quotes
                 m3 = re.match(r'\A"(.*)"\Z', val)
                 if m3:
-                    val = re.sub(r'\\(.)', _keep_escaped_format_characters,
-                                 m3.group(1))
+                    val = re.sub(
+                        r'\\(.)', _keep_escaped_format_characters,
+                        m3.group(1)
+                    )
 
                 overrides[key] = str(val)
             elif not line or line.startswith('#'):

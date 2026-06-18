@@ -41,6 +41,31 @@ fits with the scope and aims of the project. It's up to *you* to make a strong
 case to convince the project's developers of the merits of this feature. Please
 provide as much detail and context as possible.
 
+Local setup quick start
+-----------------------
+
+For a quick local setup and test run:
+
+1. Create and activate a virtual environment:
+
+   .. code-block:: bash
+
+      python3 -m venv .venv
+      . .venv/bin/activate
+
+2. Install development dependencies:
+
+   .. code-block:: bash
+
+      python -m pip install -U pip tox tox-gh-actions setuptools
+
+3. Run the test suite (or one environment while iterating):
+
+   .. code-block:: bash
+
+      tox
+      tox -e py312-django51
+
 Pull requests
 -------------
 
@@ -54,11 +79,13 @@ project:
 1. Check for open issues or open a fresh issue to start a discussion around a
    feature idea or a bug.
 2. Fork `the repository <https://github.com/joke2k/django-environ>`_
-   on GitHub to start making your changes to the ``develop`` branch
-   (or branch off of it).
-3. Write a test which shows that the bug was fixed or that the feature works as
+   on GitHub and create your topic branch from ``develop``.
+3. Open your pull request against ``develop``.
+4. ``main`` is the stable/release branch and is updated from ``develop`` by
+   maintainers as part of the release flow.
+5. Write a test which shows that the bug was fixed or that the feature works as
    expected.
-4. Send a pull request and bug the maintainer until it gets merged and published.
+6. Send a pull request and bug the maintainer until it gets merged and published.
 
 If you are intending to implement a fairly large feature we'd appreciate if you
 open an issue with GitHub detailing your use case and intended solution to

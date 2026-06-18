@@ -2,17 +2,18 @@ name: CS
 
 on:
   push:
-    branches-ignore:
-      # These should always correspond to pull requests, so ignore them for
-      # the push trigger and let them be triggered by the pull_request
-      # trigger, avoiding running the workflow twice.  This is a minor
-      # optimization so there's no need to ensure this is comprehensive.
-      - 'dependabot/**'
+    branches:
+      - develop
+      - main
 
   pull_request:
     branches:
       - develop
       - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint:
@@ -25,7 +26,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v6.2.0
@@ -39,3 +40,6 @@ jobs:
 
       - name: Lint with tox
         run: tox -e lint
+
+      - name: Check types with tox
+        run: tox -e type

@@ -2,12 +2,9 @@ name: CI
 
 on:
   push:
-    branches-ignore:
-      # These should always correspond to pull requests, so ignore them for
-      # the push trigger and let them be triggered by the pull_request
-      # trigger, avoiding running the workflow twice.  This is a minor
-      # optimization so there's no need to ensure this is comprehensive.
-      - 'dependabot/**'
+    branches:
+      - develop
+      - main
 
   # The branches below must be a subset of the branches above
   pull_request:
@@ -23,6 +20,10 @@ on:
       #      | | |____ day of the month (1 - 31)
       #      | |____ hour (0 - 23)
       #      |____ minute (0 - 59)
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 env:
   PYTHONUNBUFFERED: '1'
@@ -47,7 +48,6 @@ jobs:
 
       matrix:
         python:
-          - '3.9'
           - '3.10'
           - '3.11'
           - '3.12'
@@ -58,7 +58,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v6.0.3
         with:
           fetch-depth: 5
 
