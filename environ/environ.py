@@ -20,7 +20,11 @@ import pathlib
 import re
 import sys
 import warnings
-from typing import Dict, IO, List, Optional, Tuple, TypeAlias, Union
+from typing import Dict, IO, List, Optional, Tuple, Union
+try:
+    from typing import TypeAlias
+except ImportError:  # pragma: no cover
+    from typing_extensions import TypeAlias
 from urllib.parse import (
     parse_qs,
     ParseResult,

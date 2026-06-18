@@ -170,7 +170,10 @@ CLASSIFIERS = [
 ]
 
 # Dependencies that are downloaded by pip on installation and why.
-INSTALL_REQUIRES = []
+INSTALL_REQUIRES = [
+    # Provides TypeAlias on Python 3.9.
+    'typing_extensions>=3.10.0;python_version<"3.10"',
+]
 
 DEPENDENCY_LINKS = []
 
