@@ -185,7 +185,6 @@ EXTRAS_REQUIRE = {
     'testing': [
         'coverage[toml]>=5.0a4',  # Code coverage measurement for Python
         'pytest>=4.6.11',  # Our tests framework
-        'setuptools>=71.0.0',  # Needed as a dependency for some tests
     ],
     # Dependencies that are required to build documentation
     'docs': [
