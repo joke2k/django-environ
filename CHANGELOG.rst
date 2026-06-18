@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+`v0.14.0`_ - 18-June-2026
+-------------------------
+Added
++++++
+- Added type annotations and matching docstring information to ``Env`` methods
+  `#633 <https://github.com/joke2k/django-environ/pull/633>`_.
+- Added a Python 3.9 compatibility dependency on ``typing_extensions`` for
+  ``TypeAlias``
+  `#633 <https://github.com/joke2k/django-environ/pull/633>`_.
+
+Changed
++++++++
+- Updated ``Env.read_env()`` to accept path-like and file-like objects without
+  closing file-like objects supplied by the caller
+  `#633 <https://github.com/joke2k/django-environ/pull/633>`_.
+
+Fixed
++++++
+- Added an explicit error when ``Env.read_env()`` cannot determine its caller
+  frame while resolving the default ``.env`` path
+  `#633 <https://github.com/joke2k/django-environ/pull/633>`_.
+
+
 `v0.13.0`_ - 18-February-2026
 -----------------------------
 Added
@@ -464,6 +487,7 @@ Added
 - Initial release.
 
 
+.. _v0.14.0: https://github.com/joke2k/django-environ/compare/v0.13.0...v0.14.0
 .. _v0.13.0: https://github.com/joke2k/django-environ/compare/v0.12.1...v0.13.0
 .. _v0.12.1: https://github.com/joke2k/django-environ/compare/v0.12.0...v0.12.1
 .. _v0.12.0: https://github.com/joke2k/django-environ/compare/v0.11.2...v0.12.0
