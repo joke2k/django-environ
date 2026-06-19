@@ -235,6 +235,27 @@ class TestEnv:
             with pytest.raises(ImproperlyConfigured) as excinfo:
                 self.env.str(var, multiline=multiline, choices=choices)
             assert str(excinfo.value) == f"Invalid value: {val} not in {choices}"
+  
+    @pytest.mark.parametrize(
+        'var,val,multiline,choices',
+        [
+            ('STR_VAR_WHITESPACE', 'bar', False, Env.NOTSET),
+            ('STR_VAR_WHITESPACE', 'bar', False, ['foo', 'bar']),
+            ('STR_VAR_WHITESPACE', 'bar', False, ['pow', 'foo']),
+            ('MULTILINE_STR_VAR_WHITESPACE', 'foo\\nbar', False, Env.NOTSET),
+            ('MULTILINE_STR_VAR_WHITESPACE', 'foo\\nbar', False, ['foo\\nbar', '***']),
+            ('MULTILINE_STR_VAR_WHITESPACE', 'foo\\nbar', False, ['***', '***']),
+            ('MULTILINE_STR_VAR_WHITESPACE', 'foo\nbar', True, Env.NOTSET),
+        ],
+    )
+    def test_str_remove_whitespace(self, var, val, multiline, choices):
+        if choices is Env.NOTSET or val in choices:
+            assert isinstance(self.env(var), str)
+            assert self.env.str(var, multiline=multiline, REMOVE_WHITESPACE=True) == val
+        else:
+            with pytest.raises(ImproperlyConfigured) as excinfo:
+                self.env.str(var, multiline=multiline, choices=choices, REMOVE_WHITESPACE=True)
+            assert str(excinfo.value) == f"Invalid value: {val} not in {choices}"
 
     @pytest.mark.parametrize(
         'var,val,default',

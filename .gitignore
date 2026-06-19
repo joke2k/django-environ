@@ -22,6 +22,7 @@
 /*.egg-info
 /htmlcov
 /docs/_build
+.venv/
 
 # Python cache.
 *.py[cod]

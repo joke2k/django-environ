@@ -39,10 +39,14 @@ class FakeEnv:
     @classmethod
     def generate_data(cls):
         return dict(STR_VAR='bar',
+                    STR_VAR_WHITESPACE='bar ',
                     STR_QUOTED_IGNORE_COMMENT='foo',
                     STR_QUOTED_INCLUDE_HASH='foo # with hash',
                     MULTILINE_STR_VAR='foo\\nbar',
+                    MULTILINE_STR_VAR_WHITESPACE=" foo\\nbar ",
+                    MULTILINE_QUOTED_STR_VAR_WHITESPACE=" ---BEGIN---\\r\\n---END--- ",
                     MULTILINE_QUOTED_STR_VAR='---BEGIN---\\r\\n---END---',
+                    MULTILINE_ESCAPED_STR_VAR_WHITESPACE=' ---BEGIN---\\\\n---END--- ',
                     MULTILINE_ESCAPED_STR_VAR='---BEGIN---\\\\n---END---',
                     INT_VAR='42',
                     FLOAT_VAR='33.3',
