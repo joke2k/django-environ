@@ -379,6 +379,9 @@ class TestEnv:
             ('a=1;b=v=more',
              dict(value=str),
              {'a': '1', 'b': 'v=more'}),
+            ('1=True',
+             dict(key=int, value=str, cast={1: bool}),
+             {1: True}),
         ],
         ids=[
             'dict',
@@ -389,6 +392,7 @@ class TestEnv:
             'dict_int_cast',
             'dict_str_cast',
             'dict_value_contains_equal_sign',
+            'dict_cast_by_casted_key',
         ],
     )
     def test_dict_parsing(self, value, cast, expected):
