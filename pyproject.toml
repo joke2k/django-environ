@@ -1,11 +1,101 @@
 [build-system]
-requires = ["setuptools>=71.0.0", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "django-environ"
+dynamic = ["version"]
+description = "A package that allows you to utilize 12factor inspired environment variables to configure your Django application."
+readme = "README.rst"
+license = "MIT"
+requires-python = ">=3.10,<4"
+authors = [
+    { name = "Daniele Faraglia", email = "daniele.faraglia@gmail.com" },
+]
+maintainers = [
+    { name = "Daniele Faraglia", email = "daniele.faraglia@gmail.com" },
+]
+keywords = [
+    "12factor",
+    "django",
+    "environment",
+    "variables",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Django",
+    "Framework :: Django :: 2.2",
+    "Framework :: Django :: 3.0",
+    "Framework :: Django :: 3.1",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4.0",
+    "Framework :: Django :: 4.1",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.1",
+    "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "django>=2.2",
+]
+
+[project.optional-dependencies]
+docs = [
+    "furo>=2024.8.6", # Sphinx documentation theme
+    "sphinx-copybutton", # Add copy button to code blocks
+    "sphinx-notfound-page", # Create a custom 404 page
+    "sphinx>=5.0", # Python documentation generator
+]
+testing = [
+    "coverage[toml]>=5.0a4", # Code coverage measurement for Python
+    "pytest>=4.6.11", # Our tests framework
+]
+
+[project.urls]
+"Bug Tracker" = "https://github.com/joke2k/django-environ/issues"
+Changelog = "https://django-environ.readthedocs.org/en/latest/changelog.html"
+Documentation = "https://django-environ.readthedocs.org"
+Funding = "https://opencollective.com/django-environ"
+Homepage = "https://django-environ.readthedocs.org"
+"Say Thanks!" = "https://saythanks.io/to/joke2k"
+"Source Code" = "https://github.com/joke2k/django-environ"
+
+[tool.hatch.version]
+path = "environ/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/*.rst",
+    "/docs",
+    "/environ",
+    "/tests",
+    "/tox.ini",
+]
+
+[tool.hatch.build.targets.wheel]
+include = [
+    "/environ",
+]
 
 [tool.mypy]
 files = [
-  "environ",
-  "tests",
+    "environ",
+    "tests",
 ]
 #check_untyped_defs = true
 show_error_codes = true
