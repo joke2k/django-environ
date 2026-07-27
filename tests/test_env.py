@@ -557,6 +557,12 @@ class TestEnv:
         self.env.prefix = 'PREFIX_'
         assert self.env('TEST') == 'foo'
 
+    def test_prefix_contains(self):
+        # Membership tests must honour the prefix, consistent with get_value().
+        self.env.prefix = 'PREFIX_'
+        assert 'TEST' in self.env
+        assert 'PREFIX_TEST' not in self.env
+
     def test_prefix_and_not_present_without_default(self):
         self.env.prefix = 'PREFIX_'
         with pytest.raises(ImproperlyConfigured) as excinfo:

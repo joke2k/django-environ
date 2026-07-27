@@ -29,6 +29,9 @@ Changed
 
 Fixed
 +++++
+- Fixed ``Env.__contains__`` ignoring the configured ``prefix``, so membership
+  tests now agree with ``get_value()``
+  `#644 <https://github.com/joke2k/django-environ/issues/644>`_.
 - Improved type hint coverage and related lint issues
   `#546 <https://github.com/joke2k/django-environ/pull/546>`_.
 - Fixed typos in the FAQ page
