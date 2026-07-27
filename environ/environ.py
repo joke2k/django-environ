@@ -287,7 +287,8 @@ class Env:
         )
 
     def __contains__(self, var):
-        return var in self.ENVIRON
+        # Mirror get_value(), which reads the prefixed name, so membership tests agree with lookups.
+        return f'{self.prefix}{var}' in self.ENVIRON
 
     def str(
             self,
