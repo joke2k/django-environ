@@ -18,6 +18,7 @@ from environ import Env
 from environ.compat import (
     PYMEMCACHE_DRIVER,
     REDIS_DRIVER,
+    VALKEY_CACHE_DRIVER,
 )
 
 
@@ -96,6 +97,16 @@ def test_base_options_parsing_redis(redis_driver, timeout_key):
         ('pymemcache://memcached:11211/?key_prefix=ci',
          PYMEMCACHE_DRIVER,
          'memcached:11211'),
+        ('valkeys://127.0.0.1:6379/1', VALKEY_CACHE_DRIVER,
+        'valkeys://127.0.0.1:6379/1'),
+        ('valkey://:valkeypass@127.0.0.1:6379/0', VALKEY_CACHE_DRIVER,
+        'valkey://:valkeypass@127.0.0.1:6379/0'),
+        ('valkey://host1:6379,host2:6379,host3:9999/1', VALKEY_CACHE_DRIVER,
+        ['valkey://host1:6379/1', 'valkey://host2:6379/1',
+        'valkey://host3:9999/1']),
+        ('valkey:///path/to/socket:1', VALKEY_CACHE_DRIVER,
+        'unix:///path/to/socket:1'),
+
     ],
     ids=[
         'dbcache',
@@ -113,6 +124,10 @@ def test_base_options_parsing_redis(redis_driver, timeout_key):
         'memcached',
         'pylibmccache',
         'pylibmccache_trailing_slash',
+        'valkeys',
+        'valkey_with_password',
+        'valkey_multiple',
+        'valkey_socket',
     ],
 )
 def test_cache_parsing(url, backend, location):
@@ -154,6 +169,20 @@ def test_rediscache_compat(django_version, django_redis_installed):
                 assert driver == django_new
             else:
                 assert driver == redis_cache
+
+@pytest.mark.parametrize('django_valkey_installed', (True, False))
+def test_valkey_compat(django_valkey_installed):
+    with mock.patch("environ.compat.choose_rediscache_driver", wraps=environ.compat.choose_rediscache_driver) as mock_redis:
+        with mock.patch('environ.compat.find_spec', return_value=django_valkey_installed) as mock_find_spec:
+            driver = environ.compat.choose_valkey_driver()
+
+    if django_valkey_installed:
+        mock_redis.assert_not_called()
+        assert driver == "django_valkey.cache.ValkeyCache"
+    else:
+        mock_redis.assert_called_once()
+        assert driver == environ.compat.choose_rediscache_driver()
+
 
 
 @pytest.mark.parametrize('redis_driver,client_class_key,password_key',

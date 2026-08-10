@@ -28,6 +28,16 @@ def choose_rediscache_driver():
     # back compatibility with redis_cache package
     return 'redis_cache.RedisCache'
 
+def choose_valkey_driver():
+    """Backward compatibility for Valkey."""
+
+    # use django-valkey whenever it's available
+    if find_spec('django_valkey'):
+        return "django_valkey.cache.ValkeyCache"
+
+    # fallback to redis driver
+    return choose_rediscache_driver()
+
 
 def choose_postgres_driver():
     """Backward compatibility for postgresql driver."""
@@ -46,6 +56,9 @@ def choose_pymemcache_driver():
 
 REDIS_DRIVER = choose_rediscache_driver()
 """The name of the RedisCache driver."""
+
+VALKEY_CACHE_DRIVER = choose_valkey_driver()
+"""The name of the Vakey cache driver."""
 
 DJANGO_POSTGRES = choose_postgres_driver()
 """The name of the PostgreSQL driver."""

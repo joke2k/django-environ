@@ -39,6 +39,7 @@ from .compat import (
     DJANGO_POSTGRES,
     PYMEMCACHE_DRIVER,
     REDIS_DRIVER,
+    VALKEY_CACHE_DRIVER
 )
 from .fileaware_mapping import FileAwareMapping
 
@@ -170,8 +171,8 @@ class Env:
         'rediscache': REDIS_DRIVER,
         'redis': REDIS_DRIVER,
         'rediss': REDIS_DRIVER,
-        'valkey': REDIS_DRIVER,
-        'valkeys': REDIS_DRIVER,
+        'valkey': VALKEY_CACHE_DRIVER,
+        'valkeys': VALKEY_CACHE_DRIVER,
     }
     _CACHE_BASE_OPTIONS = [
         'TIMEOUT',
