@@ -443,6 +443,24 @@ class Env:
 
     email = email_url
 
+    def mailer_url(
+            self,
+            var=DEFAULT_EMAIL_ENV,
+            default=NOTSET,
+            backend=None) -> Dict:
+        """Returns a Django 6.1 mailer config dictionary.
+
+        The mailer method is an alias for mailer_url.
+
+        :rtype: dict
+        """
+        return self.mailer_url_config(
+            self.url(var, default=default),
+            backend=backend
+        )
+
+    mailer = mailer_url
+
     def search_url(
             self,
             var=DEFAULT_SEARCH_ENV,
@@ -951,6 +969,61 @@ class Env:
             config['OPTIONS'] = config_options
 
         return config
+
+    @classmethod
+    def mailer_url_config(cls, url, backend=None):
+        """Parse an email URL into a Django 6.1 mailer config.
+
+        :param urllib.parse.ParseResult or str url:
+            Email URL to parse.
+        :param str or None backend:
+            If None, the backend is evaluated from the URL.
+        :return: Parsed Django mailer configuration.
+        :rtype: dict
+        """
+
+        url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+
+        path = unquote_plus(url.path[1:].split('?', 2)[0])
+
+        if backend:
+            mailer_backend = backend
+        elif url.scheme not in cls.EMAIL_SCHEMES:
+            raise ImproperlyConfigured(f'Invalid email schema {url.scheme}')
+        else:
+            mailer_backend = cls.EMAIL_SCHEMES[url.scheme]
+
+        options = {}
+        option_values = {
+            'host': url.hostname,
+            'password': _cast_urlstr(url.password),
+            'port': _cast_int(url.port),
+            'username': _cast_urlstr(url.username),
+        }
+        for key, value in option_values.items():
+            if value is not None:
+                options[key] = value
+
+        if mailer_backend == 'django.core.mail.backends.filebased.EmailBackend':
+            options['file_path'] = path
+
+        if url.scheme in ('smtps', 'smtp+tls'):
+            options['use_tls'] = True
+        elif url.scheme == 'smtp+ssl':
+            options['use_ssl'] = True
+
+        if url.query:
+            for key, value in parse_qs(url.query).items():
+                option = key.lower()
+                value = _cast_int(value[0])
+                if key.upper() in cls._EMAIL_BASE_OPTIONS:
+                    option = key.lower().replace('email_', '', 1)
+                options[option] = value
+
+        return {
+            'BACKEND': mailer_backend,
+            'OPTIONS': options,
+        }
 
     @classmethod
     def channels_url_config(cls, url, backend=None):
