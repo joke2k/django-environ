@@ -1120,8 +1120,10 @@ class Env:
         existing environment variables.
 
         :param env_file: The path to the ``.env`` file your application should
-            use. If a path is not provided, `read_env` will attempt to import
-            the Django settings module from the Django project root.
+            use. If a path is not provided, `read_env` looks for a file named
+            ``.env`` in the directory holding the Python file that called it.
+            It does not search parent directories, look for ``manage.py``, or
+            import the Django settings module.
         :param overwrite: ``overwrite=True`` will force an overwrite of
             existing environment variables.
         :param parse_comments: Determines whether to recognize and ignore

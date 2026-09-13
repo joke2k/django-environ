@@ -5,16 +5,23 @@ FAQ
 
 #. **Can django-environ determine the location of .env file automatically?**
 
-   ``django-environ`` will try to get and read ``.env`` file from the project
-   root if you haven't specified the path for it when you call :meth:`.environ.Env.read_env`.
-   However, this is not the recommended way. When it is possible always specify
-   the path to the ``.env`` file. Alternatively, you can use a trick with an
-   environment variable pointing to the actual location of ``.env`` file.
-   For details see ":ref:`multiple-env-files-label`".
+   Only in a narrow sense. If you call :meth:`.environ.Env.read_env` without a
+   path, it looks for a file named ``.env`` in the directory holding the Python
+   file that called it, and nowhere else. It does not look for ``manage.py``,
+   does not walk parent directories, and does not import your settings module.
+   So calling ``read_env()`` from ``project/settings/development.py`` reads
+   ``project/settings/.env``, not the ``.env`` next to ``manage.py``.
+
+   This is not the recommended way. When it is possible always specify the path
+   to the ``.env`` file. Alternatively, you can use a trick with an environment
+   variable pointing to the actual location of ``.env`` file. For details see
+   ":ref:`multiple-env-files-label`".
 
 #. **What (where) is the root part of the project, is it the directory that contains settings.py file?**
 
-   Where your ``manage.py`` file is (that is your project root directory).
+   Where your ``manage.py`` file is (that is your project root directory). Note
+   that this is *not* where a path-less ``read_env()`` looks: see the first
+   question above.
 
 #. **What kind of file should .env be?**
 
