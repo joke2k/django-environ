@@ -236,6 +236,30 @@ class TestEnv:
                 self.env.str(var, multiline=multiline, choices=choices)
             assert str(excinfo.value) == f"Invalid value: {val} not in {choices}"
 
+    @pytest.mark.parametrize('value', [
+        '1e3', '1E3', '1e-3', '-2.5E+2', '+.5e+2', '1.e2',
+        ' 1e2 ', '1_000e-3', '0e2', '-0e+2',
+    ])
+    def test_float_scientific_notation(self, value, monkeypatch):
+        monkeypatch.setitem(self.env.ENVIRON, 'SCIENTIFIC_FLOAT', value)
+        expected = float(value)
+        assert_type_and_value(float, expected, self.env.float('SCIENTIFIC_FLOAT'))
+        assert_type_and_value(float, expected, self.env('SCIENTIFIC_FLOAT', cast=float))
+
+    @pytest.mark.parametrize('value,expected', [
+        ('EUR 1.234,50', 1234.5),
+        ('EUR 1,234.50', 1234.5),
+    ])
+    def test_float_locale_with_exponent_letter(self, value, expected, monkeypatch):
+        monkeypatch.setitem(self.env.ENVIRON, 'LOCALE_FLOAT', value)
+        assert self.env.float('LOCALE_FLOAT') == expected
+
+    @pytest.mark.parametrize('value', ['nan', 'inf', '-inf', 'Infinity', '1e-', 'e'])
+    def test_float_invalid_values(self, value, monkeypatch):
+        monkeypatch.setitem(self.env.ENVIRON, 'INVALID_FLOAT', value)
+        with pytest.raises(ValueError):
+            self.env.float('INVALID_FLOAT')
+
     @pytest.mark.parametrize(
         'var,val,default',
         [
