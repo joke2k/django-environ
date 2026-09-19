@@ -16,6 +16,7 @@ import ast
 import itertools
 import json
 import logging
+import math
 import os
 import re
 import shlex
@@ -614,6 +615,14 @@ class Env:
             # pylint: disable=consider-using-generator
             value = tuple([x for x in val if x])
         elif cast is float:
+            if isinstance(value, str) and 'e' in value.lower():
+                try:
+                    number = float(value)
+                except ValueError:
+                    pass
+                else:
+                    if math.isfinite(number):
+                        return number
             # clean string
             float_str = re.sub(r'[^\d,.-]', '', value)
             # split for avoid thousand separator and different
