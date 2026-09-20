@@ -44,6 +44,7 @@ django-environ ecosystem and community.
    :maxdepth: 2
 
    faq
+   envfile
    types
    tips
 
