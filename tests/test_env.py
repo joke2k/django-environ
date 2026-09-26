@@ -465,6 +465,30 @@ class TestEnv:
         else:
             assert config['PORT'] == port
 
+    def test_db_url_empty_string_uses_default(self):
+        self.env.ENVIRON[Env.DEFAULT_DATABASE_ENV] = ''
+        with warnings.catch_warnings():
+            warnings.simplefilter('error')
+            config = self.env.db(default=FakeEnv.SQLITE)
+        assert config['ENGINE'] == 'django.db.backends.sqlite3'
+        assert config['NAME'] == '/full/path/to/your/database/file.sqlite'
+
+    def test_db_url_empty_string_uses_callable_default(self):
+        self.env.ENVIRON[Env.DEFAULT_DATABASE_ENV] = ''
+        config = self.env.db(default=lambda: FakeEnv.SQLITE)
+        assert config['NAME'] == '/full/path/to/your/database/file.sqlite'
+
+    def test_db_url_empty_string_warns_on_default(self):
+        self.env.warn_on_default = True
+        self.env.ENVIRON[Env.DEFAULT_DATABASE_ENV] = ''
+        with pytest.warns(DefaultValueWarning, match='DATABASE_URL'):
+            self.env.db(default=FakeEnv.SQLITE)
+
+    def test_db_url_empty_string_without_default_is_unchanged(self):
+        self.env.ENVIRON[Env.DEFAULT_DATABASE_ENV] = ''
+        with pytest.warns(UserWarning, match='Engine not recognized'):
+            assert self.env.db() == {}
+
     @pytest.mark.parametrize(
         'var,backend,location,options',
         [
