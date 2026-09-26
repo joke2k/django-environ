@@ -397,8 +397,21 @@ class Env:
 
         :rtype: dict
         """
+        url = self.get_value(var, default=default)
+        if url == '' and default is not self.NOTSET:
+            # An empty URL cannot describe a database, so treat it like an
+            # unset variable and use the default instead of returning ``{}``
+            # with an "Engine not recognized" warning (#412).
+            url = default() if callable(default) else default
+            if self.warn_on_default:
+                warnings.warn(
+                    f'{self.prefix}{var} environment variable is empty; '
+                    'using default value',
+                    DefaultValueWarning,
+                    stacklevel=2,
+                )
         return self.db_url_config(
-            self.get_value(var, default=default),
+            url,
             engine=engine,
             options_cast=options_cast,
             extra_options=extra_options,
