@@ -483,7 +483,8 @@ class Env:
         """
         return Path(self.get_value(var, default=default), **kwargs)
 
-    def get_value(self, var, cast=None, default=NOTSET, parse_default=False):
+    def get_value(self, var, cast=None, default=NOTSET, parse_default=False,
+                  *, _resolving=()):
         """Return value for given environment variable.
 
         :param str var:
@@ -497,6 +498,9 @@ class Env:
         :param bool parse_default:
             Force to parse default.
         :returns: Value from environment or default (if set).
+        :raises django.core.exceptions.ImproperlyConfigured:
+            If the variable is not set and no default is given, or if
+            proxied values (``$OTHER_VAR``) reference each other in a cycle.
         :rtype: typing.IO[typing.Any]
         """
 
@@ -548,7 +552,18 @@ class Env:
         if self.interpolate and \
                 hasattr(value, 'startswith') and value.startswith(prefix):
             value = value.lstrip(prefix)
-            value = self.get_value(value, cast=cast, default=default)
+            # ``_resolving`` is the chain of (prefixed) variable names that
+            # led here; meeting one of them again means the proxied values
+            # point at each other and would otherwise recurse forever (#595).
+            chain = _resolving + (var_name,)
+            target = f'{self.prefix}{value}'
+            if target in chain:
+                raise ImproperlyConfigured(
+                    f'Circular reference detected while resolving {chain[0]}: '
+                    + ' -> '.join(chain + (target,))
+                )
+            value = self.get_value(
+                value, cast=cast, default=default, _resolving=chain)
 
         if self.escape_proxy and hasattr(value, 'replace'):
             value = value.replace(escape, prefix)

@@ -306,6 +306,44 @@ class TestEnv:
         self.env.escape_proxy = False
         assert self.env('ESCAPED_VAR') == r'\$baz'
 
+    def test_proxied_value_self_reference(self):
+        self.env.ENVIRON['SELF_REF'] = '$SELF_REF'
+        with pytest.raises(ImproperlyConfigured) as excinfo:
+            self.env('SELF_REF')
+        assert str(excinfo.value) == (
+            'Circular reference detected while resolving SELF_REF: '
+            'SELF_REF -> SELF_REF'
+        )
+
+    def test_proxied_value_indirect_circular_reference(self):
+        self.env.ENVIRON['LOOP_A'] = '$LOOP_B'
+        self.env.ENVIRON['LOOP_B'] = '$LOOP_C'
+        self.env.ENVIRON['LOOP_C'] = '$LOOP_A'
+        with pytest.raises(ImproperlyConfigured) as excinfo:
+            self.env('LOOP_A')
+        assert str(excinfo.value) == (
+            'Circular reference detected while resolving LOOP_A: '
+            'LOOP_A -> LOOP_B -> LOOP_C -> LOOP_A'
+        )
+
+    def test_proxied_value_circular_reference_with_prefix(self):
+        self.env.prefix = 'PREFIX_'
+        self.env.ENVIRON['PREFIX_LOOP_A'] = '$LOOP_B'
+        self.env.ENVIRON['PREFIX_LOOP_B'] = '$LOOP_A'
+        with pytest.raises(ImproperlyConfigured) as excinfo:
+            self.env('LOOP_A')
+        assert str(excinfo.value) == (
+            'Circular reference detected while resolving PREFIX_LOOP_A: '
+            'PREFIX_LOOP_A -> PREFIX_LOOP_B -> PREFIX_LOOP_A'
+        )
+
+    def test_proxied_value_chain_without_cycle(self):
+        self.env.ENVIRON['CHAIN_A'] = '$CHAIN_B'
+        self.env.ENVIRON['CHAIN_B'] = '$STR_VAR'
+        assert self.env('CHAIN_A') == 'bar'
+        # The same variable may legitimately be resolved twice in a row.
+        assert self.env('CHAIN_A') == 'bar'
+
     def test_int_list(self):
         assert_type_and_value(list, [42, 33], self.env('INT_LIST', cast=[int]))
         assert_type_and_value(list, [42, 33], self.env.list('INT_LIST', int))
