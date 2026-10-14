@@ -188,3 +188,27 @@ class TestSetItem:
         with make_temp_file(text="cat") as new_tmp_f:
             env["ANIMAL_FILE"] = new_tmp_f
             assert env["ANIMAL"] == "cat"
+
+
+@pytest.mark.parametrize("cache", [True, False])
+def test_empty_file_path_does_not_add_unreadable_key(cache):
+    mapping = environ.FileAwareMapping(env={"ANIMAL_FILE": ""}, cache=cache)
+    assert list(mapping) == ["ANIMAL_FILE"]
+    assert len(mapping) == 1
+    assert "ANIMAL" not in mapping
+    assert dict(mapping) == {"ANIMAL_FILE": ""}
+
+
+@pytest.mark.parametrize("cache", [True, False])
+def test_empty_file_path_keeps_direct_value(cache):
+    values = {"ANIMAL_FILE": "", "ANIMAL": "cat"}
+    mapping = environ.FileAwareMapping(env=values, cache=cache)
+    assert len(mapping) == 2
+    assert mapping["ANIMAL"] == "cat"
+    assert dict(mapping) == values
+
+
+def test_file_backed_virtual_key_remains_copyable(tmp_f):
+    mapping = environ.FileAwareMapping(env={"ANIMAL_FILE": tmp_f})
+    assert dict(mapping) == {"ANIMAL_FILE": tmp_f, "ANIMAL": "fish"}
+    assert len(mapping) == 2
