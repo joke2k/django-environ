@@ -60,7 +60,7 @@ class FileAwareMapping(MutableMapping):
         """
         for key in self.env:
             yield key
-            if key.endswith("_FILE"):
+            if key.endswith("_FILE") and self.env[key]:
                 no_file_key = key[:-5]
                 if no_file_key and no_file_key not in self.env:
                     yield no_file_key
