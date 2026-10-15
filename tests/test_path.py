@@ -86,6 +86,15 @@ def test_subtraction():
     assert Path('/home/dev/public') - 'public' == Path('/home/dev')
 
 
+@pytest.mark.parametrize('root,suffix,expected', [
+    ('/home/testtest', 'test', '/home/test'),
+    ('/home/assettest', 'test', '/home/asset'),
+    ('/home/dev', '', '/home/dev'),
+])
+def test_subtraction_removes_exact_suffix(root, suffix, expected):
+    assert Path(root) - suffix == Path(expected)
+
+
 def test_subtraction_not_int():
     """Subtraction with an invalid type should raise TypeError."""
     with pytest.raises(TypeError) as excinfo:

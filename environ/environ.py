@@ -1337,7 +1337,8 @@ class Path:
         if isinstance(other, int):
             return self.path('../' * other)
         if isinstance(other, str) and self.__root__.endswith(other):
-            return Path(self.__root__.rstrip(other))
+            root = self.__root__[:-len(other)] if other else self.__root__
+            return Path(root)
 
         raise TypeError(
             "unsupported operand type(s) for -: '{self}' and '{other}' "
