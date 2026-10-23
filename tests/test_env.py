@@ -28,44 +28,67 @@ from .fixtures import FakeEnv
 
 
 @pytest.mark.parametrize(
-        'variable,value,raw_value,parse_comments',
-        [
-            # parse_comments=True
-            ('BOOL_TRUE_STRING_LIKE_BOOL_WITH_COMMENT', 'True', "'True' # comment\n", True),
-            ('BOOL_TRUE_BOOL_WITH_COMMENT', 'True ', "True # comment\n", True),
-            ('STR_QUOTED_IGNORE_COMMENT', 'foo', " 'foo' # comment\n", True),
-            ('STR_QUOTED_INCLUDE_HASH', 'foo # with hash', "'foo # with hash' # not comment\n", True),
-            ('SECRET_KEY_1', '"abc', '"abc#def"\n', True),
-            ('SECRET_KEY_2', 'abc', 'abc#def\n', True),
-            ('SECRET_KEY_3', 'abc#def', "'abc#def'\n",  True),
-
-            # parse_comments=False
-            ('BOOL_TRUE_STRING_LIKE_BOOL_WITH_COMMENT', "'True' # comment", "'True' # comment\n", False),
-            ('BOOL_TRUE_BOOL_WITH_COMMENT', 'True # comment', "True # comment\n", False),
-            ('STR_QUOTED_IGNORE_COMMENT', " 'foo' # comment", " 'foo' # comment\n", False),
-            ('STR_QUOTED_INCLUDE_HASH', "'foo # with hash' # not comment", "'foo # with hash' # not comment\n", False),
-            ('SECRET_KEY_1', 'abc#def', '"abc#def"\n', False),
-            ('SECRET_KEY_2', 'abc#def', 'abc#def\n', False),
-            ('SECRET_KEY_3', 'abc#def', "'abc#def'\n",  False),
-
-            # parse_comments is not defined (default behavior)
-            ('BOOL_TRUE_STRING_LIKE_BOOL_WITH_COMMENT', "'True' # comment", "'True' # comment\n", None),
-            ('BOOL_TRUE_BOOL_WITH_COMMENT', 'True # comment', "True # comment\n", None),
-            ('STR_QUOTED_IGNORE_COMMENT', " 'foo' # comment", " 'foo' # comment\n", None),
-            ('STR_QUOTED_INCLUDE_HASH', "'foo # with hash' # not comment", "'foo # with hash' # not comment\n", None),
-            ('SECRET_KEY_1', 'abc#def', '"abc#def"\n', None),
-            ('SECRET_KEY_2', 'abc#def', 'abc#def\n', None),
-            ('SECRET_KEY_3', 'abc#def', "'abc#def'\n",  None),
-        ],
-    )
+    "variable,value,raw_value,parse_comments",
+    [
+        # parse_comments=True
+        ("BOOL_TRUE_STRING_LIKE_BOOL_WITH_COMMENT", "True", "'True' # comment\n", True),
+        ("BOOL_TRUE_BOOL_WITH_COMMENT", "True ", "True # comment\n", True),
+        ("STR_QUOTED_IGNORE_COMMENT", "foo", " 'foo' # comment\n", True),
+        (
+            "STR_QUOTED_INCLUDE_HASH",
+            "foo # with hash",
+            "'foo # with hash' # not comment\n",
+            True,
+        ),
+        ("SECRET_KEY_1", '"abc', '"abc#def"\n', True),
+        ("SECRET_KEY_2", "abc", "abc#def\n", True),
+        ("SECRET_KEY_3", "abc#def", "'abc#def'\n", True),
+        # parse_comments=False
+        (
+            "BOOL_TRUE_STRING_LIKE_BOOL_WITH_COMMENT",
+            "'True' # comment",
+            "'True' # comment\n",
+            False,
+        ),
+        ("BOOL_TRUE_BOOL_WITH_COMMENT", "True # comment", "True # comment\n", False),
+        ("STR_QUOTED_IGNORE_COMMENT", " 'foo' # comment", " 'foo' # comment\n", False),
+        (
+            "STR_QUOTED_INCLUDE_HASH",
+            "'foo # with hash' # not comment",
+            "'foo # with hash' # not comment\n",
+            False,
+        ),
+        ("SECRET_KEY_1", "abc#def", '"abc#def"\n', False),
+        ("SECRET_KEY_2", "abc#def", "abc#def\n", False),
+        ("SECRET_KEY_3", "abc#def", "'abc#def'\n", False),
+        # parse_comments is not defined (default behavior)
+        (
+            "BOOL_TRUE_STRING_LIKE_BOOL_WITH_COMMENT",
+            "'True' # comment",
+            "'True' # comment\n",
+            None,
+        ),
+        ("BOOL_TRUE_BOOL_WITH_COMMENT", "True # comment", "True # comment\n", None),
+        ("STR_QUOTED_IGNORE_COMMENT", " 'foo' # comment", " 'foo' # comment\n", None),
+        (
+            "STR_QUOTED_INCLUDE_HASH",
+            "'foo # with hash' # not comment",
+            "'foo # with hash' # not comment\n",
+            None,
+        ),
+        ("SECRET_KEY_1", "abc#def", '"abc#def"\n', None),
+        ("SECRET_KEY_2", "abc#def", "abc#def\n", None),
+        ("SECRET_KEY_3", "abc#def", "'abc#def'\n", None),
+    ],
+)
 def test_parse_comments(variable, value, raw_value, parse_comments):
     old_environ = os.environ
 
     with tempfile.TemporaryDirectory() as temp_dir:
-        env_path = os.path.join(temp_dir, '.env')
+        env_path = os.path.join(temp_dir, ".env")
 
-        with open(env_path, 'w') as f:
-            f.write(f'{variable}={raw_value}\n')
+        with open(env_path, "w") as f:
+            f.write(f"{variable}={raw_value}\n")
             f.flush()
 
             env = Env()
@@ -84,21 +107,21 @@ def test_read_env_parses_shell_quoted_single_token_values():
     old_environ = os.environ
 
     with tempfile.TemporaryDirectory() as temp_dir:
-        env_path = os.path.join(temp_dir, '.env')
+        env_path = os.path.join(temp_dir, ".env")
 
-        with open(env_path, 'w') as f:
+        with open(env_path, "w") as f:
             f.write('MY_DICTIONARY="Tom"="Jerry"\n')
             f.write("MY_OTHER_DICTIONARY='Tom'='Jerry'\n")
-            f.write('MYTEST=\'Hello\'"\'"\'World\'\n')
+            f.write("MYTEST='Hello'\"'\"'World'\n")
             f.flush()
 
             env = Env()
             Env.ENVIRON = {}
             env.read_env(env_path)
 
-            assert env.dict('MY_DICTIONARY') == {'Tom': 'Jerry'}
-            assert env.dict('MY_OTHER_DICTIONARY') == {'Tom': 'Jerry'}
-            assert env('MYTEST') == "Hello'World"
+            assert env.dict("MY_DICTIONARY") == {"Tom": "Jerry"}
+            assert env.dict("MY_OTHER_DICTIONARY") == {"Tom": "Jerry"}
+            assert env("MYTEST") == "Hello'World"
 
     os.environ = old_environ
 
@@ -113,8 +136,9 @@ def test_pep561_py_typed_marker_is_shipped():
     annotations since #546.
     """
     import environ as environ_pkg
+
     pkg_dir = os.path.dirname(environ_pkg.__file__)
-    marker = os.path.join(pkg_dir, 'py.typed')
+    marker = os.path.join(pkg_dir, "py.typed")
     assert os.path.isfile(marker), (
         f"Expected PEP 561 marker at {marker}; without it, downstream "
         "mypy/pyright users do not see django-environ's inline type hints."
@@ -125,9 +149,9 @@ def test_read_env_keeps_json_object_value_for_json_cast():
     old_environ = os.environ
 
     with tempfile.TemporaryDirectory() as temp_dir:
-        env_path = os.path.join(temp_dir, '.env')
+        env_path = os.path.join(temp_dir, ".env")
 
-        with open(env_path, 'w') as f:
+        with open(env_path, "w") as f:
             f.write('MY_JSON={"a":"b=c"}\n')
             f.flush()
 
@@ -135,8 +159,8 @@ def test_read_env_keeps_json_object_value_for_json_cast():
             Env.ENVIRON = {}
             env.read_env(env_path)
 
-            assert env('MY_JSON') == '{"a":"b=c"}'
-            assert env.json('MY_JSON') == {'a': 'b=c'}
+            assert env("MY_JSON") == '{"a":"b=c"}'
+            assert env.json("MY_JSON") == {"a": "b=c"}
 
     os.environ = old_environ
 
@@ -163,16 +187,16 @@ class TestEnv:
         os.environ = self.old_environ
 
     def test_not_present_with_default(self):
-        assert self.env('not_present', default=3) == 3
+        assert self.env("not_present", default=3) == 3
 
     def test_not_present_with_callable_default(self):
         factory_called = []
 
         def factory():
             factory_called.append(True)
-            return 'lazy-value'
+            return "lazy-value"
 
-        assert self.env('not_present', default=factory) == 'lazy-value'
+        assert self.env("not_present", default=factory) == "lazy-value"
         assert len(factory_called) == 1
 
     def test_present_with_callable_default_not_called(self):
@@ -180,49 +204,59 @@ class TestEnv:
 
         def factory():
             factory_called.append(True)
-            return 'lazy-value'
+            return "lazy-value"
 
-        assert self.env('STR_VAR', default=factory) == 'bar'
+        assert self.env("STR_VAR", default=factory) == "bar"
         assert len(factory_called) == 0
 
     def test_not_present_with_default_warning_disabled(self):
         with warnings.catch_warnings(record=True) as warns:
-            warnings.simplefilter('always')
-            assert self.env('not_present', default=3) == 3
+            warnings.simplefilter("always")
+            assert self.env("not_present", default=3) == 3
         assert warns == []
 
     def test_not_present_with_default_warning_enabled(self):
         self.env.warn_on_default = True
         with pytest.warns(
-                DefaultValueWarning,
-                match='not_present environment variable not set'):
-            assert self.env('not_present', default=3) == 3
+            DefaultValueWarning, match="not_present environment variable not set"
+        ):
+            assert self.env("not_present", default=3) == 3
 
     def test_not_present_without_default(self):
         with pytest.raises(ImproperlyConfigured) as excinfo:
-            self.env('not_present')
-        assert str(excinfo.value) == 'Set the not_present environment variable'
+            self.env("not_present")
+        assert str(excinfo.value) == "Set the not_present environment variable"
         assert excinfo.value.__cause__ is not None
 
     def test_contains(self):
-        assert 'STR_VAR' in self.env
-        assert 'EMPTY_LIST' in self.env
-        assert 'I_AM_NOT_A_VAR' not in self.env
+        assert "STR_VAR" in self.env
+        assert "EMPTY_LIST" in self.env
+        assert "I_AM_NOT_A_VAR" not in self.env
 
     @pytest.mark.parametrize(
-        'var,val,multiline,choices',
+        "var,val,multiline,choices",
         [
-            ('STR_VAR', 'bar', False, Env.NOTSET),
-            ('STR_VAR', 'bar', False, ['foo', 'bar']),
-            ('STR_VAR', 'bar', False, ['pow', 'foo']),
-            ('MULTILINE_STR_VAR', 'foo\\nbar', False, Env.NOTSET),
-            ('MULTILINE_STR_VAR', 'foo\\nbar', False, ['foo\\nbar', '***']),
-            ('MULTILINE_STR_VAR', 'foo\\nbar', False, ['***', '***']),
-            ('MULTILINE_STR_VAR', 'foo\nbar', True, Env.NOTSET),
-            ('MULTILINE_QUOTED_STR_VAR', '---BEGIN---\\r\\n---END---', False, Env.NOTSET),
-            ('MULTILINE_QUOTED_STR_VAR', '---BEGIN---\n---END---', True, Env.NOTSET),
-            ('MULTILINE_ESCAPED_STR_VAR', '---BEGIN---\\\\n---END---', False, Env.NOTSET),
-            ('MULTILINE_ESCAPED_STR_VAR', '---BEGIN---\\\n---END---', True, Env.NOTSET),
+            ("STR_VAR", "bar", False, Env.NOTSET),
+            ("STR_VAR", "bar", False, ["foo", "bar"]),
+            ("STR_VAR", "bar", False, ["pow", "foo"]),
+            ("MULTILINE_STR_VAR", "foo\\nbar", False, Env.NOTSET),
+            ("MULTILINE_STR_VAR", "foo\\nbar", False, ["foo\\nbar", "***"]),
+            ("MULTILINE_STR_VAR", "foo\\nbar", False, ["***", "***"]),
+            ("MULTILINE_STR_VAR", "foo\nbar", True, Env.NOTSET),
+            (
+                "MULTILINE_QUOTED_STR_VAR",
+                "---BEGIN---\\r\\n---END---",
+                False,
+                Env.NOTSET,
+            ),
+            ("MULTILINE_QUOTED_STR_VAR", "---BEGIN---\n---END---", True, Env.NOTSET),
+            (
+                "MULTILINE_ESCAPED_STR_VAR",
+                "---BEGIN---\\\\n---END---",
+                False,
+                Env.NOTSET,
+            ),
+            ("MULTILINE_ESCAPED_STR_VAR", "---BEGIN---\\\n---END---", True, Env.NOTSET),
         ],
     )
     def test_str(self, var, val, multiline, choices):
@@ -237,88 +271,88 @@ class TestEnv:
             assert str(excinfo.value) == f"Invalid value: {val} not in {choices}"
 
     @pytest.mark.parametrize(
-        'var,val,default',
+        "var,val,default",
         [
-            ('STR_VAR', b'bar', Env.NOTSET),
-            ('NON_EXISTENT_BYTES_VAR', b'some-default', b'some-default'),
-            ('NON_EXISTENT_STR_VAR', b'some-default', 'some-default'),
-        ]
+            ("STR_VAR", b"bar", Env.NOTSET),
+            ("NON_EXISTENT_BYTES_VAR", b"some-default", b"some-default"),
+            ("NON_EXISTENT_STR_VAR", b"some-default", "some-default"),
+        ],
     )
     def test_bytes(self, var, val, default):
         assert_type_and_value(bytes, val, self.env.bytes(var, default=default))
 
     def test_int(self):
-        assert_type_and_value(int, 42, self.env('INT_VAR', cast=int))
-        assert_type_and_value(int, 42, self.env.int('INT_VAR'))
+        assert_type_and_value(int, 42, self.env("INT_VAR", cast=int))
+        assert_type_and_value(int, 42, self.env.int("INT_VAR"))
 
     def test_int_with_none_default(self):
-        assert self.env('NOT_PRESENT_VAR', cast=int, default=None) is None
-        assert self.env('EMPTY_INT_VAR', cast=int, default=None) is None
+        assert self.env("NOT_PRESENT_VAR", cast=int, default=None) is None
+        assert self.env("EMPTY_INT_VAR", cast=int, default=None) is None
 
     @pytest.mark.parametrize(
-        'value,variable',
+        "value,variable",
         [
-            (33.3, 'FLOAT_VAR'),
-            (33.3, 'FLOAT_COMMA_VAR'),
-            (123420333.3, 'FLOAT_STRANGE_VAR1'),
-            (123420333.3, 'FLOAT_STRANGE_VAR2'),
-            (-1.0, 'FLOAT_NEGATIVE_VAR'),
-        ]
+            (33.3, "FLOAT_VAR"),
+            (33.3, "FLOAT_COMMA_VAR"),
+            (123420333.3, "FLOAT_STRANGE_VAR1"),
+            (123420333.3, "FLOAT_STRANGE_VAR2"),
+            (-1.0, "FLOAT_NEGATIVE_VAR"),
+        ],
     )
     def test_float(self, value, variable):
         assert_type_and_value(float, value, self.env.float(variable))
         assert_type_and_value(float, value, self.env(variable, cast=float))
 
     @pytest.mark.parametrize(
-        'value,variable',
+        "value,variable",
         [
-            (True, 'BOOL_TRUE_STRING_LIKE_INT'),
-            (True, 'BOOL_TRUE_STRING_LIKE_BOOL'),
-            (True, 'BOOL_TRUE_INT'),
-            (True, 'BOOL_TRUE_BOOL'),
-            (True, 'BOOL_TRUE_STRING_1'),
-            (True, 'BOOL_TRUE_STRING_2'),
-            (True, 'BOOL_TRUE_STRING_3'),
-            (True, 'BOOL_TRUE_STRING_4'),
-            (True, 'BOOL_TRUE_STRING_5'),
-            (False, 'BOOL_FALSE_STRING_LIKE_INT'),
-            (False, 'BOOL_FALSE_INT'),
-            (False, 'BOOL_FALSE_STRING_LIKE_BOOL'),
-            (False, 'BOOL_FALSE_BOOL'),
-        ]
+            (True, "BOOL_TRUE_STRING_LIKE_INT"),
+            (True, "BOOL_TRUE_STRING_LIKE_BOOL"),
+            (True, "BOOL_TRUE_INT"),
+            (True, "BOOL_TRUE_BOOL"),
+            (True, "BOOL_TRUE_STRING_1"),
+            (True, "BOOL_TRUE_STRING_2"),
+            (True, "BOOL_TRUE_STRING_3"),
+            (True, "BOOL_TRUE_STRING_4"),
+            (True, "BOOL_TRUE_STRING_5"),
+            (False, "BOOL_FALSE_STRING_LIKE_INT"),
+            (False, "BOOL_FALSE_INT"),
+            (False, "BOOL_FALSE_STRING_LIKE_BOOL"),
+            (False, "BOOL_FALSE_BOOL"),
+        ],
     )
     def test_bool_true(self, value, variable):
         assert_type_and_value(bool, value, self.env.bool(variable))
         assert_type_and_value(bool, value, self.env(variable, cast=bool))
 
     def test_proxied_value(self):
-        assert self.env('PROXIED_VAR') == 'bar'
+        assert self.env("PROXIED_VAR") == "bar"
 
     def test_proxied_value_interpolate_disabled(self):
         self.env.interpolate = False
-        assert self.env('PROXIED_VAR') == '$STR_VAR'
+        assert self.env("PROXIED_VAR") == "$STR_VAR"
 
     def test_escaped_dollar_sign(self):
         self.env.escape_proxy = True
-        assert self.env('ESCAPED_VAR') == '$baz'
+        assert self.env("ESCAPED_VAR") == "$baz"
 
     def test_escaped_dollar_sign_disabled(self):
         self.env.escape_proxy = False
-        assert self.env('ESCAPED_VAR') == r'\$baz'
+        assert self.env("ESCAPED_VAR") == r"\$baz"
 
     def test_int_list(self):
-        assert_type_and_value(list, [42, 33], self.env('INT_LIST', cast=[int]))
-        assert_type_and_value(list, [42, 33], self.env.list('INT_LIST', int))
+        assert_type_and_value(list, [42, 33], self.env("INT_LIST", cast=[int]))
+        assert_type_and_value(list, [42, 33], self.env.list("INT_LIST", int))
 
     def test_int_list_cast_tuple(self):
-        assert_type_and_value(tuple, (42, 33), self.env('INT_LIST', cast=(int,)))
-        assert_type_and_value(tuple, (42, 33), self.env.tuple('INT_LIST', int))
-        assert_type_and_value(tuple, ('42', '33'), self.env.tuple('INT_LIST'))
+        assert_type_and_value(tuple, (42, 33), self.env("INT_LIST", cast=(int,)))
+        assert_type_and_value(tuple, (42, 33), self.env.tuple("INT_LIST", int))
+        assert_type_and_value(tuple, ("42", "33"), self.env.tuple("INT_LIST"))
 
     def test_int_tuple(self):
-        assert_type_and_value(tuple, (42, 33), self.env('INT_TUPLE', cast=(int,)))
-        assert_type_and_value(tuple, (42, 33), self.env.tuple('INT_TUPLE', int))
-        assert_type_and_value(tuple, ('42', '33'), self.env.tuple('INT_TUPLE'))
+        assert_type_and_value(tuple, (42, 33), self.env("INT_TUPLE", cast=(int,)))
+        assert_type_and_value(tuple, (42, 33), self.env.tuple("INT_TUPLE", int))
+        assert_type_and_value(tuple, ("42", "33"), self.env.tuple("INT_TUPLE"))
 
     def test_mix_tuple_issue_387(self):
         """Cast a tuple of mixed types.
@@ -327,85 +361,92 @@ class TestEnv:
         See: https://github.com/joke2k/django-environ/issues/387 for details."""
         assert_type_and_value(
             tuple,
-            (42, 'Test'),
+            (42, "Test"),
             self.env(
-                'MIX_TUPLE',
-                default=(0, ''),
+                "MIX_TUPLE",
+                default=(0, ""),
                 cast=lambda t: tuple(
                     map(
                         lambda v: int(v) if v.isdigit() else v.strip(),
-                        [c for c in t.strip('()').split(',')]
+                        [c for c in t.strip("()").split(",")],
                     )
                 ),
-            )
+            ),
         )
 
     def test_str_list_with_spaces(self):
-        assert_type_and_value(list, [' foo', '  spaces'],
-                              self.env('STR_LIST_WITH_SPACES', cast=[str]))
-        assert_type_and_value(list, [' foo', '  spaces'],
-                              self.env.list('STR_LIST_WITH_SPACES'))
+        assert_type_and_value(
+            list, [" foo", "  spaces"], self.env("STR_LIST_WITH_SPACES", cast=[str])
+        )
+        assert_type_and_value(
+            list, [" foo", "  spaces"], self.env.list("STR_LIST_WITH_SPACES")
+        )
 
     def test_empty_list(self):
-        assert_type_and_value(list, [], self.env('EMPTY_LIST', cast=[int]))
+        assert_type_and_value(list, [], self.env("EMPTY_LIST", cast=[int]))
 
     def test_dict_value(self):
-        assert_type_and_value(dict, FakeEnv.DICT, self.env.dict('DICT_VAR'))
-        assert_type_and_value(dict, FakeEnv.DICT_WITH_EQ, self.env.dict('DICT_WITH_EQ_VAR'))
+        assert_type_and_value(dict, FakeEnv.DICT, self.env.dict("DICT_VAR"))
+        assert_type_and_value(
+            dict, FakeEnv.DICT_WITH_EQ, self.env.dict("DICT_WITH_EQ_VAR")
+        )
 
     def test_complex_dict_value(self):
         assert_type_and_value(
             dict,
             FakeEnv.SAML_ATTRIBUTE_MAPPING,
-            self.env.dict('SAML_ATTRIBUTE_MAPPING', cast={'value': tuple})
+            self.env.dict("SAML_ATTRIBUTE_MAPPING", cast={"value": tuple}),
         )
 
     @pytest.mark.parametrize(
-        'value,cast,expected',
+        "value,cast,expected",
         [
-            ('a=1', dict, {'a': '1'}),
-            ('a=1', dict(value=int), {'a': 1}),
-            ('a=1', dict(value=float), {'a': 1.0}),
-            ('a=1,2,3', dict(value=[str]), {'a': ['1', '2', '3']}),
-            ('a=1,2,3', dict(value=[int]), {'a': [1, 2, 3]}),
-            ('a=1;b=1.1,2.2;c=3', dict(value=int, cast=dict(b=[float])),
-             {'a': 1, 'b': [1.1, 2.2], 'c': 3}),
-            ('a=uname;c=http://www.google.com;b=True',
-             dict(value=str, cast=dict(b=bool)),
-             {'a': "uname", 'c': "http://www.google.com", 'b': True}),
+            ("a=1", dict, {"a": "1"}),
+            ("a=1", dict(value=int), {"a": 1}),
+            ("a=1", dict(value=float), {"a": 1.0}),
+            ("a=1,2,3", dict(value=[str]), {"a": ["1", "2", "3"]}),
+            ("a=1,2,3", dict(value=[int]), {"a": [1, 2, 3]}),
+            (
+                "a=1;b=1.1,2.2;c=3",
+                dict(value=int, cast=dict(b=[float])),
+                {"a": 1, "b": [1.1, 2.2], "c": 3},
+            ),
+            (
+                "a=uname;c=http://www.google.com;b=True",
+                dict(value=str, cast=dict(b=bool)),
+                {"a": "uname", "c": "http://www.google.com", "b": True},
+            ),
             # Regression for #565: complex dict cast must preserve '=' inside
             # values (e.g. base64 padding, query strings, JWT segments). Prior
             # to the fix, ``b`` was truncated to ``"v"`` instead of ``"v=more"``.
-            ('a=1;b=v=more',
-             dict(value=str),
-             {'a': '1', 'b': 'v=more'}),
+            ("a=1;b=v=more", dict(value=str), {"a": "1", "b": "v=more"}),
         ],
         ids=[
-            'dict',
-            'dict_int',
-            'dict_float',
-            'dict_str_list',
-            'dict_int_list',
-            'dict_int_cast',
-            'dict_str_cast',
-            'dict_value_contains_equal_sign',
+            "dict",
+            "dict_int",
+            "dict_float",
+            "dict_str_list",
+            "dict_int_list",
+            "dict_int_cast",
+            "dict_str_cast",
+            "dict_value_contains_equal_sign",
         ],
     )
     def test_dict_parsing(self, value, cast, expected):
         assert self.env.parse_value(value, cast) == expected
 
     def test_url_value(self):
-        url = self.env.url('URL_VAR')
+        url = self.env.url("URL_VAR")
         assert url.__class__ == self.env.URL_CLASS
         assert url.geturl() == FakeEnv.URL
-        assert self.env.url('OTHER_URL', default=None) is None
+        assert self.env.url("OTHER_URL", default=None) is None
 
     def test_url_empty_string_default_value(self):
-        unset_var_name = 'VARIABLE_NOT_SET_IN_ENVIRONMENT'
+        unset_var_name = "VARIABLE_NOT_SET_IN_ENVIRONMENT"
         assert unset_var_name not in os.environ
-        url = self.env.url(unset_var_name, '')
+        url = self.env.url(unset_var_name, "")
         assert url.__class__ == self.env.URL_CLASS
-        assert url.geturl() == ''
+        assert url.geturl() == ""
 
     def test_url_encoded_parts(self):
         password_with_unquoted_characters = "#password"
@@ -413,125 +454,218 @@ class TestEnv:
             password_with_unquoted_characters
         )
         parsed_url = self.env.db_url_config(encoded_url)
-        assert parsed_url['PASSWORD'] == password_with_unquoted_characters
+        assert parsed_url["PASSWORD"] == password_with_unquoted_characters
 
     @pytest.mark.parametrize(
-        'var,engine,name,host,user,passwd,port',
+        "var,engine,name,host,user,passwd,port",
         [
-            (Env.DEFAULT_DATABASE_ENV, DJANGO_POSTGRES, 'd8r82722',
-             'ec2-107-21-253-135.compute-1.amazonaws.com', 'uf07k1',
-             'wegauwhg', 5431),
-            ('DATABASE_MYSQL_URL', 'django.db.backends.mysql', 'heroku_97681',
-             'us-cdbr-east.cleardb.com', 'bea6eb0', '69772142', ''),
-            ('DATABASE_MYSQL_GIS_URL', 'django.contrib.gis.db.backends.mysql',
-             'some_database', '127.0.0.1', 'user', 'password', ''),
-            ('DATABASE_ORACLE_TNS_URL', 'django.db.backends.oracle', 'sid', '',
-             'user', 'password', None),
-            ('DATABASE_ORACLE_URL', 'django.db.backends.oracle', 'sid', 'host',
-             'user', 'password', '1521'),
-            ('DATABASE_REDSHIFT_URL', 'django_redshift_backend', 'dev',
-             'examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com',
-             'user', 'password', 5439),
-            ('DATABASE_SQLITE_URL', 'django.db.backends.sqlite3',
-             '/full/path/to/your/database/file.sqlite', '', '', '', ''),
-            ('DATABASE_CUSTOM_BACKEND_URL', 'custom.backend', 'database',
-             'example.com', 'user', 'password', 5430),
-            ('DATABASE_MYSQL_CLOUDSQL_URL', 'django.db.backends.mysql', 'mydatabase',
-             '/cloudsql/arvore-codelab:us-central1:mysqlinstance', 'djuser', 'hidden-password', ''),
+            (
+                Env.DEFAULT_DATABASE_ENV,
+                DJANGO_POSTGRES,
+                "d8r82722",
+                "ec2-107-21-253-135.compute-1.amazonaws.com",
+                "uf07k1",
+                "wegauwhg",
+                5431,
+            ),
+            (
+                "DATABASE_MYSQL_URL",
+                "django.db.backends.mysql",
+                "heroku_97681",
+                "us-cdbr-east.cleardb.com",
+                "bea6eb0",
+                "69772142",
+                "",
+            ),
+            (
+                "DATABASE_MYSQL_GIS_URL",
+                "django.contrib.gis.db.backends.mysql",
+                "some_database",
+                "127.0.0.1",
+                "user",
+                "password",
+                "",
+            ),
+            (
+                "DATABASE_ORACLE_TNS_URL",
+                "django.db.backends.oracle",
+                "sid",
+                "",
+                "user",
+                "password",
+                None,
+            ),
+            (
+                "DATABASE_ORACLE_URL",
+                "django.db.backends.oracle",
+                "sid",
+                "host",
+                "user",
+                "password",
+                "1521",
+            ),
+            (
+                "DATABASE_REDSHIFT_URL",
+                "django_redshift_backend",
+                "dev",
+                "examplecluster.abc123xyz789.us-west-2.redshift.amazonaws.com",
+                "user",
+                "password",
+                5439,
+            ),
+            (
+                "DATABASE_SQLITE_URL",
+                "django.db.backends.sqlite3",
+                "/full/path/to/your/database/file.sqlite",
+                "",
+                "",
+                "",
+                "",
+            ),
+            (
+                "DATABASE_CUSTOM_BACKEND_URL",
+                "custom.backend",
+                "database",
+                "example.com",
+                "user",
+                "password",
+                5430,
+            ),
+            (
+                "DATABASE_MYSQL_CLOUDSQL_URL",
+                "django.db.backends.mysql",
+                "mydatabase",
+                "/cloudsql/arvore-codelab:us-central1:mysqlinstance",
+                "djuser",
+                "hidden-password",
+                "",
+            ),
         ],
         ids=[
-            'postgres',
-            'mysql',
-            'mysql_gis',
-            'oracle_tns',
-            'oracle',
-            'redshift',
-            'sqlite',
-            'custom',
-            'cloudsql',
+            "postgres",
+            "mysql",
+            "mysql_gis",
+            "oracle_tns",
+            "oracle",
+            "redshift",
+            "sqlite",
+            "custom",
+            "cloudsql",
         ],
     )
     def test_db_url_value(self, var, engine, name, host, user, passwd, port):
         config = self.env.db(var)
 
-        assert config['ENGINE'] == engine
-        assert config['NAME'] == name
-        assert config['HOST'] == host
-        assert config['USER'] == user
-        assert config['PASSWORD'] == passwd
+        assert config["ENGINE"] == engine
+        assert config["NAME"] == name
+        assert config["HOST"] == host
+        assert config["USER"] == user
+        assert config["PASSWORD"] == passwd
 
         if port is None:
-            assert 'PORT' not in config
+            assert "PORT" not in config
         else:
-            assert config['PORT'] == port
+            assert config["PORT"] == port
 
     @pytest.mark.parametrize(
-        'var,backend,location,options',
+        "var,backend,location,options",
         [
-            (Env.DEFAULT_CACHE_ENV,
-             'django.core.cache.backends.memcached.MemcachedCache',
-             '127.0.0.1:11211', None),
-            ('CACHE_REDIS',
-             'django.core.cache.backends.redis.RedisCache',
-             'redis://127.0.0.1:6379/1',
-             {'client_class': 'django_redis.client.DefaultClient',
-              'password': 'secret'}),
-            ('CACHE_REDIS',
-             'django_redis.cache.RedisCache',
-             'redis://127.0.0.1:6379/1',
-             {'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-              'PASSWORD': 'secret'}),
+            (
+                Env.DEFAULT_CACHE_ENV,
+                "django.core.cache.backends.memcached.MemcachedCache",
+                "127.0.0.1:11211",
+                None,
+            ),
+            (
+                "CACHE_REDIS",
+                "django.core.cache.backends.redis.RedisCache",
+                "redis://127.0.0.1:6379/1",
+                {
+                    "client_class": "django_redis.client.DefaultClient",
+                    "password": "secret",
+                },
+            ),
+            (
+                "CACHE_REDIS",
+                "django_redis.cache.RedisCache",
+                "redis://127.0.0.1:6379/1",
+                {
+                    "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                    "PASSWORD": "secret",
+                },
+            ),
         ],
         ids=[
-            'memcached',
-            'django',  # Django Redis cache backend
-            'redis_django',  # django_redis backend
+            "memcached",
+            "django",  # Django Redis cache backend
+            "redis_django",  # django_redis backend
         ],
     )
     def test_cache_url_value(self, var, backend, location, options):
         mocked_cache_schemes = Env.CACHE_SCHEMES.copy()
-        mocked_cache_schemes.update({
-            'rediscache': backend,
-            'redis': backend,
-            'rediss': backend,
-        })
-        with mock.patch.object(Env, 'CACHE_SCHEMES', mocked_cache_schemes):
+        mocked_cache_schemes.update(
+            {
+                "rediscache": backend,
+                "redis": backend,
+                "rediss": backend,
+            }
+        )
+        with mock.patch.object(Env, "CACHE_SCHEMES", mocked_cache_schemes):
             config = self.env.cache_url(var)
 
-            assert config['BACKEND'] == backend
-            assert config['LOCATION'] == location
+            assert config["BACKEND"] == backend
+            assert config["LOCATION"] == location
 
             if options is None:
-                assert 'OPTIONS' not in config
+                assert "OPTIONS" not in config
             else:
-                assert config['OPTIONS'] == options
+                assert config["OPTIONS"] == options
 
     def test_email_url_value(self):
         email_config = self.env.email_url()
-        assert email_config['EMAIL_BACKEND'] == (
-            'django.core.mail.backends.smtp.EmailBackend'
+        assert email_config["EMAIL_BACKEND"] == (
+            "django.core.mail.backends.smtp.EmailBackend"
         )
-        assert email_config['EMAIL_HOST'] == 'smtp.example.com'
-        assert email_config['EMAIL_HOST_PASSWORD'] == 'password'
-        assert email_config['EMAIL_HOST_USER'] == 'user@domain.com'
-        assert email_config['EMAIL_PORT'] == 587
-        assert email_config['EMAIL_USE_TLS']
+        assert email_config["EMAIL_HOST"] == "smtp.example.com"
+        assert email_config["EMAIL_HOST_PASSWORD"] == "password"
+        assert email_config["EMAIL_HOST_USER"] == "user@domain.com"
+        assert email_config["EMAIL_PORT"] == 587
+        assert email_config["EMAIL_USE_TLS"]
+
+    def test_mailer_url_value(self):
+        mailer_config = self.env.mailer_url()
+        assert mailer_config["BACKEND"] == (
+            "django.core.mail.backends.smtp.EmailBackend"
+        )
+        assert mailer_config["OPTIONS"]["host"] == "smtp.example.com"
+        assert mailer_config["OPTIONS"]["password"] == "password"
+        assert mailer_config["OPTIONS"]["username"] == "user@domain.com"
+        assert mailer_config["OPTIONS"]["port"] == 587
+        assert mailer_config["OPTIONS"]["use_tls"]
+        assert self.env.mailer() == mailer_config
+
+    def test_mailer_url_extra_options(self):
+        extra_options = {"use_tls": False, "timeout": 30}
+
+        mailer_config = self.env.mailer_url(extra_options=extra_options)
+
+        assert mailer_config["OPTIONS"]["use_tls"] is False
+        assert mailer_config["OPTIONS"]["timeout"] == 30
+        assert self.env.mailer(extra_options=extra_options) == mailer_config
 
     def test_json_value(self):
-        assert self.env.json('JSON_VAR') == FakeEnv.JSON
+        assert self.env.json("JSON_VAR") == FakeEnv.JSON
 
     def test_path(self):
-        root = self.env.path('PATH_VAR')
+        root = self.env.path("PATH_VAR")
         assert_type_and_value(Path, Path(FakeEnv.PATH), root)
 
     def test_smart_cast(self):
-        assert self.env.get_value('STR_VAR', default='string') == 'bar'
-        assert self.env.get_value('BOOL_TRUE_STRING_LIKE_INT', default=True)
-        assert not self.env.get_value(
-            'BOOL_FALSE_STRING_LIKE_INT',
-            default=True)
-        assert self.env.get_value('INT_VAR', default=1) == 42
-        assert self.env.get_value('FLOAT_VAR', default=1.2) == 33.3
+        assert self.env.get_value("STR_VAR", default="string") == "bar"
+        assert self.env.get_value("BOOL_TRUE_STRING_LIKE_INT", default=True)
+        assert not self.env.get_value("BOOL_FALSE_STRING_LIKE_INT", default=True)
+        assert self.env.get_value("INT_VAR", default=1) == 42
+        assert self.env.get_value("FLOAT_VAR", default=1.2) == 33.3
 
     def test_get_value_debug_log_does_not_eval_lazy_default(self, caplog):
         class LazyDefault:
@@ -540,107 +674,109 @@ class TestEnv:
 
             def __str__(self):
                 self.was_evaluated = True
-                return 'lazy-default'
+                return "lazy-default"
 
         lazy_default = LazyDefault()
 
-        with caplog.at_level(logging.DEBUG, logger='environ.environ'):
-            value = self.env.get_value('MISSING_VAR', default=lazy_default)
+        with caplog.at_level(logging.DEBUG, logger="environ.environ"):
+            value = self.env.get_value("MISSING_VAR", default=lazy_default)
 
         assert value is lazy_default
         assert not lazy_default.was_evaluated
 
     def test_exported(self):
-        assert self.env('EXPORTED_VAR') == FakeEnv.EXPORTED
+        assert self.env("EXPORTED_VAR") == FakeEnv.EXPORTED
 
     def test_prefix(self):
-        self.env.prefix = 'PREFIX_'
-        assert self.env('TEST') == 'foo'
+        self.env.prefix = "PREFIX_"
+        assert self.env("TEST") == "foo"
 
     def test_prefix_and_not_present_without_default(self):
-        self.env.prefix = 'PREFIX_'
+        self.env.prefix = "PREFIX_"
         with pytest.raises(ImproperlyConfigured) as excinfo:
-            self.env('not_present')
-        assert str(excinfo.value) == 'Set the PREFIX_not_present environment variable'
+            self.env("not_present")
+        assert str(excinfo.value) == "Set the PREFIX_not_present environment variable"
         assert excinfo.value.__cause__ is not None
 
     def test_read_env_with_file_like_object(self):
         env_cls = type(self.env)
         env_cls.ENVIRON = {}
-        self.env.read_env(io.StringIO('FROM_FILELIKE=value\n'))
-        assert env_cls.ENVIRON['FROM_FILELIKE'] == 'value'
+        self.env.read_env(io.StringIO("FROM_FILELIKE=value\n"))
+        assert env_cls.ENVIRON["FROM_FILELIKE"] == "value"
 
     def test_read_env_without_path_logs_when_missing(self, monkeypatch, caplog):
-        monkeypatch.setattr(os.path, 'exists', lambda *_: False)
-        with caplog.at_level(logging.INFO, logger='environ.environ'):
+        monkeypatch.setattr(os.path, "exists", lambda *_: False)
+        with caplog.at_level(logging.INFO, logger="environ.environ"):
             self.env.read_env()
         assert any("doesn't exist" in message for message in caplog.messages)
 
     def test_read_env_missing_file_logs_and_returns(self, caplog):
-        env_file = '/tmp/definitely-missing-django-environ.env'
-        with caplog.at_level(logging.INFO, logger='environ.environ'):
+        env_file = "/tmp/definitely-missing-django-environ.env"
+        with caplog.at_level(logging.INFO, logger="environ.environ"):
             self.env.read_env(env_file)
-        assert any("not found - if you're not configuring your " in message
-                   for message in caplog.messages)
+        assert any(
+            "not found - if you're not configuring your " in message
+            for message in caplog.messages
+        )
 
     def test_read_env_invalid_line_warns(self, caplog):
         with tempfile.TemporaryDirectory() as temp_dir:
-            env_path = os.path.join(temp_dir, '.env')
-            with open(env_path, 'w') as file_handle:
-                file_handle.write('INVALID LINE\n')
+            env_path = os.path.join(temp_dir, ".env")
+            with open(env_path, "w") as file_handle:
+                file_handle.write("INVALID LINE\n")
 
-            with caplog.at_level(logging.WARNING, logger='environ.environ'):
+            with caplog.at_level(logging.WARNING, logger="environ.environ"):
                 self.env.read_env(env_path)
 
-        assert any('Invalid line: INVALID LINE' in message
-                   for message in caplog.messages)
+        assert any(
+            "Invalid line: INVALID LINE" in message for message in caplog.messages
+        )
 
     def test_configured_reads_file_and_configures_flags(self, tmp_path):
-        env_path = tmp_path / '.env'
+        env_path = tmp_path / ".env"
         env_path.write_text(
-            'APP_VALUE=42\n'
-            r'APP_ESCAPED=\$APP_VALUE'
-            '\n',
-            encoding='utf-8',
+            "APP_VALUE=42\n"
+            r"APP_ESCAPED=\$APP_VALUE"
+            "\n",
+            encoding="utf-8",
         )
 
         env = Env.configured(
             env_path,
-            scheme={'APP_VALUE': int},
+            scheme={"APP_VALUE": int},
             overwrite=True,
             smart_cast=False,
             escape_proxy=True,
             interpolate=False,
             warn_on_default=True,
-            prefix='APP_',
+            prefix="APP_",
         )
 
-        assert env('VALUE') == 42
-        assert env('ESCAPED') == '$APP_VALUE'
+        assert env("VALUE") == 42
+        assert env("ESCAPED") == "$APP_VALUE"
         assert not env.smart_cast
         assert env.escape_proxy
         assert not env.interpolate
         assert env.warn_on_default
-        assert env.prefix == 'APP_'
+        assert env.prefix == "APP_"
 
     def test_configured_passes_read_env_options(self, tmp_path):
-        env_path = tmp_path / '.env'
-        env_path.write_text('FROM_ENV_FILE=loaded # comment\n',
-                            encoding='utf-8')
+        env_path = tmp_path / ".env"
+        env_path.write_text("FROM_ENV_FILE=loaded # comment\n", encoding="utf-8")
 
-        Env.ENVIRON['FROM_ENV_FILE'] = 'existing'
+        Env.ENVIRON["FROM_ENV_FILE"] = "existing"
 
         env = Env.configured(
             env_path,
             overwrite=False,
             parse_comments=True,
-            FROM_ENV_OVERRIDE='override',
+            FROM_ENV_OVERRIDE="override",
         )
-        assert env('FROM_ENV_FILE') == 'existing'
-        assert env('FROM_ENV_OVERRIDE') == 'override'
+        assert env("FROM_ENV_FILE") == "existing"
+        assert env("FROM_ENV_OVERRIDE") == "override"
 
         env = Env.configured(env_path, overwrite=True, parse_comments=True)
-        assert env('FROM_ENV_FILE') == 'loaded '
+        assert env("FROM_ENV_FILE") == "loaded "
 
     def test_configured_without_file_only_configures_flags(self):
         env = Env.configured(
@@ -648,7 +784,7 @@ class TestEnv:
             escape_proxy=True,
             interpolate=False,
             warn_on_default=True,
-            prefix='APP_',
+            prefix="APP_",
         )
 
         assert env.scheme == {}
@@ -656,19 +792,19 @@ class TestEnv:
         assert env.escape_proxy
         assert not env.interpolate
         assert env.warn_on_default
-        assert env.prefix == 'APP_'
+        assert env.prefix == "APP_"
 
     def test_configured_returns_subclass_instance(self, tmp_path):
         class CustomEnv(Env):
             pass
 
-        env_path = tmp_path / '.env'
-        env_path.write_text('SUBCLASS_VALUE=value\n', encoding='utf-8')
+        env_path = tmp_path / ".env"
+        env_path.write_text("SUBCLASS_VALUE=value\n", encoding="utf-8")
 
         env = CustomEnv.configured(env_path, overwrite=True)
 
         assert isinstance(env, CustomEnv)
-        assert env('SUBCLASS_VALUE') == 'value'
+        assert env("SUBCLASS_VALUE") == "value"
 
 
 class TestFileEnv(TestEnv):
@@ -683,15 +819,15 @@ class TestFileEnv(TestEnv):
 
         Env.ENVIRON = {}
         self.env.read_env(
-            Path(__file__, is_file=True)('test_env.txt'),
-            PATH_VAR=Path(__file__, is_file=True).__root__
+            Path(__file__, is_file=True)("test_env.txt"),
+            PATH_VAR=Path(__file__, is_file=True).__root__,
         )
 
     def create_temp_env_file(self, name):
         import pathlib
         import tempfile
 
-        env_file_path = (pathlib.Path(tempfile.gettempdir()) / name)
+        env_file_path = pathlib.Path(tempfile.gettempdir()) / name
         try:
             env_file_path.unlink()
         except FileNotFoundError:
@@ -701,15 +837,15 @@ class TestFileEnv(TestEnv):
         return env_file_path
 
     def test_read_env_path_like(self):
-        env_file_path = self.create_temp_env_file('test_pathlib.env')
+        env_file_path = self.create_temp_env_file("test_pathlib.env")
 
-        env_key = 'SECRET'
-        env_val = 'enigma'
-        env_str = env_key + '=' + env_val
+        env_key = "SECRET"
+        env_val = "enigma"
+        env_str = env_key + "=" + env_val
 
         # open() doesn't take path-like on Python < 3.6
-        with open(str(env_file_path), 'w', encoding='utf-8') as f:
-            f.write(env_str + '\n')
+        with open(str(env_file_path), "w", encoding="utf-8") as f:
+            f.write(env_str + "\n")
 
         self.env.read_env(env_file_path)
         assert env_key in self.env.ENVIRON
@@ -717,10 +853,10 @@ class TestFileEnv(TestEnv):
 
     @pytest.mark.parametrize("overwrite", [True, False])
     def test_existing_overwrite(self, overwrite):
-        env_file_path = self.create_temp_env_file('test_existing.env')
-        with open(str(env_file_path), 'w') as f:
+        env_file_path = self.create_temp_env_file("test_existing.env")
+        with open(str(env_file_path), "w") as f:
             f.write("EXISTING=b")
-        self.env.ENVIRON['EXISTING'] = "a"
+        self.env.ENVIRON["EXISTING"] = "a"
         self.env.read_env(env_file_path, overwrite=overwrite)
         assert self.env.ENVIRON["EXISTING"] == ("b" if overwrite else "a")
 
