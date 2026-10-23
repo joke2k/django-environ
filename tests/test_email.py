@@ -53,6 +53,24 @@ def test_mailer_parsing():
     }
 
 
+def test_mailer_extra_options_override_url_options_without_casting():
+    url = 'smtp+ssl://smtp.example.com?timeout=30'
+    extra_options = {
+        'timeout': 45,
+        'use_ssl': False,
+        'custom': {'retries': 3},
+    }
+
+    config = Env.mailer_url_config(url, extra_options=extra_options)
+
+    assert config['OPTIONS'] == {
+        'host': 'smtp.example.com',
+        'timeout': 45,
+        'use_ssl': False,
+        'custom': {'retries': 3},
+    }
+
+
 def test_mailer_file_parsing():
     url = 'filemail:///tmp/email'
 

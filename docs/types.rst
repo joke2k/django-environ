@@ -253,3 +253,18 @@ nested dictionaries like Django 5.1 PostgreSQL ``pool`` options), pass
 :py:meth:`~.environ.Env.email_url`, but returns one Django 6.1 ``MAILERS``
 entry with ``BACKEND`` and lowercase ``OPTIONS`` keys. The ``mailer`` method
 is an alias for ``mailer_url``.
+
+Pass ``extra_options`` to either method to add options that are awkward to
+encode in a URL or to override URL-derived values. Extra option keys should
+use the lowercase Django mailer option names, and their values are preserved
+without casting:
+
+.. code-block:: python
+
+   config = env.mailer_url(extra_options={
+     "use_tls": False,
+     "custom_option": {"retries": 3},
+   })
+
+The extra values are merged into ``OPTIONS`` after URL parsing, so they take
+precedence over options from the URL.
