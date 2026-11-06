@@ -34,6 +34,20 @@ def tmp_f():
         yield f_name
 
 
+@pytest.fixture(params=[2, 3])
+def nested_file_values(tmp_path, request):
+    value = tmp_path / 'value'
+    value.write_text('fish', encoding='utf-8')
+    values = {'ANIMAL': 'cat', 'ANIMAL_FILE': str(value)}
+    for depth in range(2, request.param + 1):
+        pointer = tmp_path / f'pointer-{depth}'
+        pointer.write_text(
+            values['ANIMAL' + '_FILE' * (depth - 1)], encoding='utf-8'
+        )
+        values['ANIMAL' + '_FILE' * depth] = str(pointer)
+    return values
+
+
 def test_mapping(tmp_f):
     env = environ.FileAwareMapping(env={"ANIMAL_FILE": tmp_f})
     assert env["ANIMAL"] == "fish"
@@ -157,6 +171,37 @@ class TestDelItem:
         assert env["ANIMAL"] == "fish"
         del env["ANIMAL_FILE"]
         assert env["ANIMAL"] == "cat"
+
+    @pytest.mark.parametrize('cache', [True, False])
+    def test_del_nested_logical_key(self, nested_file_values, cache):
+        env = environ.FileAwareMapping(nested_file_values, cache=cache)
+        assert env['ANIMAL'] == 'fish'
+        del env['ANIMAL']
+        assert list(env) == []
+        assert len(env) == 0
+        assert 'ANIMAL' not in env
+        with pytest.raises(KeyError):
+            env['ANIMAL']
+
+    @pytest.mark.parametrize('cache', [True, False])
+    def test_del_nested_file_key_restores_fallback(self, nested_file_values, cache):
+        env = environ.FileAwareMapping(nested_file_values, cache=cache)
+        assert env['ANIMAL'] == 'fish'
+        del env['ANIMAL_FILE']
+        assert env['ANIMAL'] == 'cat'
+        assert list(env) == ['ANIMAL']
+
+    @pytest.mark.parametrize('cache', [True, False])
+    def test_clear_nested_mapping_restores_default(
+        self, nested_file_values, cache, monkeypatch
+    ):
+        env = environ.FileAwareMapping(nested_file_values, cache=cache)
+        monkeypatch.setattr(environ.FileAwareEnv, 'ENVIRON', env)
+        config = environ.FileAwareEnv()
+        env.clear()
+        assert list(env) == []
+        assert len(env) == 0
+        assert config('ANIMAL', default='default') == 'default'
 
 
 class TestSetItem:

@@ -81,13 +81,14 @@ class FileAwareMapping(MutableMapping):
 
     def __delitem__(self, key):
         file_key = key + "_FILE"
-        if file_key in self.env:
+        has_file_key = file_key in self.env
+        if has_file_key:
             del self[file_key]
             if key in self.env:
                 del self.env[key]
-            return
         if self.cache and key.endswith("_FILE"):
             no_file_key = key[:-5]
             if no_file_key and no_file_key in self.files_cache:
                 del self.files_cache[no_file_key]
-        del self.env[key]
+        if not has_file_key:
+            del self.env[key]
