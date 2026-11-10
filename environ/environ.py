@@ -1071,7 +1071,7 @@ class Env:
             secure = True
         if scheme not in cls.SEARCH_SCHEMES:
             raise ImproperlyConfigured(f'Invalid search schema {url.scheme}')
-        config['ENGINE'] = cls.SEARCH_SCHEMES[scheme]
+        config['ENGINE'] = engine or cls.SEARCH_SCHEMES[scheme]
 
         # check commons params
         cfg, params = cls._parse_common_search_params(url)
@@ -1099,9 +1099,6 @@ class Env:
             config.update(cls._parse_whoosh_search_params(params))
         elif url.scheme == 'xapian':
             config.update(cls._parse_xapian_search_params(params))
-
-        if engine:
-            config['ENGINE'] = engine
 
         return config
 

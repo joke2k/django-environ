@@ -87,12 +87,10 @@ def test_elasticsearch_parsing(url, engine, scheme):
     assert url["URL"].startswith(scheme + ":")
 
 
-def test_custom_search_engine():
+def test_custom_search_engine(search_url):
     """Override ENGINE determined from schema."""
-    env_url = 'elasticsearch://127.0.0.1:9200/index'
-
     engine = 'mypackage.backends.whatever'
-    url = Env.db_url_config(env_url, engine=engine)
+    url = Env.search_url_config(search_url, engine=engine)
 
     assert url['ENGINE'] == engine
 
