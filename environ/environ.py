@@ -966,17 +966,19 @@ class Env:
         config = {}
         url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
 
+        known_scheme = url.scheme in cls.CHANNELS_SCHEMES
         if backend:
             config["BACKEND"] = backend
-        elif url.scheme not in cls.CHANNELS_SCHEMES:
+        elif not known_scheme:
             raise ImproperlyConfigured(f"Invalid channels schema {url.scheme}")
         else:
             config["BACKEND"] = cls.CHANNELS_SCHEMES[url.scheme]
-            if url.scheme.startswith(("redis", "valkey")):
-                redis_scheme, *_ = url.scheme.split("+")
-                config["CONFIG"] = {
-                    "hosts": [url._replace(scheme=redis_scheme).geturl()]
-                }
+
+        if known_scheme and url.scheme.startswith(("redis", "valkey")):
+            redis_scheme, *_ = url.scheme.split("+")
+            config["CONFIG"] = {
+                "hosts": [url._replace(scheme=redis_scheme).geturl()]
+            }
 
         return config
 
