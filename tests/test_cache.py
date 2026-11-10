@@ -32,17 +32,17 @@ def test_base_options_parsing_memcache():
     assert url['VERSION'] == 1
 
 
-@pytest.mark.parametrize('redis_driver,timeout_key',
+@pytest.mark.parametrize('redis_driver',
     [
-        ('django.core.cache.backends.redis.RedisCache', 'timeout'),
-        ('django_redis.cache.RedisCache', 'TIMEOUT'),
+        'django.core.cache.backends.redis.RedisCache',
+        'django_redis.cache.RedisCache',
     ],
     ids=[
         'django',
         'django_redis',
     ],
 )
-def test_base_options_parsing_redis(redis_driver, timeout_key):
+def test_base_options_parsing_redis(redis_driver):
     mocked_cache_schemes = Env.CACHE_SCHEMES.copy()
     mocked_cache_schemes.update({
         'rediscache': redis_driver,
@@ -50,10 +50,41 @@ def test_base_options_parsing_redis(redis_driver, timeout_key):
         'rediss': redis_driver,
     })
     with mock.patch.object(Env, 'CACHE_SCHEMES', mocked_cache_schemes):
-        url = 'redis://127.0.0.1:6379/?timeout=None'
+        url = ('redis://127.0.0.1:6379/?timeout=None&key_prefix=app&'
+               'key_function=foo.get_key&version=7')
         url = Env.cache_url_config(url)
 
-        assert url[timeout_key] is None
+        assert url['TIMEOUT'] is None
+        assert url['KEY_PREFIX'] == 'app'
+        assert url['KEY_FUNCTION'] == 'foo.get_key'
+        assert url['VERSION'] == 7
+
+
+@pytest.mark.parametrize(
+    'query,timeout,version,cache_key',
+    [
+        ('timeout=60&key_prefix=app&version=7&socket_timeout=2',
+         60, 7, 'app:7:entry'),
+        ('TIMEOUT=0&KEY_PREFIX=app&VERSION=0&SOCKET_TIMEOUT=2',
+         0, 0, 'app:0:entry'),
+        ('TimeOut=None&Key_PreFix=app&VerSion=3&Socket_TimeOut=2',
+         None, 3, 'app:3:entry'),
+    ],
+)
+def test_redis_base_options_are_used_by_django(
+        query, timeout, version, cache_key):
+    redis_backend = pytest.importorskip('django.core.cache.backends.redis')
+    config = Env.cache_url_config(
+        'redis://127.0.0.1:6379/0?' + query,
+        backend='django.core.cache.backends.redis.RedisCache',
+    )
+    cache = redis_backend.RedisCache(config['LOCATION'], config)
+
+    assert cache.default_timeout == timeout
+    assert cache.key_prefix == 'app'
+    assert cache.version == version
+    assert cache.make_key('entry') == cache_key
+    assert config['OPTIONS'] == {'socket_timeout': 2}
 
 
 @pytest.mark.parametrize(

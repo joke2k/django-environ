@@ -870,12 +870,11 @@ class Env:
                 key_modifier = 'upper'
 
             for k, v in parsed_query.items():
-                key = getattr(k, key_modifier)()
-                opt = {key: _cast(v[0])}
-                if k.upper() in cls._CACHE_BASE_OPTIONS:
-                    config.update(opt)
+                key = k.upper()
+                if key in cls._CACHE_BASE_OPTIONS:
+                    config[key] = _cast(v[0])
                 else:
-                    config_options.update(opt)
+                    config_options[getattr(k, key_modifier)()] = _cast(v[0])
             config['OPTIONS'] = config_options
 
         return config
