@@ -235,6 +235,33 @@ def test_db_parsing(url, engine, name, host, user, passwd, port):
         assert config['OPTIONS'] == {'reconnect': 'true'}
 
 
+@pytest.mark.parametrize('scheme', ['postgres', 'mysql', 'sqlite'])
+@pytest.mark.parametrize(
+    'path,expected_name',
+    [
+        ('a+b', 'a+b'),
+        ('a%2Bb', 'a+b'),
+        ('a%20b', 'a b'),
+        ('a%252Bb', 'a%2Bb'),
+    ],
+)
+def test_database_path_preserves_plus_signs(scheme, path, expected_name):
+    """Decode percent escapes in paths without form-decoding plus signs."""
+    host = '' if scheme == 'sqlite' else 'localhost'
+    config = Env.db_url_config(f'{scheme}://{host}/{path}')
+
+    assert config['NAME'] == expected_name
+
+
+def test_database_path_and_query_use_different_plus_decoding():
+    config = Env.db_url_config(
+        'postgres://localhost/a+b?application_name=my+app'
+    )
+
+    assert config['NAME'] == 'a+b'
+    assert config['OPTIONS']['application_name'] == 'my app'
+
+
 def test_custom_db_engine():
     """Override ENGINE determined from schema."""
     env_url = 'postgres://enigma:secret@example.com:5431/dbname'

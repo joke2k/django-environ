@@ -12,6 +12,9 @@ Fixed
 - Preserve omitted PostgreSQL cluster port positions so each port remains
   associated with its host
   `#681 <https://github.com/joke2k/django-environ/issues/681>`_.
+- Preserve literal plus signs in database names and SQLite paths while
+  continuing to decode percent escapes
+  `#682 <https://github.com/joke2k/django-environ/issues/682>`_.
 
 
 `v0.13.0`_ - 18-February-2026

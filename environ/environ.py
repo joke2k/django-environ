@@ -695,7 +695,7 @@ class Env:
             url = _urlparse_quote(urlunparse(url))
         # Remove query strings.
         path = url.path[1:]
-        path = unquote_plus(path.split('?', 2)[0])
+        path = unquote(path.split('?', 2)[0])
 
         if url.scheme == 'sqlite':
             if path == '':
