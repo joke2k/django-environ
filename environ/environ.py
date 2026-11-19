@@ -735,7 +735,10 @@ class Env:
 
             hinfo = list(itertools.zip_longest(*host_parts))
             hostname = ','.join(hinfo[0])
-            port = ','.join(filter(None, hinfo[1])) if len(hinfo) == 2 else ''
+            port = ''
+            if len(hinfo) == 2 and any(hinfo[1]):
+                # Empty slots select each host's default port in libpq.
+                port = ','.join(hinfo[1])
         else:
             hostname = url.hostname
             port = url.port

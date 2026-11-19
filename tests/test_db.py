@@ -290,7 +290,30 @@ def test_postgres_cluster_with_ipv6_without_port_parsing():
     assert url['HOST'] == 'host1,[2001:db8::1234],host3'
     assert url['USER'] == 'user'
     assert url['PASSWORD'] == 'pass'
-    assert url['PORT'] == '111,333'
+    assert url['PORT'] == '111,,333'
+
+
+@pytest.mark.parametrize(
+    'hosts,expected_port',
+    [
+        ('host1:5433,host2', '5433,'),
+        ('host1,host2:5433', ',5433'),
+        ('host1:5433,host2,host3:5434', '5433,,5434'),
+        ('host1,host2:5433,host3', ',5433,'),
+        ('host1,[2001:db8::1]:5433', ',5433'),
+        ('[2001:db8::1]:5433,host2', '5433,'),
+        ('host1,host2', ''),
+        ('host1:5433,host2:5434', '5433,5434'),
+    ],
+)
+def test_postgres_cluster_preserves_port_positions(hosts, expected_port):
+    """Keep default-port placeholders aligned with their hosts."""
+    config = Env.db_url_config(f'postgres://user:pass@{hosts}/db')
+
+    assert config['PORT'] == expected_port
+    assert config['NAME'] == 'db'
+    assert config['USER'] == 'user'
+    assert config['PASSWORD'] == 'pass'
 
 
 @pytest.mark.parametrize(

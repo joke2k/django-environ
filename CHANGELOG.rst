@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is inspired by `Keep a Changelog <https://keepachangelog.com/en/1.0.0/>`_
 and this project adheres to `Semantic Versioning <https://semver.org/spec/v2.0.0.html>`_.
 
+Unreleased
+----------
+Fixed
++++++
+- Preserve omitted PostgreSQL cluster port positions so each port remains
+  associated with its host
+  `#681 <https://github.com/joke2k/django-environ/issues/681>`_.
+
+
 `v0.13.0`_ - 18-February-2026
 -----------------------------
 Added
