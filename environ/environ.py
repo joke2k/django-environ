@@ -33,6 +33,7 @@ from urllib.parse import (
     urlunparse,
 )
 
+import django
 from django.core.exceptions import ImproperlyConfigured
 
 from .compat import (
@@ -442,6 +443,31 @@ class Env:
         )
 
     email = email_url
+
+    def mailer_url(
+        self,
+        var=DEFAULT_EMAIL_ENV,
+        default=NOTSET,
+        backend=None,
+        extra_options=None
+    ) -> Dict:
+        """Returns a Django 6.1 mailer config dictionary.
+
+        The mailer method is an alias for mailer_url.
+
+        :param dict|None extra_options:
+            Optional dictionary merged into ``OPTIONS`` after URL parsing.
+            Values in ``extra_options`` override URL-derived options.
+
+        :rtype: dict
+        """
+        return self.mailer_url_config(
+            self.url(var, default=default),
+            backend=backend,
+            extra_options=extra_options,
+        )
+
+    mailer = mailer_url
 
     def search_url(
             self,
@@ -910,6 +936,14 @@ class Env:
         :return: Parsed email URL.
         :rtype: dict
         """
+        if django.VERSION >= (6, 1):
+            warnings.warn(
+                (
+                    "The EMAIL_* settings are deprecated in Django 6.1+, "
+                    "consider switching to env.mailer_url"
+                ),
+                DeprecationWarning,
+            )
 
         config = {}
 
@@ -951,6 +985,69 @@ class Env:
             config['OPTIONS'] = config_options
 
         return config
+
+    @classmethod
+    def mailer_url_config(cls, url, backend=None, extra_options=None):
+        """Parse an email URL into a Django 6.1 mailer config.
+
+        :param urllib.parse.ParseResult or str url:
+            Email URL to parse.
+        :param str or None backend:
+            If None, the backend is evaluated from the URL.
+        :param dict|None extra_options:
+            Optional dictionary merged into ``OPTIONS`` after URL parsing.
+            Values in ``extra_options`` override URL-derived options.
+        :return: Parsed Django mailer configuration.
+        :rtype: dict
+        """
+
+        url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+
+        path = unquote_plus(url.path[1:].split('?', 2)[0])
+
+        if backend:
+            mailer_backend = backend
+        elif url.scheme not in cls.EMAIL_SCHEMES:
+            raise ImproperlyConfigured(f'Invalid email schema {url.scheme}')
+        else:
+            mailer_backend = cls.EMAIL_SCHEMES[url.scheme]
+
+        options = {}
+        option_values = {
+            'host': url.hostname,
+            'password': _cast_urlstr(url.password),
+            'port': _cast_int(url.port),
+            'username': _cast_urlstr(url.username),
+        }
+        for key, value in option_values.items():
+            if value is not None:
+                options[key] = value
+
+        if mailer_backend == (
+            'django.core.mail.backends.filebased.EmailBackend'
+        ):
+            options['file_path'] = path
+
+        if url.scheme in ('smtps', 'smtp+tls'):
+            options['use_tls'] = True
+        elif url.scheme == 'smtp+ssl':
+            options['use_ssl'] = True
+
+        if url.query:
+            for key, value in parse_qs(url.query).items():
+                option = key.lower()
+                value = _cast_int(value[0])
+                if key.upper() in cls._EMAIL_BASE_OPTIONS:
+                    option = key.lower().replace('email_', '', 1)
+                options[option] = value
+
+        if extra_options:
+            options.update(extra_options)
+
+        return {
+            'BACKEND': mailer_backend,
+            'OPTIONS': options,
+        }
 
     @classmethod
     def channels_url_config(cls, url, backend=None):

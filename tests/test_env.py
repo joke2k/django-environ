@@ -516,6 +516,27 @@ class TestEnv:
         assert email_config['EMAIL_HOST_USER'] == 'user@domain.com'
         assert email_config['EMAIL_PORT'] == 587
         assert email_config['EMAIL_USE_TLS']
+        
+    def test_mailer_url_value(self):
+        mailer_config = self.env.mailer_url()
+        assert mailer_config["BACKEND"] == (
+            "django.core.mail.backends.smtp.EmailBackend"
+        )
+        assert mailer_config["OPTIONS"]["host"] == "smtp.example.com"
+        assert mailer_config["OPTIONS"]["password"] == "password"
+        assert mailer_config["OPTIONS"]["username"] == "user@domain.com"
+        assert mailer_config["OPTIONS"]["port"] == 587
+        assert mailer_config["OPTIONS"]["use_tls"]
+        assert self.env.mailer() == mailer_config
+
+    def test_mailer_url_extra_options(self):
+        extra_options = {"use_tls": False, "timeout": 30}
+
+        mailer_config = self.env.mailer_url(extra_options=extra_options)
+
+        assert mailer_config["OPTIONS"]["use_tls"] is False
+        assert mailer_config["OPTIONS"]["timeout"] == 30
+        assert self.env.mailer(extra_options=extra_options) == mailer_config
 
     def test_json_value(self):
         assert self.env.json('JSON_VAR') == FakeEnv.JSON
