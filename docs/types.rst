@@ -18,6 +18,7 @@ The following are all type-casting methods of :py:class:`.environ.Env`.
 * :py:meth:`~.environ.Env.cache_url` (see below, ":ref:`environ-env-cache-url`" section)
 * :py:meth:`~.environ.Env.search_url` (see below, ":ref:`environ-env-search-url`" section)
 * :py:meth:`~.environ.Env.email_url` (see below, ":ref:`environ-env-email-url`" section)
+* :py:meth:`~.environ.Env.mailer_url` (see below, ":ref:`environ-env-mailer-url`" section)
 
 
 .. _environ-env-dict:
@@ -241,3 +242,49 @@ nested dictionaries like Django 5.1 PostgreSQL ``pool`` options), pass
 * File mail: ``filemail://``
 * LocMem mail: ``memorymail://``
 * Dummy mail: ``dummymail://``
+
+
+.. _environ-env-mailer-url:
+
+``environ.Env.mailer_url``
+===========================
+
+:py:meth:`~.environ.Env.mailer_url` uses the same URL schemas as
+:py:meth:`~.environ.Env.email_url`, but returns one Django 6.1 ``MAILERS``
+entry with ``BACKEND`` and lowercase ``OPTIONS`` keys. The ``mailer`` method
+is an alias for ``mailer_url``.
+
+Pass ``extra_options`` to either method to add options that are awkward to
+encode in a URL or to override URL-derived values. Extra option keys should
+use the lowercase Django mailer option names, and their values are preserved
+without casting:
+
+.. code-block:: python
+
+   config = env.mailer_url(extra_options={
+     "use_tls": False,
+     "custom_option": {"retries": 3},
+   })
+
+The extra values are merged into ``OPTIONS`` after URL parsing, so they take
+precedence over options from the URL. For is for example your ``EMAIL_URL`` is
+set to: ``smtp+tls://your_username:your_password@://example.com`` the following
+is how it would all be resolved:
+
+.. code-block:: python
+
+    >>> MAILERS = {"default": ...}
+    >>> print(MAILER)
+    {
+        'default': {
+            'BACKEND': 'django.core.mail.backends.smtp.EmailBackend',
+            'OPTIONS': {
+                'password': 'your_password',
+                'username': 'your_username',
+                'use_tls': False,
+                'custom_options': {'retries': 3}
+            }
+        }
+    }
+
+Note that ``use_tls`` is ``False`` even though the original URL started with ``"smpt+tls"``.

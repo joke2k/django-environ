@@ -202,6 +202,15 @@ In order to set email configuration for Django you can use this code:
 
    vars().update(EMAIL_CONFIG)
 
+For Django 6.1 and later, the same URL format can configure individual
+entries in the ``MAILERS`` setting:
+
+.. code-block:: python
+
+   MAILERS = {
+       "default": env.mailer_url('EMAIL_URL', default='smtp://user:password@localhost:25'),
+   }
+
 
 SQLite urls
 ===========
