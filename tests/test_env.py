@@ -268,7 +268,17 @@ class TestEnv:
     def test_float(self, value, variable):
         assert_type_and_value(float, value, self.env.float(variable))
         assert_type_and_value(float, value, self.env(variable, cast=float))
-
+    @pytest.mark.parametrize(
+        'value,expected',
+        [
+            ('1,000,000', 1000000.0),
+            ('1.000.000', 1000000.0),
+            ('-2,500,000', -2500000.0),
+        ]
+    )
+    def test_float_repeated_thousands_separator(self, value, expected, monkeypatch):
+        monkeypatch.setitem(self.env.ENVIRON, 'THOUSANDS_FLOAT', value)
+        assert_type_and_value(float, expected, self.env.float('THOUSANDS_FLOAT'))
     @pytest.mark.parametrize(
         'value,variable',
         [

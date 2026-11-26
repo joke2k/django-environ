@@ -619,8 +619,11 @@ class Env:
             # split for avoid thousand separator and different
             # locale comma/dot symbol
             parts = re.split(r'[,.]', float_str)
+            separators = set(re.findall(r'[,.]', float_str))
             if len(parts) == 1:
                 float_str = parts[0]
+            elif len(parts) > 2 and len(separators) == 1:
+                float_str = ''.join(parts)
             else:
                 float_str = f"{''.join(parts[0:-1])}.{parts[-1]}"
             value = float(float_str)
