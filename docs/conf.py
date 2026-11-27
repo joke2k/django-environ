@@ -1,6 +1,7 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021-2023, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2024-present, Daniele Faraglia <daniele.faraglia@gmail.com>
+# Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -60,6 +61,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
+    "sphinx_copybutton",
     "notfound.extension",
 ]
 
@@ -116,6 +118,7 @@ linkcheck_ignore = [
     # Do not check links to compare tags.
     r"https://github.com/joke2k/django-environ/compare/.*",
 ]
+linkcheck_timeout = 60
 
 #
 # -- Options for nitpick -----------------------------------------------------

@@ -1,6 +1,7 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021-2022, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2024-present, Daniele Faraglia <daniele.faraglia@gmail.com>
+# Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -15,9 +16,15 @@ import ast
 import itertools
 import logging
 import os
+import pathlib
 import re
 import sys
 import warnings
+from typing import Dict, IO, List, Optional, Tuple, Union
+try:
+    from typing import TypeAlias
+except ImportError:  # pragma: no cover
+    from typing_extensions import TypeAlias
 from urllib.parse import (
     parse_qs,
     ParseResult,
@@ -37,8 +44,13 @@ from .compat import (
 )
 from .fileaware_mapping import FileAwareMapping
 
-Openable = (str, os.PathLike)
+OPENABLE = (str, os.PathLike)
 logger = logging.getLogger(__name__)
+
+# These type names are also method names of "Env",
+# so use these for type hinting within "Env"
+_bool: TypeAlias = bool  # pylint: disable=invalid-name
+_str: TypeAlias = str  # pylint: disable=invalid-name
 
 
 def _cast(value):
@@ -69,6 +81,10 @@ class NoValue:
 
     def __repr__(self):
         return f'<{self.__class__.__name__}>'
+
+
+class DefaultValueWarning(UserWarning):
+    """Warning used when returning an explicit default value."""
 
 
 class Env:
@@ -106,7 +122,15 @@ class Env:
     BOOLEAN_TRUE_STRINGS = ('true', 'on', 'ok', 'y', 'yes', '1')
     URL_CLASS = ParseResult
 
-    POSTGRES_FAMILY = ['postgres', 'postgresql', 'psql', 'pgsql', 'postgis']
+    POSTGRES_FAMILY = [
+        'postgres',
+        'postgresql',
+        'psql',
+        'pgsql',
+        'postgis',
+        'prometheus_postgresql',
+        'prometheus_postgis',
+    ]
 
     DEFAULT_DATABASE_ENV = 'DATABASE_URL'
     DB_SCHEMES = {
@@ -115,16 +139,22 @@ class Env:
         'psql': DJANGO_POSTGRES,
         'pgsql': DJANGO_POSTGRES,
         'postgis': 'django.contrib.gis.db.backends.postgis',
+        'prometheus_postgresql': 'django_prometheus.db.backends.postgresql',
+        'prometheus_postgis': 'django_prometheus.db.backends.postgis',
+        'cockroachdb': 'django_cockroachdb',
         'mysql': 'django.db.backends.mysql',
         'mysql2': 'django.db.backends.mysql',
         'mysql-connector': 'mysql.connector.django',
         'mysqlgis': 'django.contrib.gis.db.backends.mysql',
+        'prometheus_mysql': 'django_prometheus.db.backends.mysql',
         'mssql': 'mssql',
         'oracle': 'django.db.backends.oracle',
         'pyodbc': 'sql_server.pyodbc',
         'redshift': 'django_redshift_backend',
         'spatialite': 'django.contrib.gis.db.backends.spatialite',
+        'prometheus_spatialite': 'django_prometheus.db.backends.spatialite',
         'sqlite': 'django.db.backends.sqlite3',
+        'prometheus_sqlite': 'django_prometheus.db.backends.sqlite3',
         'ldap': 'ldapdb.backends.ldap',
     }
     _DB_BASE_OPTIONS = [
@@ -147,6 +177,8 @@ class Env:
         'rediscache': REDIS_DRIVER,
         'redis': REDIS_DRIVER,
         'rediss': REDIS_DRIVER,
+        'valkey': REDIS_DRIVER,
+        'valkeys': REDIS_DRIVER,
     }
     _CACHE_BASE_OPTIONS = [
         'TIMEOUT',
@@ -189,13 +221,32 @@ class Env:
                             for s in ('', 's')]
     CLOUDSQL = 'cloudsql'
 
+    DEFAULT_CHANNELS_ENV = "CHANNELS_URL"
+    CHANNELS_SCHEMES = {
+        "inmemory": "channels.layers.InMemoryChannelLayer",
+        "redis": "channels_redis.core.RedisChannelLayer",
+        "rediss": "channels_redis.core.RedisChannelLayer",
+        "redis+pubsub": "channels_redis.pubsub.RedisPubSubChannelLayer",
+        "rediss+pubsub": "channels_redis.pubsub.RedisPubSubChannelLayer",
+    }
+
     def __init__(self, **scheme):
         self.smart_cast = True
         self.escape_proxy = False
+        self.warn_on_default = False
         self.prefix = ""
         self.scheme = scheme
 
-    def __call__(self, var, cast=None, default=NOTSET, parse_default=False):
+    def __call__(
+            self,
+            var: _str,
+            cast=None,
+            default=NOTSET,
+            parse_default: _bool = False):
+        """
+        :param str var:
+        :param bool parse_default:
+        """
         return self.get_value(
             var,
             cast=cast,
@@ -203,20 +254,43 @@ class Env:
             parse_default=parse_default
         )
 
-    def __contains__(self, var):
+    def __contains__(self, var: _str):
+        """
+        :param str var:
+        """
         return var in self.ENVIRON
 
-    def str(self, var, default=NOTSET, multiline=False):
+    def str(
+            self,
+            var: _str,
+            default: Union[_str, NoValue] = NOTSET,
+            multiline: _bool = False,
+            choices=NOTSET) -> _str:
         """
+        :param str var:
+        :param str or NoValue default:
+        :param bool multiline:
         :rtype: str
         """
         value = self.get_value(var, cast=str, default=default)
         if multiline:
             return re.sub(r'(\\r)?\\n', r'\n', value)
+        if choices is not self.NOTSET:
+            # if choices is provided, check that the value is in choices
+            if value not in choices:
+                raise ImproperlyConfigured(
+                    f"Invalid value: {value} not in {choices}"
+                )
         return value
 
-    def bytes(self, var, default=NOTSET, encoding='utf8'):
+    def bytes(
+            self,
+            var: _str,
+            default: Union[bytes, NoValue] = NOTSET,
+            encoding='utf8') -> bytes:
         """
+        :param str var:
+        :param bytes or NoValue default:
         :rtype: bytes
         """
         value = self.get_value(var, cast=str, default=default)
@@ -224,32 +298,42 @@ class Env:
             return value.encode(encoding)
         return value
 
-    def bool(self, var, default=NOTSET):
+    def bool(self, var: _str, default: Union[bool, NoValue] = NOTSET) -> bool:
         """
+        :param str var:
+        :param bool or NoValue default:
         :rtype: bool
         """
         return self.get_value(var, cast=bool, default=default)
 
-    def int(self, var, default=NOTSET):
+    def int(self, var: _str, default: Union[int, NoValue] = NOTSET) -> int:
         """
+        :param str var:
+        :param int or NoValue default:
         :rtype: int
         """
         return self.get_value(var, cast=int, default=default)
 
-    def float(self, var, default=NOTSET):
+    def float(self,
+              var: _str,
+              default: Union[float, NoValue] = NOTSET) -> float:
         """
+        :param str var:
+        :param float or NoValue default:
         :rtype: float
         """
         return self.get_value(var, cast=float, default=default)
 
-    def json(self, var, default=NOTSET):
+    def json(self, var: _str, default=NOTSET):
         """
+        :param str var:
         :returns: Json parsed
         """
         return self.get_value(var, cast=json.loads, default=default)
 
-    def list(self, var, cast=None, default=NOTSET):
+    def list(self, var: _str, cast=None, default=NOTSET) -> List:
         """
+        :param str var:
         :rtype: list
         """
         return self.get_value(
@@ -258,8 +342,9 @@ class Env:
             default=default
         )
 
-    def tuple(self, var, cast=None, default=NOTSET):
+    def tuple(self, var: _str, cast=None, default=NOTSET) -> Tuple:
         """
+        :param str var:
         :rtype: tuple
         """
         return self.get_value(
@@ -268,14 +353,16 @@ class Env:
             default=default
         )
 
-    def dict(self, var, cast=dict, default=NOTSET):
+    def dict(self, var: _str, cast=dict, default=NOTSET) -> Dict:
         """
+        :param str var:
         :rtype: dict
         """
         return self.get_value(var, cast=cast, default=default)
 
-    def url(self, var, default=NOTSET):
+    def url(self, var: _str, default=NOTSET) -> ParseResult:
         """
+        :param str var:
         :rtype: urllib.parse.ParseResult
         """
         return self.get_value(
@@ -285,7 +372,11 @@ class Env:
             parse_default=True
         )
 
-    def db_url(self, var=DEFAULT_DATABASE_ENV, default=NOTSET, engine=None):
+    def db_url(
+            self,
+            var=DEFAULT_DATABASE_ENV,
+            default=NOTSET,
+            engine=None) -> Dict:
         """Returns a config dictionary, defaulting to DATABASE_URL.
 
         The db method is an alias for db_url.
@@ -299,7 +390,11 @@ class Env:
 
     db = db_url
 
-    def cache_url(self, var=DEFAULT_CACHE_ENV, default=NOTSET, backend=None):
+    def cache_url(
+            self,
+            var=DEFAULT_CACHE_ENV,
+            default=NOTSET,
+            backend=None) -> Dict:
         """Returns a config dictionary, defaulting to CACHE_URL.
 
         The cache method is an alias for cache_url.
@@ -313,7 +408,11 @@ class Env:
 
     cache = cache_url
 
-    def email_url(self, var=DEFAULT_EMAIL_ENV, default=NOTSET, backend=None):
+    def email_url(
+            self,
+            var=DEFAULT_EMAIL_ENV,
+            default=NOTSET,
+            backend=None) -> Dict:
         """Returns a config dictionary, defaulting to EMAIL_URL.
 
         The email method is an alias for email_url.
@@ -327,7 +426,11 @@ class Env:
 
     email = email_url
 
-    def search_url(self, var=DEFAULT_SEARCH_ENV, default=NOTSET, engine=None):
+    def search_url(
+            self,
+            var=DEFAULT_SEARCH_ENV,
+            default: Union[Dict, NoValue] = NOTSET,
+            engine=None) -> Dict:
         """Returns a config dictionary, defaulting to SEARCH_URL.
 
         :rtype: dict
@@ -337,13 +440,42 @@ class Env:
             engine=engine
         )
 
-    def path(self, var, default=NOTSET, **kwargs):
+    def channels_url(
+            self,
+            var: _str = DEFAULT_CHANNELS_ENV,
+            default: Union[Dict, NoValue] = NOTSET,
+            backend=None) -> Dict:
+        """Returns a config dictionary, defaulting to CHANNELS_URL.
+
+        :param str var:
+        :param dict or NoValue default:
+        :rtype: dict
         """
+        return self.channels_url_config(
+            self.url(var, default=default),
+            backend=backend
+        )
+
+    channels = channels_url
+
+    def path(
+            self,
+            var: _str,
+            default: Union['Path', NoValue] = NOTSET,
+            **kwargs) -> 'Path':
+        """
+        :param str var:
+        :param Path or NoValue default:
         :rtype: Path
         """
         return Path(self.get_value(var, default=default), **kwargs)
 
-    def get_value(self, var, cast=None, default=NOTSET, parse_default=False):
+    def get_value(
+            self,
+            var: _str,
+            cast=None,
+            default=NOTSET,
+            parse_default: _bool = False):
         """Return value for given environment variable.
 
         :param str var:
@@ -359,8 +491,8 @@ class Env:
         """
 
         logger.debug(
-            "get '%s' casted as '%s' with default '%s'",
-            var, cast, default)
+            "get %r casted as %r with default type %s",
+            var, cast, type(default).__name__)
 
         var_name = f'{self.prefix}{var}'
         if var_name in self.scheme:
@@ -388,10 +520,17 @@ class Env:
             value = self.ENVIRON[var_name]
         except KeyError as exc:
             if default is self.NOTSET:
-                error_msg = f'Set the {var} environment variable'
+                error_msg = f'Set the {var_name} environment variable'
                 raise ImproperlyConfigured(error_msg) from exc
 
             value = default
+            if self.warn_on_default:
+                warnings.warn(
+                    f'{var_name} environment variable not set; '
+                    'using default value',
+                    DefaultValueWarning,
+                    stacklevel=2,
+                )
 
         # Resolve any proxied values
         prefix = b'$' if isinstance(value, bytes) else '$'
@@ -553,16 +692,25 @@ class Env:
                 path += f':{url.port}'
 
         user_host = url.netloc.rsplit('@', 1)
-        if url.scheme in cls.POSTGRES_FAMILY and ',' in user_host[-1]:
+        db_netloc = unquote(user_host[-1])
+        if url.scheme in cls.POSTGRES_FAMILY and ',' in db_netloc:
             # Parsing postgres cluster dsn
-            hinfo = list(
-                itertools.zip_longest(
-                    *(
-                        host.rsplit(':', 1)
-                        for host in user_host[-1].split(',')
-                    )
-                )
-            )
+            host_parts = []
+            for host in db_netloc.split(','):
+                if host.startswith('['):
+                    end = host.find(']')
+                    if end != -1 and host[end + 1:end + 2] == ':':
+                        host_parts.append((host[:end + 1], host[end + 2:]))
+                    else:
+                        host_parts.append((host, ''))
+                else:
+                    hparts = host.rsplit(':', 1)
+                    if len(hparts) == 2 and hparts[1].isdigit():
+                        host_parts.append(tuple(hparts))
+                    else:
+                        host_parts.append((host, ''))
+
+            hinfo = list(itertools.zip_longest(*host_parts))
             hostname = ','.join(hinfo[0])
             port = ','.join(filter(None, hinfo[1])) if len(hinfo) == 2 else ''
         else:
@@ -676,18 +824,27 @@ class Env:
             else:
                 config['LOCATION'] = locations
 
+        if backend:
+            config['BACKEND'] = backend
+
         if url.query:
             config_options = {}
+            # Django Redis cache backend expects options in lower case
+            # while "django_redis" expects them in upper case
+            backend = config['BACKEND']
+            if backend == 'django.core.cache.backends.redis.RedisCache':
+                key_modifier = 'lower'
+            else:
+                key_modifier = 'upper'
+
             for k, v in parse_qs(url.query).items():
-                opt = {k.upper(): _cast(v[0])}
+                key = getattr(k, key_modifier)()
+                opt = {key: _cast(v[0])}
                 if k.upper() in cls._CACHE_BASE_OPTIONS:
                     config.update(opt)
                 else:
                     config_options.update(opt)
             config['OPTIONS'] = config_options
-
-        if backend:
-            config['BACKEND'] = backend
 
         return config
 
@@ -741,6 +898,34 @@ class Env:
                 else:
                     config_options.update(opt)
             config['OPTIONS'] = config_options
+
+        return config
+
+    @classmethod
+    def channels_url_config(cls, url, backend=None):
+        """Parse an arbitrary channels URL.
+
+        :param urllib.parse.ParseResult or str url:
+            Email URL to parse.
+        :param str or None backend:
+            If None, the backend is evaluates from the ``url``.
+        :return: Parsed channels URL.
+        :rtype: dict
+        """
+        config = {}
+        url = urlparse(url) if not isinstance(url, cls.URL_CLASS) else url
+
+        if backend:
+            config["BACKEND"] = backend
+        elif url.scheme not in cls.CHANNELS_SCHEMES:
+            raise ImproperlyConfigured(f"Invalid channels schema {url.scheme}")
+        else:
+            config["BACKEND"] = cls.CHANNELS_SCHEMES[url.scheme]
+            if url.scheme.startswith("redis"):
+                redis_scheme, *_ = url.scheme.split("+")
+                config["CONFIG"] = {
+                    "hosts": [url._replace(scheme=redis_scheme).geturl()]
+                }
 
         return config
 
@@ -817,7 +1002,7 @@ class Env:
         :param urllib.parse.ParseResult or str url:
             Search URL to parse.
         :param str or None engine:
-            If None, the engine is evaluates from the ``url``.
+            If None, the engine is evaluating from the ``url``.
         :return: Parsed search URL.
         :rtype: dict
         """
@@ -870,8 +1055,14 @@ class Env:
         return config
 
     @classmethod
-    def read_env(cls, env_file=None, overwrite=False, encoding='utf8',
-                 **overrides):
+    # pylint: disable=too-many-statements
+    def read_env(
+            cls,
+            env_file: Optional[Union[_str, pathlib.Path, IO[_str]]] = None,
+            overwrite: _bool = False,
+            parse_comments: _bool = False,
+            encoding: _str = 'utf8',
+            **overrides):
         r"""Read a .env file into os.environ.
 
         If not given a path to a dotenv path, does filthy magic stack
@@ -882,16 +1073,16 @@ class Env:
         by the file content. ``overwrite=True`` will force an overwrite of
         existing environment variables.
 
-        Refs:
-
-        * https://wellfire.co/learn/easier-12-factor-django
-
-        :param env_file: The path to the ``.env`` file your application should
-            use. If a path is not provided, `read_env` will attempt to import
-            the Django settings module from the Django project root.
-        :param overwrite: ``overwrite=True`` will force an overwrite of
+        :param str or pathlib.Path or IO or None env_file: The path to the
+            ``.env`` file your application should use. If a path is not
+            provided, `read_env` will attempt to import the Django settings
+            module from the Django project root.
+        :param bool overwrite: ``overwrite=True`` will force an overwrite of
             existing environment variables.
-        :param encoding: The encoding to use when reading the environment file.
+        :param bool parse_comments: Determines whether to recognize and ignore
+           inline comments in the .env file. Default is False.
+        :param str encoding: The encoding to use when reading the environment
+            file.
         :param \**overrides: Any additional keyword arguments provided directly
             to read_env will be added to the environment. If the key matches an
             existing environment variable, the value will be overridden.
@@ -899,8 +1090,11 @@ class Env:
         if env_file is None:
             # pylint: disable=protected-access
             frame = sys._getframe()
+            caller_frame = frame.f_back
+            if caller_frame is None:  # pragma: no cover
+                raise RuntimeError('Unable to determine caller frame')
             env_file = os.path.join(
-                os.path.dirname(frame.f_back.f_code.co_filename),
+                os.path.dirname(caller_frame.f_code.co_filename),
                 '.env'
             )
             if not os.path.exists(env_file):
@@ -910,13 +1104,11 @@ class Env:
                 return
 
         try:
-            if isinstance(env_file, Openable):
-                # Python 3.5 support (wrap path with str).
-                with open(str(env_file), encoding=encoding) as f:
+            if isinstance(env_file, OPENABLE):
+                with open(env_file, encoding=encoding) as f:
                     content = f.read()
             else:
-                with env_file as f:
-                    content = f.read()
+                content = env_file.read()
         except OSError:
             logger.info(
                 "%s not found - if you're not configuring your "
@@ -935,22 +1127,40 @@ class Env:
         for line in content.splitlines():
             m1 = re.match(r'\A(?:export )?([A-Za-z_0-9]+)=(.*)\Z', line)
             if m1:
+
+                # Example:
+                #
+                # line: KEY_499=abc#def
+                # key:  KEY_499
+                # val:  abc#def
                 key, val = m1.group(1), m1.group(2)
-                # Look for value in quotes, ignore post-# comments
-                # (outside quotes)
-                m2 = re.match(r"\A\s*'(?<!\\)(.*)'\s*(#.*\s*)?\Z", val)
-                if m2:
-                    val = m2.group(1)
+
+                if not parse_comments:
+                    # Default behavior
+                    #
+                    # Look for value in single quotes
+                    m2 = re.match(r"\A'(.*)'\Z", val)
+                    if m2:
+                        val = m2.group(1)
                 else:
-                    # For no quotes, find value, ignore comments
-                    # after the first #
-                    m2a = re.match(r"\A(.*?)(#.*\s*)?\Z", val)
-                    if m2a:
-                        val = m2a.group(1)
+                    # Ignore post-# comments (outside quotes).
+                    # Something like ['val'  # comment] becomes ['val'].
+                    m2 = re.match(r"\A\s*'(?<!\\)(.*)'\s*(#.*\s*)?\Z", val)
+                    if m2:
+                        val = m2.group(1)
+                    else:
+                        # For no quotes, find value, ignore comments
+                        # after the first #
+                        m2a = re.match(r"\A(.*?)(#.*\s*)?\Z", val)
+                        if m2a:
+                            val = m2a.group(1)
+
+                # Look for value in double quotes
                 m3 = re.match(r'\A"(.*)"\Z', val)
                 if m3:
                     val = re.sub(r'\\(.)', _keep_escaped_format_characters,
                                  m3.group(1))
+
                 overrides[key] = str(val)
             elif not line or line.startswith('#'):
                 # ignore warnings for empty line-breaks or comments

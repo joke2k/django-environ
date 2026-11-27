@@ -147,6 +147,7 @@ For more detailed example see ":ref:`complex_dict_format`".
   * ``pylibmc://``
 
 * Redis: ``rediscache://``, ``redis://``, or ``rediss://``
+* Valkey: ``valkey://``, or ``valkeys://``
 
 
 .. _environ-env-search-url:

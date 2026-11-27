@@ -1,6 +1,7 @@
 # This file is part of the django-environ.
 #
-# Copyright (c) 2021, Serghei Iakovlev <egrep@protonmail.ch>
+# Copyright (c) 2024-present, Daniele Faraglia <daniele.faraglia@gmail.com>
+# Copyright (c) 2021-2024, Serghei Iakovlev <oss@serghei.pl>
 # Copyright (c) 2013-2021, Daniele Faraglia <daniele.faraglia@gmail.com>
 #
 # For the full copyright and license information, please view
@@ -84,6 +85,16 @@ def test_elasticsearch_parsing(url, engine, scheme):
     assert url['TIMEOUT'] == timeout
     assert 'PATH' not in url
     assert url["URL"].startswith(scheme + ":")
+
+
+def test_custom_search_engine():
+    """Override ENGINE determined from schema."""
+    env_url = 'elasticsearch://127.0.0.1:9200/index'
+
+    engine = 'mypackage.backends.whatever'
+    url = Env.db_url_config(env_url, engine=engine)
+
+    assert url['ENGINE'] == engine
 
 
 @pytest.mark.parametrize('storage', ['file', 'ram'])
